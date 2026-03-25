@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "go-test-cover",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"test",
+				"-cover"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "go-test-cover-now",
+			"type": "shell",
+			"command": "go",
+			"args": [
+				"test",
+				"-cover"
+			],
+			"isBackground": false
+		}
+	]
+}
