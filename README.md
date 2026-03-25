@@ -1,11 +1,11 @@
-# INF2007---Advanved-Programming
+
 
 ## English
 
 ### Badges
 
-![Go Coverage Workflow](https://github.com/<OWNER>/<REPO>/actions/workflows/coverage.yml/badge.svg)
-![Codecov](https://codecov.io/gh/<OWNER>/<REPO>/branch/main/graph/badge.svg)
+![Go Coverage Workflow](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg)
+![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
 
 Replace `<OWNER>` and `<REPO>` with your GitHub username and repository name.
 
@@ -27,8 +27,8 @@ Replace `<OWNER>` and `<REPO>` with your GitHub username and repository name.
 
 ### Badges
 
-![Workflow Go Coverage](https://github.com/<OWNER>/<REPO>/actions/workflows/coverage.yml/badge.svg)
-![Codecov](https://codecov.io/gh/<OWNER>/<REPO>/branch/main/graph/badge.svg)
+![Workflow Go Coverage](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg)
+![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
 
 Remplacez `<OWNER>` et `<REPO>` par votre nom d'utilisateur GitHub et le nom du depot.
 
