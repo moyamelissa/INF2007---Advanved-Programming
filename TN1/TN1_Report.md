@@ -1,38 +1,37 @@
-# INF2007 - TN1 - Melissa Moya
+# INF2007 – TN1 – Melissa Moya
 
 ## Justification des cas de test choisis
 
-J'ai choisi ces cas de test pour couvrir les comportements essentiels de `DaysUntilDeadline`, en situations normales et en erreur.
+J’ai choisi ces cas de test pour couvrir les comportements essentiels de `DaysUntilDeadline`, en situations normales et en erreur. Les tests positifs (échéance future et même jour) valident la fonctionnalité principale : calculer correctement les jours entre deux dates valides. Le cas futur reflète un usage réel, tandis que le cas « même jour » vérifie la limite où le résultat attendu est 0.
 
-Les tests positifs (echeance future et meme jour) valident la fonctionnalite principale : calculer correctement les jours entre deux dates valides. Le cas futur reflete un usage reel, tandis que le cas "meme jour" verifie la limite ou le resultat attendu est 0.
+Les tests négatifs (format invalide, séparateur incorrect, échéance antérieure) vérifient la robustesse. Ils confirment que la fonction rejette les entrées mal formées et retourne une erreur explicite quand la logique métier est violée. Dans ces cas, la valeur retournée doit rester 0, ce qui garantit un comportement cohérent en échec.
 
-Les tests negatifs (format invalide, separateur incorrect, echeance anterieure) verifient la robustesse. Ils confirment que la fonction rejette les entrees mal formees et retourne une erreur explicite quand la logique metier est violee. Dans ces cas, la valeur retournee doit rester 0, ce qui garantit un comportement coherent en echec.
-
-J'ai aussi ajoute des cas limites (annee bissextile, date impossible, fin de mois, fin d'annee, chaine vide, espaces) pour reduire le risque de bogues subtils lies aux dates.
+J’ai aussi ajouté des cas limites (année bissextile, date impossible, fin de mois, fin d’année, chaîne vide, espaces) pour réduire le risque de bogues subtils liés aux dates.
 
 ## Comment les tests garantissent la correction de la fonction
 
-Les tests garantissent la correction en verifiant systematiquement les sorties attendues sur des entrees valides et invalides.
+Les tests garantissent la correction en vérifiant systématiquement les sorties attendues sur des entrées valides et invalides. Les tests positifs confirment que la logique de calcul est correcte quand les dates sont bien formées : la fonction retourne le bon nombre de jours et aucune erreur. Cela valide le comportement nominal de `DaysUntilDeadline`.
 
-Les tests positifs confirment que la logique de calcul est correcte quand les dates sont bien formees : la fonction retourne le bon nombre de jours et aucune erreur. Cela valide le comportement nominal de `DaysUntilDeadline`.
+Les tests négatifs valident la gestion des erreurs : pour des entrées invalides (format incorrect, séparateur invalide, échéance antérieure), la fonction doit retourner une erreur appropriée et la valeur 0. Cette double vérification (`days` et `err`) assure un échec contrôlé et prévisible.
 
-Les tests negatifs valident la gestion des erreurs : pour des entrees invalides (format incorrect, separateur invalide, echeance anterieure), la fonction doit retourner une erreur appropriee et la valeur 0. Cette double verification (`days` et `err`) assure un echec controle et previsible.
+Les cas limites (même jour, année bissextile, fin de mois, fin d’année, date vide, espaces) renforcent la correction en ciblant des situations où les erreurs de logique sont fréquentes. Enfin, l’exécution automatisée avec `go test` et la couverture mesuree (100 %) montrent que toutes les branches actuelles du code sont exercées, sans confondre couverture élevée et qualité des cas de test.
 
-Les cas limites (meme jour, annee bissextile, fin de mois, fin d'annee, date vide, espaces) renforcent la correction en ciblant des situations ou les erreurs de logique sont frequentes.
+## Défis rencontrés
 
-Enfin, l'execution automatisee avec `go test` et la couverture mesuree (100 %) montrent que toutes les branches actuelles du code sont exercees, sans confondre couverture elevee et qualite des cas de test.
+Le principal défi a été la gestion des erreurs de façon cohérente avec les attentes du devoir. En Go, comparer directement des erreurs créées avec `errors.New(...)` peut être ambigu si une nouvelle erreur est recréée dans le test.
 
-## Defis rencontres
+Pour rester aligné avec la fonction fournie, j’ai vérifié la présence de l’erreur (`err != nil`), comparé son message (`err.Error()`) et confirmé que la valeur retournée reste 0 en cas d’échec.
 
-Le principal defi a ete la gestion des erreurs de facon coherente avec les attentes du devoir. En Go, comparer directement des erreurs creees avec `errors.New(...)` peut etre ambigu si une nouvelle erreur est recreee dans le test.
+Un deuxième défi a été le choix des cas limites pertinents. Le traitement des dates comporte des pièges, soit : année bissextile, 29 février invalide, fin de mois, fin d’année, chaînes vides ou avec espaces, séparateurs incorrects. Il fallait couvrir ces risques sans rendre la suite redondante.
 
-Pour rester aligne avec la fonction fournie, j'ai verifie la presence de l'erreur (`err != nil`), compare son message (`err.Error()`) et confirme que la valeur retournee reste 0 en cas d'echec.
-
-Un deuxieme defi a ete le choix des cas limites pertinents. Le traitement des dates comporte des pieges, soit : annee bissextile, 29 fevrier invalide, fin de mois, fin d'annee, chaines vides ou avec espaces, separateurs incorrects. Il fallait couvrir ces risques sans rendre la suite redondante.
-
-J'ai aussi du equilibrer couverture et pertinence : l'objectif n'est pas seulement d'atteindre un pourcentage eleve, mais d'avoir des tests lisibles, commentes et orientes sur des comportements metier clairs.
+J’ai aussi dû équilibrer couverture et pertinence : l’objectif n’est pas seulement d’atteindre un pourcentage élevé, mais d’avoir des tests lisibles, commentés et orientés sur des comportements métier clairs.
 
 ## Liens
 
 - GitHub Repo : https://github.com/moyamelissa/Advanved-Programming/tree/main/TN1
-- Video Explicative : https://youtu.be/Tsw6rHtLz_k
+- Vidéo explicative : https://youtu.be/Tsw6rHtLz_k
+
+## Fichiers utilisés
+
+- Implémentation principale : [deadline.go](TN1/deadline.go)
+- Tests unitaires : [deadline_test.go](TN1/deadline_test.go)
