@@ -20,12 +20,13 @@ jobs:
           go-version-file: TN1/go.mod
 
       - name: Run tests with coverage
-        run: go test ./TN1/... -coverprofile=coverage.out -covermode=atomic
+        working-directory: TN1
+        run: go test ./... -coverprofile=coverage.out -covermode=atomic
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: coverage.out
+          files: TN1/coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: TN1
           name: tn1-coverage
