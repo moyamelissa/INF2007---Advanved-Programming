@@ -40,7 +40,7 @@ J’ai aussi dû équilibrer couverture et pertinence : l’objectif n’est pas
  - Tests unitaires : [deadline_test.go](https://github.com/moyamelissa/Advanved-Programming/blob/main/TN1/deadline_test.go)
 
 ## Bibliographie
-Manuel INF2007, chapitre 1 (tests unitaires).
-Documentation Go Testing : https://pkg.go.dev/testing
-Tutoriel Go sur les tests : https://go.dev/doc/tutorial/add-a-test
-A Tour of Go : https://tour.golang.org/
+- Manuel INF2007, chapitre 1 (tests unitaires).
+- Documentation Go Testing : https://pkg.go.dev/testing
+- Tutoriel Go sur les tests : https://go.dev/doc/tutorial/add-a-test
+- A Tour of Go : https://tour.golang.org/
