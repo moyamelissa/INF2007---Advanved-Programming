@@ -26,7 +26,8 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: TN1/coverage.out
+          files: coverage.out
+          directory: TN1
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: TN1
           name: tn1-coverage
