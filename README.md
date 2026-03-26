@@ -7,8 +7,6 @@
 ![Go Coverage Workflow](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg)
 ![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
 
-Replace `<OWNER>` and `<REPO>` with your GitHub username and repository name.
-
 ### Coverage Setup
 
 1. Push this repository to GitHub.
@@ -29,8 +27,6 @@ Replace `<OWNER>` and `<REPO>` with your GitHub username and repository name.
 
 ![Workflow Go Coverage](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg)
 ![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
-
-Remplacez `<OWNER>` et `<REPO>` par votre nom d'utilisateur GitHub et le nom du depot.
 
 ### Configuration de la couverture
 
