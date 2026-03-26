@@ -33,5 +33,5 @@ J’ai aussi dû équilibrer couverture et pertinence : l’objectif n’est pas
 
 ## Fichiers utilisés
 
-- Implémentation principale : [deadline.go](TN1/deadline.go)
-- Tests unitaires : [deadline_test.go](TN1/deadline_test.go)
+- Implémentation principale : [[deadline.go](TN1/deadline.go)](https://github.com/moyamelissa/Advanved-Programming/blob/main/TN1/deadline.go)
+- Tests unitaires : [[deadline_test.go](TN1/deadline_test.go)](https://github.com/moyamelissa/Advanved-Programming/blob/main/TN1/deadline_test.go)
