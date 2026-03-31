@@ -2,155 +2,180 @@ package main
 
 import "testing"
 
-// Test positif : échéance future valide
+// Objectif : Cas positif — échéance future valide (vérifie le calcul nominal).
 func TestDaysUntilDeadline_FutureDate(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-05-26", "2025-06-01")
+	current, due := "2025-05-26", "2025-06-01"
+	want := 6
+	days, err := DaysUntilDeadline(current, due)
 	if err != nil {
-		t.Errorf("expected no error, got %v", err)
+		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
-	if days != 6 {
-		t.Errorf("expected 6 days, got %d", days)
+	if days != want {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
-// Test positif : même jour
+// Objectif : Cas limite positif — même jour (vérifie que le résultat est 0).
 func TestDaysUntilDeadline_SameDay(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-05-26", "2025-05-26")
+	current, due := "2025-05-26", "2025-05-26"
+	want := 0
+	days, err := DaysUntilDeadline(current, due)
 	if err != nil {
-		t.Errorf("expected no error, got %v", err)
+		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
-	if days != 0 {
-		t.Errorf("expected 0 days, got %d", days)
+	if days != want {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
-// Test négatif : format invalide
+// Objectif : Cas négatif — format de date invalide (vérifie erreur et days==0).
 func TestDaysUntilDeadline_InvalidFormat(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-13-01", "2025-05-26")
+	current, due := "2025-13-01", "2025-05-26"
+	wantErr := "invalid current date format"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error for invalid date format")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "invalid current date format" {
-		t.Errorf("expected error \"invalid current date format\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
-// Test négatif : deadline avant la date actuelle
+// Objectif : Cas négatif — échéance antérieure (vérifie erreur métier et days==0).
 func TestDaysUntilDeadline_DeadlineBeforeCurrent(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-05-26", "2025-05-25")
+	current, due := "2025-05-26", "2025-05-25"
+	wantErr := "deadline cannot be before current date"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error because deadline is before current date")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "deadline cannot be before current date" {
-		t.Errorf("expected error \"deadline cannot be before current date\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
-// Test négatif : mauvais séparateur
+// Objectif : Cas négatif — séparateur invalide (vérifie erreur de parsing).
 func TestDaysUntilDeadline_WrongSeparator(t *testing.T) {
-	days, err := DaysUntilDeadline("2025/05/26", "2025-06-01")
+	current, due := "2025/05/26", "2025-06-01"
+	wantErr := "invalid current date format"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error for wrong date separator")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "invalid current date format" {
-		t.Errorf("expected error \"invalid current date format\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
-// Test négatif : format invalide pour la deadline
+// Objectif : Cas négatif — format invalide pour la deadline (vérifie erreur et days==0).
 func TestDaysUntilDeadline_InvalidDeadlineFormat(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-05-26", "2025-13-01")
+	current, due := "2025-05-26", "2025-13-01"
+	wantErr := "invalid deadline format"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error for invalid deadline format")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "invalid deadline format" {
-		t.Errorf("expected error \"invalid deadline format\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
-// Test limite : année bissextile valide
+// Objectif : Cas limite positif — année bissextile (vérifie que 29 février est valide).
 func TestDaysUntilDeadline_LeapYearValid(t *testing.T) {
-	days, err := DaysUntilDeadline("2024-02-28", "2024-02-29")
+	current, due := "2024-02-28", "2024-02-29"
+	want := 1
+	days, err := DaysUntilDeadline(current, due)
 	if err != nil {
-		t.Errorf("expected no error, got %v", err)
+		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
-	if days != 1 {
-		t.Errorf("expected 1 day, got %d", days)
+	if days != want {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
-// Test limite : date impossible en année non bissextile
+// Objectif : Cas limite négatif — date impossible en année non bissextile (vérifie erreur).
 func TestDaysUntilDeadline_InvalidNonLeapDate(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-02-29", "2025-03-01")
+	current, due := "2025-02-29", "2025-03-01"
+	wantErr := "invalid current date format"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error for invalid current date")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "invalid current date format" {
-		t.Errorf("expected error \"invalid current date format\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
-// Test limite : passage de fin de mois
+// Objectif : Cas limite positif — passage de fin de mois (vérifie transition de mois).
 func TestDaysUntilDeadline_EndOfMonth(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-01-31", "2025-02-01")
+	current, due := "2025-01-31", "2025-02-01"
+	want := 1
+	days, err := DaysUntilDeadline(current, due)
 	if err != nil {
-		t.Errorf("expected no error, got %v", err)
+		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
-	if days != 1 {
-		t.Errorf("expected 1 day, got %d", days)
+	if days != want {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
-// Test limite : passage de fin d'année
+// Objectif : Cas limite positif — passage de fin d'année (vérifie transition d'année).
 func TestDaysUntilDeadline_EndOfYear(t *testing.T) {
-	days, err := DaysUntilDeadline("2025-12-31", "2026-01-01")
+	current, due := "2025-12-31", "2026-01-01"
+	want := 1
+
+	days, err := DaysUntilDeadline(current, due)
 	if err != nil {
-		t.Errorf("expected no error, got %v", err)
+		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
-	if days != 1 {
-		t.Errorf("expected 1 day, got %d", days)
+	if days != want {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
-// Test limite : date actuelle vide
+// Objectif : Cas négatif — date actuelle vide (vérifie erreur et days==0).
 func TestDaysUntilDeadline_EmptyCurrentDate(t *testing.T) {
-	days, err := DaysUntilDeadline("", "2025-06-01")
+	current, due := "", "2025-06-01"
+	wantErr := "invalid current date format"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error for empty current date")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "invalid current date format" {
-		t.Errorf("expected error \"invalid current date format\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
-// Test limite : date actuelle avec espaces
+// Objectif : Cas négatif — date actuelle avec espaces (vérifie erreur de format).
 func TestDaysUntilDeadline_CurrentDateWithSpaces(t *testing.T) {
-	days, err := DaysUntilDeadline(" 2025-05-26 ", "2025-06-01")
+	current, due := " 2025-05-26 ", "2025-06-01"
+	wantErr := "invalid current date format"
+	days, err := DaysUntilDeadline(current, due)
 	if err == nil {
-		t.Errorf("expected an error for spaced current date")
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Errorf("expected 0 days when error occurs, got %d", days)
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
-	if err != nil && err.Error() != "invalid current date format" {
-		t.Errorf("expected error \"invalid current date format\", got %q", err.Error())
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
