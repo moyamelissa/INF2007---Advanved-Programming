@@ -47,6 +47,13 @@ func TestDaysUntilDeadline_TableDriven(t *testing.T) {
 			wantErr:     "invalid current date format",
 		},
 		{
+			name:        "negatif_format_deadline_invalide",
+			currentDate: "2025-05-26",
+			deadline:    "2025-13-01",
+			wantDays:    0,
+			wantErr:     "invalid deadline format",
+		},
+		{
 			name:        "edge_annee_bissextile_valide",
 			currentDate: "2024-02-28",
 			deadline:    "2024-02-29",
@@ -87,6 +94,27 @@ func TestDaysUntilDeadline_TableDriven(t *testing.T) {
 			deadline:    "2025-06-01",
 			wantDays:    0,
 			wantErr:     "invalid current date format",
+		},
+		{
+			name:        "negatif_deadline_vide",
+			currentDate: "2025-05-26",
+			deadline:    "",
+			wantDays:    0,
+			wantErr:     "invalid deadline format",
+		},
+		{
+			name:        "negatif_deadline_avec_espaces",
+			currentDate: "2025-05-26",
+			deadline:    " 2025-06-01 ",
+			wantDays:    0,
+			wantErr:     "invalid deadline format",
+		},
+		{
+			name:        "positif_grande_difference",
+			currentDate: "2025-01-01",
+			deadline:    "2026-01-01",
+			wantDays:    365,
+			wantErr:     "",
 		},
 	}
 

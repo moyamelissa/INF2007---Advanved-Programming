@@ -179,3 +179,48 @@ func TestDaysUntilDeadline_CurrentDateWithSpaces(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
+
+// Objectif : Cas négatif — deadline vide (vérifie erreur et days==0).
+func TestDaysUntilDeadline_EmptyDeadline(t *testing.T) {
+	current, due := "2025-05-26", ""
+	wantErr := "invalid deadline format"
+	days, err := DaysUntilDeadline(current, due)
+	if err == nil {
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
+	}
+	if days != 0 {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
+	}
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
+	}
+}
+
+// Objectif : Cas négatif — deadline avec espaces (vérifie erreur de format).
+func TestDaysUntilDeadline_DeadlineWithSpaces(t *testing.T) {
+	current, due := "2025-05-26", " 2025-06-01 "
+	wantErr := "invalid deadline format"
+	days, err := DaysUntilDeadline(current, due)
+	if err == nil {
+		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
+	}
+	if days != 0 {
+		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
+	}
+	if err.Error() != wantErr {
+		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
+	}
+}
+
+// Objectif : Cas positif — grande différence de dates (vérifie calcul sur 365 jours).
+func TestDaysUntilDeadline_LargeDateRange(t *testing.T) {
+	current, due := "2025-01-01", "2026-01-01"
+	want := 365
+	days, err := DaysUntilDeadline(current, due)
+	if err != nil {
+		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
+	}
+	if days != want {
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
+	}
+}
