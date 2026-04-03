@@ -8,9 +8,6 @@ L'analyse de la fonction `DaysUntilDeadline` révèle quatre chemins d'exécutio
 
 J'ai rédigé 24 tests unitaires dans `deadline_test.go`, organisés en six sections thématiques. La première regroupe les cas positifs, notamment une échéance future, deux dates identiques et des plages d'un an et dix ans. La deuxième cible les transitions calendaires telles que la fin de mois, la fin d'année et les années bissextiles. Les troisième et quatrième couvrent les erreurs de format sur `currentDate` et `deadline` respectivement, incluant un mois hors plage, un séparateur incorrect, une chaîne vide, des espaces parasites, un jour inexistant, un mois ou jour à zéro, un format ISO avec heure, l'absence de zéro initial et une entrée aléatoire. La cinquième traite de l'erreur métier et la sixième vérifie le comportement lorsque les deux entrées sont invalides simultanément.
 
-Afin de pousser l'expérimentation et d'appliquer l'ensemble des concepts vus au chapitre 1, j'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks.
-
-
 ## Comment les tests garantissent la correction de la fonction
 
 Chacun des 24 tests vérifie systématiquement les deux sorties de la fonction, soit `days` et `err`, assurant un comportement cohérent dans tous les scénarios.
@@ -26,8 +23,7 @@ Le principal défi a été la gestion des erreurs. En Go, comparer des erreurs c
 
 J'ai également porté attention au choix entre `t.Fatalf` et `t.Errorf`. Le premier interrompt l'exécution du test lorsqu'il serait trompeur de continuer, par exemple quand une erreur inattendue rend la vérification de `days` sans objet. Le second signale l'échec tout en laissant le test poursuivre afin de collecter davantage d'informations.
 
-Enfin, la sélection des cas limites pertinents a demandé d'identifier les entrées qui exercent chacun des quatre chemins de manière significative, sans redondance. Le regroupement par catégorie préserve la lisibilité malgré le nombre élevé de cas.
-
+Enfin, la sélection des cas limites pertinents a demandé d'identifier les entrées qui exercent chacun des quatre chemins de manière significative, sans redondance. Le regroupement par catégorie préserve la lisibilité malgré le nombre élevé de cas. Afin de pousser l'expérimentation et d'appliquer l'ensemble des concepts vus au chapitre 1, j'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks.
 
 ## Liens
 
