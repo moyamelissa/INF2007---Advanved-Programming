@@ -10,8 +10,7 @@ Les tests négatifs (format invalide, séparateur incorrect, échéance antérie
 
 J’ai aussi ajouté des cas limites (année bissextile, date impossible, fin de mois, fin d’année, chaîne vide, espaces) pour réduire le risque de bogues subtils liés aux dates.
 
-<img width="975" height="112" alt="image" src="https://github.com/user-attachments/assets/24b3dacb-d86c-4427-bc18-671b00cb037c" />
-
+<img width="670" height="70" alt="image" src="https://github.com/user-attachments/assets/0fc87747-37a3-4f12-ba89-3ecfd86f4445" />
 
 ## Comment les tests garantissent la correction de la fonction
 
