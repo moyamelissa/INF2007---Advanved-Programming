@@ -8,7 +8,7 @@ L'analyse de la fonction `DaysUntilDeadline` révèle quatre chemins d'exécutio
 
 J'ai rédigé 24 tests unitaires dans `deadline_test.go`, organisés en six sections thématiques. La première regroupe les cas positifs, notamment une échéance future, deux dates identiques et des plages d'un an et dix ans. La deuxième cible les transitions calendaires telles que la fin de mois, la fin d'année et les années bissextiles. Les troisième et quatrième couvrent les erreurs de format sur `currentDate` et `deadline` respectivement, incluant un mois hors plage, un séparateur incorrect, une chaîne vide, des espaces parasites, un jour inexistant, un mois ou jour à zéro, un format ISO avec heure, l'absence de zéro initial et une entrée aléatoire. La cinquième traite de l'erreur métier et la sixième vérifie le comportement lorsque les deux entrées sont invalides simultanément.
 
-J'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks afin d'appliquer l'ensemble des concepts du chapitre 1.
+Afin de pousser l'expérimentation et d'appliquer l'ensemble des concepts vus au chapitre 1, j'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks.
 
 <img width="670" height="70" alt="image" src="https://github.com/user-attachments/assets/0fc87747-37a3-4f12-ba89-3ecfd86f4445" />
 
@@ -18,7 +18,7 @@ Chacun des 24 tests vérifie systématiquement les deux sorties de la fonction, 
 
 Les tests positifs valident la justesse du calcul sur des plages allant de six jours à 3653 jours. Les tests négatifs confirment que chaque catégorie d'entrée invalide déclenche l'erreur attendue tout en retournant zéro jour. Les cas limites ciblent les transitions calendaires et les années bissextiles, des situations reconnues pour générer des anomalies subtiles.
 
-La couverture atteint 100 % des instructions et les quatre chemins d'exécution sont tous exercés, offrant une validation rigoureuse de la correction.
+La couverture atteint 100 % des instructions, ce qui signifie que les quatre chemins d'exécution sont tous exercés. Cette couverture complète, combinée à la variété des cas testés, offre une validation rigoureuse de la correction de la fonction.
 
 ## Défis rencontrés
 
