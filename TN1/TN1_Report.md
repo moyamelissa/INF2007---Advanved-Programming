@@ -8,7 +8,7 @@ La fonction `DaysUntilDeadline` possède exactement 4 chemins d'exécution : err
 
 En complément, j'ai poussé l'expérimentation en appliquant tous les concepts du chapitre 1 : tests tabulaires, fuzz testing et benchmarks, dans des fichiers séparés.
 
-<img width="975" height="94" alt="image" src="https://github.com/user-attachments/assets/6f0cd66e-6999-4351-a728-bb7ee81442ae" />
+<img width="670" height="70" alt="image" src="https://github.com/user-attachments/assets/0fc87747-37a3-4f12-ba89-3ecfd86f4445" />
 
 ## Comment les tests garantissent la correction de la fonction
 
