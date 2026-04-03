@@ -19,11 +19,11 @@ La couverture atteint 100 % des instructions, ce qui signifie que les quatre che
 
 ## Défis rencontrés
 
-Le principal défi a été la gestion des erreurs. En Go, comparer des erreurs créées avec `errors.New(...)` peut s'avérer ambigu lorsqu'une nouvelle instance est recréée dans le test. J'ai donc adopté une approche en trois étapes pour chaque test négatif, soit vérifier la présence d'une erreur, comparer son message via `err.Error()`, puis confirmer que `days` demeure à zéro.
+Le principal défi a été la gestion des erreurs. En Go, comparer des erreurs créées avec `errors.New(...)` peut s'avérer ambigu lorsqu'une nouvelle instance est recréée dans le test. J'ai donc vérifié la présence de l'erreur, comparé son message via `err.Error()`, puis confirmé que `days` demeure à zéro.
 
-J'ai également porté attention au choix entre `t.Fatalf` et `t.Errorf`. Le premier interrompt l'exécution du test lorsqu'il serait trompeur de continuer, par exemple quand une erreur inattendue rend la vérification de `days` sans objet. Le second signale l'échec tout en laissant le test poursuivre afin de collecter davantage d'informations.
+J'ai également distingué l'usage de `t.Fatalf`, qui interrompt le test lorsque continuer serait trompeur, et `t.Errorf`, qui signale l'échec en laissant le test poursuivre afin de collecter davantage d'informations.
 
-Enfin, la sélection des cas limites pertinents a demandé d'identifier les entrées qui exercent chacun des quatre chemins de manière significative, sans redondance. Le regroupement par catégorie préserve la lisibilité malgré le nombre élevé de cas. Afin de pousser l'expérimentation et d'appliquer l'ensemble des concepts vus au chapitre 1, j'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks.
+Enfin, la sélection des cas limites pertinents a demandé d'exercer chacun des quatre chemins sans redondance, en regroupant les tests par catégorie pour préserver la lisibilité. J'ai également produit des fichiers complémentaires de tests tabulaires, fuzz testing et benchmarks pour appliquer l'ensemble des concepts du chapitre 1.
 
 ## Liens
 
