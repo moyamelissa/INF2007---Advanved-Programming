@@ -11,7 +11,7 @@ func TestDaysUntilDeadline_FutureDate(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
 	if days != want {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
@@ -24,7 +24,7 @@ func TestDaysUntilDeadline_SameDay(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
 	if days != want {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
@@ -37,10 +37,10 @@ func TestDaysUntilDeadline_InvalidFormat(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
 	if err.Error() != wantErr {
-		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
+		t.Errorf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
@@ -53,10 +53,10 @@ func TestDaysUntilDeadline_DeadlineBeforeCurrent(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
 	if err.Error() != wantErr {
-		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
+		t.Errorf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
@@ -69,10 +69,10 @@ func TestDaysUntilDeadline_WrongSeparator(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
 	if err.Error() != wantErr {
-		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
+		t.Errorf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
@@ -101,7 +101,7 @@ func TestDaysUntilDeadline_LeapYearValid(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) unexpected error: %v", current, due, err)
 	}
 	if days != want {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want %d", current, due, days, want)
 	}
 }
 
@@ -114,10 +114,10 @@ func TestDaysUntilDeadline_InvalidNonLeapDate(t *testing.T) {
 		t.Fatalf("DaysUntilDeadline(%q,%q) expected error, got nil", current, due)
 	}
 	if days != 0 {
-		t.Fatalf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
+		t.Errorf("DaysUntilDeadline(%q,%q) = %d, want 0 on error", current, due, days)
 	}
 	if err.Error() != wantErr {
-		t.Fatalf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
+		t.Errorf("DaysUntilDeadline(%q,%q) error = %q, want %q", current, due, err.Error(), wantErr)
 	}
 }
 
