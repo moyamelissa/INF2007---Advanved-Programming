@@ -4,27 +4,29 @@
 
 ## Justification des cas de test choisis
 
-La fonction `DaysUntilDeadline` possède exactement 4 chemins d'exécution : erreur de parsing de `currentDate`, erreur de parsing de `deadline`, erreur métier (deadline antérieure) et succès. J'ai écrit 24 tests unitaires dans `deadline_test.go` pour couvrir ces 4 chemins de façon exhaustive, organisés en sections : cas positifs (échéance future, même jour, 1 an, 10 ans), cas limites de transition (fin de mois, fin d'année, année bissextile), erreurs de format sur `currentDate` (mois invalide, séparateur `/`, vide, espaces, jour hors plage, mois/jour zéro, heure ISO, sans zéro initial, garbage), erreurs de format sur `deadline` (mois invalide, vide, espaces, jour hors plage), erreur métier (deadline antérieure) et les deux entrées invalides simultanément.
+L'analyse de la fonction `DaysUntilDeadline` révèle exactement quatre chemins d'exécution distincts, soit une erreur de parsing sur `currentDate`, une erreur de parsing sur `deadline`, une erreur métier lorsque la deadline précède la date actuelle, et enfin le cas de succès où le nombre de jours est calculé normalement. Cette structure a guidé l'ensemble de ma stratégie de test.
 
-En complément, j'ai poussé l'expérimentation en appliquant tous les concepts du chapitre 1 : tests tabulaires, fuzz testing et benchmarks, dans des fichiers séparés.
+J'ai rédigé 24 tests unitaires dans `deadline_test.go`, organisés en six sections thématiques. La première section regroupe les cas positifs, notamment le calcul d'une échéance future, le cas où les deux dates sont identiques, ainsi que des plages plus larges d'un an et de dix ans. La deuxième section cible les cas limites liés aux transitions calendaires, comme le passage de fin de mois, la transition de fin d'année et le traitement d'une année bissextile. Les troisième et quatrième sections couvrent respectivement les erreurs de format sur `currentDate` et sur `deadline`, incluant des scénarios variés tels qu'un mois hors plage, un séparateur incorrect, une chaîne vide, des espaces parasites, un jour inexistant, un mois ou jour à zéro, un format ISO comportant une heure, l'absence de zéro initial et une entrée complètement aléatoire. La cinquième section traite de l'erreur métier lorsque la deadline est antérieure, et la sixième vérifie le comportement lorsque les deux entrées sont invalides simultanément.
+
+Afin de pousser l'expérimentation et d'appliquer l'ensemble des concepts vus au chapitre 1, j'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks.
 
 <img width="670" height="70" alt="image" src="https://github.com/user-attachments/assets/0fc87747-37a3-4f12-ba89-3ecfd86f4445" />
 
 ## Comment les tests garantissent la correction de la fonction
 
-Les 24 tests vérifient systématiquement les deux sorties (`days` et `err`) sur chacun des 4 chemins d'exécution. Les tests positifs confirment le calcul correct sur des plages variées (6 jours, 0 jour, 365 jours, 3653 jours). Les tests négatifs valident que chaque type d'entrée invalide retourne l'erreur appropriée et `days == 0`, assurant un échec contrôlé. Les cas limites (transitions de mois/année, bissextile) ciblent les situations où les erreurs de logique sont fréquentes.
+Chacun des 24 tests vérifie systématiquement les deux sorties de la fonction, soit la valeur entière `days` et l'erreur `err`. Cette double vérification permet de s'assurer que le comportement est cohérent dans tous les scénarios.
 
-Avec 100 % de couverture et les 4 chemins d'exécution tous exercés, la correction est validée de façon rigoureuse.
+Les tests positifs valident la justesse du calcul sur des plages de durées variées, allant de six jours jusqu'à 3653 jours sur une décennie complète. Les tests négatifs confirment que chaque catégorie d'entrée invalide déclenche l'erreur attendue tout en retournant zéro jour, garantissant ainsi un échec contrôlé et prévisible. Les cas limites, quant à eux, ciblent les transitions calendaires et les années bissextiles, des situations reconnues pour générer des anomalies subtiles dans le traitement des dates.
+
+La couverture atteint 100 % des instructions, ce qui signifie que les quatre chemins d'exécution sont tous exercés. Cette couverture complète, combinée à la variété des cas testés, offre une validation rigoureuse de la correction de la fonction.
 
 ## Défis rencontrés
 
-Le principal défi a été la gestion des erreurs de façon cohérente avec les attentes du devoir. En Go, comparer directement des erreurs créées avec `errors.New(...)` peut être ambigu si une nouvelle erreur est recréée dans le test.
+Le principal défi a été la gestion des erreurs de façon cohérente avec les attentes du devoir. En Go, comparer directement des erreurs créées avec `errors.New(...)` peut s'avérer ambigu lorsqu'une nouvelle instance est recréée dans le test. Pour rester aligné avec la fonction fournie, j'ai adopté une approche en trois étapes pour chaque test négatif, soit vérifier la présence d'une erreur avec `err != nil`, comparer son message via `err.Error()`, puis confirmer que la valeur retournée demeure à zéro.
 
-Pour rester aligné avec la fonction fournie, j'ai vérifié la présence de l'erreur (`err != nil`), comparé son message (`err.Error()`) et confirmé que la valeur retournée reste 0 en cas d'échec. J'ai aussi utilisé `t.Fatalf` et `t.Errorf` de façon intentionnelle : `t.Fatalf` arrête immédiatement le test quand continuer n'a pas de sens (par exemple, si une erreur inattendue survient et que vérifier `days` après serait trompeur), tandis que `t.Errorf` signale l'échec mais laisse le test continuer pour collecter toutes les informations utiles au débogage.
+J'ai également porté une attention particulière au choix entre `t.Fatalf` et `t.Errorf`. Le premier interrompt immédiatement l'exécution du test lorsqu'il serait trompeur de continuer, par exemple quand une erreur inattendue rend la vérification subséquente de `days` sans objet. Le second signale l'échec tout en laissant le test poursuivre, ce qui permet de collecter davantage d'informations utiles au débogage.
 
-Un deuxième défi a été le choix des cas limites pertinents. La fonction n'ayant que 4 chemins d'exécution, il fallait identifier les entrées qui exercent chacun de façon significative (dates hors plage, mois/jour zéro, format ISO avec heure, garbage) sans rendre la suite redondante. J'ai regroupé les tests par catégorie (format currentDate, format deadline, erreur métier) pour maintenir la lisibilité malgré les 24 cas.
-
-Enfin, pour pousser l'expérimentation, j'ai aussi créé des tests tabulaires, de fuzzing et des benchmarks, ce qui m'a permis d'appliquer l'ensemble des concepts vus au chapitre 1.
+Un deuxième défi a été la sélection des cas limites pertinents. La fonction ne comportant que quatre chemins d'exécution, il était essentiel d'identifier les entrées qui exercent chacun d'entre eux de manière significative, sans introduire de redondance. J'ai regroupé les tests par catégorie, soit format de `currentDate`, format de `deadline` et erreur métier, afin de préserver la lisibilité malgré le nombre élevé de cas.
 
 
 ## Liens
