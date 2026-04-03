@@ -10,8 +10,6 @@ J'ai rédigé 24 tests unitaires dans `deadline_test.go`, organisés en six sect
 
 Afin de pousser l'expérimentation et d'appliquer l'ensemble des concepts vus au chapitre 1, j'ai également produit des fichiers complémentaires contenant des tests tabulaires, du fuzz testing et des benchmarks.
 
-<img width="670" height="70" alt="image" src="https://github.com/user-attachments/assets/0fc87747-37a3-4f12-ba89-3ecfd86f4445" />
-
 ## Comment les tests garantissent la correction de la fonction
 
 Chacun des 24 tests vérifie systématiquement les deux sorties de la fonction, soit la valeur entière `days` et l'erreur `err`. Cette double vérification permet de s'assurer que le comportement est cohérent dans tous les scénarios.
@@ -19,6 +17,7 @@ Chacun des 24 tests vérifie systématiquement les deux sorties de la fonction, 
 Les tests positifs valident la justesse du calcul sur des plages de durées variées, allant de six jours jusqu'à 3653 jours sur une décennie complète. Les tests négatifs confirment que chaque catégorie d'entrée invalide déclenche l'erreur attendue tout en retournant zéro jour, garantissant ainsi un échec contrôlé et prévisible. Les cas limites, quant à eux, ciblent les transitions calendaires et les années bissextiles, des situations reconnues pour générer des anomalies subtiles dans le traitement des dates.
 
 La couverture atteint 100 % des instructions, ce qui signifie que les quatre chemins d'exécution sont tous exercés. Cette couverture complète, combinée à la variété des cas testés, offre une validation rigoureuse de la correction de la fonction.
+<img width="1036" height="90" alt="image" src="https://github.com/user-attachments/assets/191796c8-43ee-456d-b926-4dd239d6f7c9" />
 
 ## Défis rencontrés
 
