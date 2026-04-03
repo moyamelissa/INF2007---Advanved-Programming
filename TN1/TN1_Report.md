@@ -31,11 +31,6 @@ Un deuxième défi a été le choix des cas limites pertinents. Le traitement de
 J’ai aussi dû équilibrer couverture et pertinence : l’objectif n’est pas seulement d’atteindre un pourcentage élevé, mais d’avoir des tests lisibles, commentés et orientés sur des comportements métier clairs.
 
 
-## Fichiers utilisés
-
-- Implémentation principale : https://github.com/moyamelissa/Advanved-Programming/blob/main/TN1/deadline.go
-- Tests unitaires : https://github.com/moyamelissa/Advanved-Programming/blob/main/TN1/deadline_test.go
-
 ## Liens
 
 - GitHub Repo : https://github.com/moyamelissa/Advanved-Programming/tree/main/TN1
