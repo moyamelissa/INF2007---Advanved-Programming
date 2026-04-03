@@ -20,10 +20,7 @@ Le principal défi a été la gestion des erreurs. En Go, comparer des erreurs c
 - GitHub Repo : https://github.com/moyamelissa/Advanved-Programming/tree/main/TN1
 - Vidéo explicative : https://youtu.be/Tsw6rHtLz_k
 
-## Fichiers utilisés
+## Fichiers TN1
 
 - Implémentation principale : [deadline.go](TN1/deadline.go)
 - Tests unitaires (24 tests, organisés par section) : [deadline_test.go](TN1/deadline_test.go)
-- Tests tabulaires (réplicat des 24 cas) : [deadline_table_test.go](TN1/deadline_table_test.go)
-- Tests de fuzzing (entrées aléatoires) : [deadline_fuzz_test.go](TN1/deadline_fuzz_test.go)
-- Benchmarks (6 scénarios de performance) : [deadline_benchmark_test.go](TN1/deadline_benchmark_test.go)
