@@ -6,7 +6,7 @@ import "testing"
 // SECTION 1 : Cas positifs — dates valides, calcul nominal
 // ============================================================================
 
-// Objectif : Cas positif — échéance future valide (vérifie le calcul nominal).
+// Test 1 - Objectif : Cas positif — échéance future valide (vérifie le calcul nominal).
 func TestDaysUntilDeadline_FutureDate(t *testing.T) {
 	current, due := "2025-05-26", "2025-06-01"
 	want := 6
@@ -19,7 +19,7 @@ func TestDaysUntilDeadline_FutureDate(t *testing.T) {
 	}
 }
 
-// Objectif : Cas positif — même jour (vérifie que le résultat est 0).
+// Test 2 - Objectif : Cas positif — même jour (vérifie que le résultat est 0).
 func TestDaysUntilDeadline_SameDay(t *testing.T) {
 	current, due := "2025-05-26", "2025-05-26"
 	want := 0
@@ -32,7 +32,7 @@ func TestDaysUntilDeadline_SameDay(t *testing.T) {
 	}
 }
 
-// Objectif : Cas positif — grande différence de dates (vérifie calcul sur 365 jours).
+// Test 3 - Objectif : Cas positif — grande différence de dates (vérifie calcul sur 365 jours).
 func TestDaysUntilDeadline_LargeDateRange(t *testing.T) {
 	current, due := "2025-01-01", "2026-01-01"
 	want := 365
@@ -45,7 +45,7 @@ func TestDaysUntilDeadline_LargeDateRange(t *testing.T) {
 	}
 }
 
-// Objectif : Cas positif — très grande plage de 10 ans (vérifie la précision du calcul).
+// Test 4 - Objectif : Cas positif — très grande plage de 10 ans (vérifie la précision du calcul).
 func TestDaysUntilDeadline_TenYears(t *testing.T) {
 	current, due := "2020-01-01", "2030-01-01"
 	want := 3653 // 10 ans incluant 3 années bissextiles (2020, 2024, 2028)
@@ -62,7 +62,7 @@ func TestDaysUntilDeadline_TenYears(t *testing.T) {
 // SECTION 2 : Cas limites — transitions de dates (fin de mois, année, bissextile)
 // ============================================================================
 
-// Objectif : Cas limite — année bissextile (vérifie que 29 février est valide).
+// Test 5 - Objectif : Cas limite — année bissextile (vérifie que 29 février est valide).
 func TestDaysUntilDeadline_LeapYearValid(t *testing.T) {
 	current, due := "2024-02-28", "2024-02-29"
 	want := 1
@@ -75,7 +75,7 @@ func TestDaysUntilDeadline_LeapYearValid(t *testing.T) {
 	}
 }
 
-// Objectif : Cas limite — passage de fin de mois (vérifie transition de mois).
+// Test 6 - Objectif : Cas limite — passage de fin de mois (vérifie transition de mois).
 func TestDaysUntilDeadline_EndOfMonth(t *testing.T) {
 	current, due := "2025-01-31", "2025-02-01"
 	want := 1
@@ -88,7 +88,7 @@ func TestDaysUntilDeadline_EndOfMonth(t *testing.T) {
 	}
 }
 
-// Objectif : Cas limite — passage de fin d'année (vérifie transition d'année).
+// Test 7 - Objectif : Cas limite — passage de fin d'année (vérifie transition d'année).
 func TestDaysUntilDeadline_EndOfYear(t *testing.T) {
 	current, due := "2025-12-31", "2026-01-01"
 	want := 1
@@ -105,7 +105,7 @@ func TestDaysUntilDeadline_EndOfYear(t *testing.T) {
 // SECTION 3 : Cas négatifs — format de currentDate invalide
 // ============================================================================
 
-// Objectif : Cas négatif — mois hors plage (vérifie erreur de parsing).
+// Test 8 - Objectif : Cas négatif — mois hors plage (vérifie erreur de parsing).
 func TestDaysUntilDeadline_InvalidFormat(t *testing.T) {
 	current, due := "2025-13-01", "2025-05-26"
 	wantErr := "invalid current date format"
@@ -121,7 +121,7 @@ func TestDaysUntilDeadline_InvalidFormat(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — séparateur invalide (vérifie erreur de parsing).
+// Test 9 - Objectif : Cas négatif — séparateur invalide (vérifie erreur de parsing).
 func TestDaysUntilDeadline_WrongSeparator(t *testing.T) {
 	current, due := "2025/05/26", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -137,7 +137,7 @@ func TestDaysUntilDeadline_WrongSeparator(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — date actuelle vide (vérifie erreur et days==0).
+// Test 10 - Objectif : Cas négatif — date actuelle vide (vérifie erreur et days==0).
 func TestDaysUntilDeadline_EmptyCurrentDate(t *testing.T) {
 	current, due := "", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -153,7 +153,7 @@ func TestDaysUntilDeadline_EmptyCurrentDate(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — date actuelle avec espaces (vérifie erreur de format).
+// Test 11 - Objectif : Cas négatif — date actuelle avec espaces (vérifie erreur de format).
 func TestDaysUntilDeadline_CurrentDateWithSpaces(t *testing.T) {
 	current, due := " 2025-05-26 ", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -169,7 +169,7 @@ func TestDaysUntilDeadline_CurrentDateWithSpaces(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — date impossible en année non bissextile (vérifie erreur).
+// Test 12 - Objectif : Cas négatif — date impossible en année non bissextile (vérifie erreur).
 func TestDaysUntilDeadline_InvalidNonLeapDate(t *testing.T) {
 	current, due := "2025-02-29", "2025-03-01"
 	wantErr := "invalid current date format"
@@ -185,7 +185,7 @@ func TestDaysUntilDeadline_InvalidNonLeapDate(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — jour hors plage pour le mois (avril a 30 jours, pas 31).
+// Test 13 - Objectif : Cas négatif — jour hors plage pour le mois (avril a 30 jours, pas 31).
 func TestDaysUntilDeadline_DayOutOfRange(t *testing.T) {
 	current, due := "2025-04-31", "2025-05-15"
 	wantErr := "invalid current date format"
@@ -201,7 +201,7 @@ func TestDaysUntilDeadline_DayOutOfRange(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — mois zéro (vérifie que "00" est rejeté par le parser).
+// Test 14 - Objectif : Cas négatif — mois zéro (vérifie que "00" est rejeté par le parser).
 func TestDaysUntilDeadline_ZeroMonth(t *testing.T) {
 	current, due := "2025-00-15", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -217,7 +217,7 @@ func TestDaysUntilDeadline_ZeroMonth(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — jour zéro (vérifie que le jour "00" est rejeté).
+// Test 15 - Objectif : Cas négatif — jour zéro (vérifie que le jour "00" est rejeté).
 func TestDaysUntilDeadline_ZeroDay(t *testing.T) {
 	current, due := "2025-05-00", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -233,7 +233,7 @@ func TestDaysUntilDeadline_ZeroDay(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — date avec heure ISO (vérifie que le surplus est rejeté).
+// Test 16 - Objectif : Cas négatif — date avec heure ISO (vérifie que le surplus est rejeté).
 func TestDaysUntilDeadline_DateWithTime(t *testing.T) {
 	current, due := "2025-05-26T12:00:00", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -249,7 +249,7 @@ func TestDaysUntilDeadline_DateWithTime(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — mois/jour sans zéro initial (vérifie la strictness du format).
+// Test 17 - Objectif : Cas négatif — mois/jour sans zéro initial (vérifie la strictness du format).
 func TestDaysUntilDeadline_NoLeadingZero(t *testing.T) {
 	current, due := "2025-5-1", "2025-06-01"
 	wantErr := "invalid current date format"
@@ -265,7 +265,7 @@ func TestDaysUntilDeadline_NoLeadingZero(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — entrée complètement garbage (vérifie erreur de parsing).
+// Test 18 - Objectif : Cas négatif — entrée complètement garbage (vérifie erreur de parsing).
 func TestDaysUntilDeadline_GarbageInput(t *testing.T) {
 	current, due := "abc", "not-a-date"
 	wantErr := "invalid current date format"
@@ -285,7 +285,7 @@ func TestDaysUntilDeadline_GarbageInput(t *testing.T) {
 // SECTION 4 : Cas négatifs — format de deadline invalide
 // ============================================================================
 
-// Objectif : Cas négatif — format invalide pour la deadline (mois hors plage).
+// Test 19 - Objectif : Cas négatif — format invalide pour la deadline (mois hors plage).
 func TestDaysUntilDeadline_InvalidDeadlineFormat(t *testing.T) {
 	current, due := "2025-05-26", "2025-13-01"
 	wantErr := "invalid deadline format"
@@ -301,7 +301,7 @@ func TestDaysUntilDeadline_InvalidDeadlineFormat(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — deadline vide (vérifie erreur et days==0).
+// Test 20 - Objectif : Cas négatif — deadline vide (vérifie erreur et days==0).
 func TestDaysUntilDeadline_EmptyDeadline(t *testing.T) {
 	current, due := "2025-05-26", ""
 	wantErr := "invalid deadline format"
@@ -317,7 +317,7 @@ func TestDaysUntilDeadline_EmptyDeadline(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — deadline avec espaces (vérifie erreur de format).
+// Test 21 - Objectif : Cas négatif — deadline avec espaces (vérifie erreur de format).
 func TestDaysUntilDeadline_DeadlineWithSpaces(t *testing.T) {
 	current, due := "2025-05-26", " 2025-06-01 "
 	wantErr := "invalid deadline format"
@@ -333,7 +333,7 @@ func TestDaysUntilDeadline_DeadlineWithSpaces(t *testing.T) {
 	}
 }
 
-// Objectif : Cas négatif — jour hors plage côté deadline (juin a 30 jours, pas 31).
+// Test 22 - Objectif : Cas négatif — jour hors plage côté deadline (juin a 30 jours, pas 31).
 func TestDaysUntilDeadline_DeadlineDayOutOfRange(t *testing.T) {
 	current, due := "2025-06-01", "2025-06-31"
 	wantErr := "invalid deadline format"
@@ -353,7 +353,7 @@ func TestDaysUntilDeadline_DeadlineDayOutOfRange(t *testing.T) {
 // SECTION 5 : Cas négatifs — erreur métier (deadline antérieure)
 // ============================================================================
 
-// Objectif : Cas négatif — échéance antérieure à la date actuelle (vérifie erreur métier).
+// Test 23 - Objectif : Cas négatif — échéance antérieure à la date actuelle (vérifie erreur métier).
 func TestDaysUntilDeadline_DeadlineBeforeCurrent(t *testing.T) {
 	current, due := "2025-05-26", "2025-05-25"
 	wantErr := "deadline cannot be before current date"
@@ -373,7 +373,7 @@ func TestDaysUntilDeadline_DeadlineBeforeCurrent(t *testing.T) {
 // SECTION 6 : Cas négatifs — les deux entrées invalides
 // ============================================================================
 
-// Objectif : Cas négatif — les deux entrées invalides simultanément (vérifie que la première erreur est retournée).
+// Test 24 - Objectif : Cas négatif — les deux entrées invalides simultanément (vérifie que la première erreur est retournée).
 func TestDaysUntilDeadline_BothInvalid(t *testing.T) {
 	current, due := "invalid", "also-invalid"
 	wantErr := "invalid current date format"
