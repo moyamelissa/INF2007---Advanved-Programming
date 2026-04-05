@@ -12,17 +12,17 @@ This repository contains homework and practical work for INF2007.
 - TN3: Coming soon
 - TN4: Coming soon
 - TN5: Coming soon
-- Programmation project: Coming soon
+- Programming project: Coming soon
 
 ## Francais
 
-Ce depot contient les travaux pratiques et devoirs du cours INF2007.
+Ce dépôt contient les travaux pratiques et devoirs du cours INF2007.
 
 ### Travaux
 
-- TN1 : [README TN1](TN1/README.md)
-- TN2 : A venir
-- TN3: A venir
-- TN4: A venir
-- TN5: A venir
-- Project de programmation: A venir
+- TN1: [README TN1](TN1/README.md)
+- TN2: À venir
+- TN3: À venir
+- TN4: À venir
+- TN5: À venir
+- Project de programmation: À venir
