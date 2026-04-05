@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-// Fuzz test : vérifie que la fonction ne panic jamais et respecte des invariants simples.
+// Fuzz test : teste la robustesse de DaysUntilDeadline afin d’éviter tout arrêt inattendu et de vérifier des invariants simples.
 func FuzzDaysUntilDeadline_Standalone(f *testing.F) {
 	seeds := [][2]string{
 		{"2025-05-26", "2025-06-01"},
