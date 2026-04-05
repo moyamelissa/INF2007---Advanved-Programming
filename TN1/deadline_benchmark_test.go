@@ -1,6 +1,7 @@
-// Ce fichier contient des benchmarks (tests de performance) pour la fonction DaysUntilDeadline
+package main
 
 import "testing"
+// Ce fichier contient des benchmarks (tests de performance) pour la fonction DaysUntilDeadline
 
 // Scénario : dates valides (deadline après la date courante).
 func BenchmarkDaysUntilDeadline_ValidDates(b *testing.B) {
@@ -39,10 +40,6 @@ func BenchmarkDaysUntilDeadline_InvalidDeadlineFormat(b *testing.B) {
 
 // Scénario : dates vides.
 func BenchmarkDaysUntilDeadline_EmptyDates(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = DaysUntilDeadline("", "")
-	}
-}
 	for i := 0; i < b.N; i++ {
 		_, _ = DaysUntilDeadline("", "")
 	}
