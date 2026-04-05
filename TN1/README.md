@@ -2,11 +2,6 @@
 
 ## English
 
-### Badges
-
-![Go Coverage Workflow](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg)
-![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
-
 ### Coverage Setup
 
 1. Push this repository to GitHub.
@@ -20,13 +15,6 @@
 cd TN1
 go test ./... -cover
 ```
-
-### Documentation Sources
-
-- INF2007 Manual, Chapter 1 (Unit Testing).
-- Go Testing documentation: https://pkg.go.dev/testing
-- Go tutorial on testing: https://go.dev/doc/tutorial/add-a-test
-- A Tour of Go: https://tour.golang.org/
 
 ## Francais
 
@@ -48,10 +36,3 @@ go test ./... -cover
 cd TN1
 go test ./... -cover
 ```
-
-### Bibliographie / Sources documentaires
-
-- Manuel INF2007, chapitre 1 (tests unitaires).
-- Documentation Go Testing : https://pkg.go.dev/testing
-- Tutoriel Go sur les tests : https://go.dev/doc/tutorial/add-a-test
-- A Tour of Go : https://tour.golang.org/
