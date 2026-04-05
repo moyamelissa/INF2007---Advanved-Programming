@@ -31,4 +31,4 @@ L'ambiguïté des instances d'erreurs en Go (errors.New) a imposé une validatio
 - Documentation Go Testing : https://pkg.go.dev/testing
 - Tutoriel Go sur les tests : https://go.dev/doc/tutorial/add-a-test
 - A Tour of Go : https://tour.golang.org/
-- Outil d’IA : GitHub Copilot — utiliser avec une vérification systématique des changements recommandé
+- Outil d'IA : GitHub Copilot — utilisé comme outil d'assistance avec une vérification systématique de chaque suggestion avant intégration. Voir la [liste des prompts utilisés](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN1/AI_Prompts.md).
