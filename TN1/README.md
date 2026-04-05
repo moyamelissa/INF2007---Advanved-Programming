@@ -18,11 +18,6 @@ go test ./... -cover
 
 ## Francais
 
-### Badges
-
-![Workflow Go Coverage](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg)
-![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
-
 ### Configuration de la couverture
 
 1. Poussez ce depot sur GitHub.
