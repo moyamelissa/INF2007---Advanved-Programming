@@ -18,7 +18,7 @@ L'ambiguïté des instances d'erreurs en Go (errors.New) a imposé une validatio
 ### Liens
 
 - GitHub Repo : https://github.com/moyamelissa/Advanved-Programming/tree/main/TN1
-- Vidéo explicative : https://youtu.be/Tsw6rHtLz_k
+- Vidéo explicative : https://youtu.be/jC_luJYEZWw
 
 ### Fichiers TN1
 
