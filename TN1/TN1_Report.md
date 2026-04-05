@@ -31,3 +31,4 @@ Le principal défi a été la gestion des erreurs. En Go, comparer des erreurs c
 - Documentation Go Testing : https://pkg.go.dev/testing
 - Tutoriel Go sur les tests : https://go.dev/doc/tutorial/add-a-test
 - A Tour of Go : https://tour.golang.org/
+- Outil d’IA : GitHub Copilot — utiliser avec une vérification systématique des changements recommandé
