@@ -23,7 +23,7 @@ L'ambiguïté des instances d'erreurs en Go (errors.New) a imposé une validatio
 ### Fichiers TN1
 
 - Implémentation principale : [deadline.go](TN1/deadline.go)
-- Tests unitaires (24 tests, organisés par section) : [deadline_test.go](TN1/deadline_test.go)
+- Tests unitaires : [deadline_test.go](TN1/deadline_test.go)
 
 ### Bibliographie / Sources documentaires
 
