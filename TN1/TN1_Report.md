@@ -13,7 +13,7 @@ Chaque test valide systématiquement le couple de sorties (days, err), garantiss
 
 ## Défis rencontrés
 
-L'ambiguïté des instances d'erreurs en Go (errors.New) a imposé une validation textuelle via err.Error() pour maintenir le déterminisme des tests. J'ai validé systématiquement le couple de sorties, m'assurant que days reste nul lors d'un échec pour renforcer la stabilité du composant. La gestion de la sévérité via t.Fatalf et t.Errorf a optimisé le diagnostic technique. Au-delà des exigences, l'implémentation du fuzz testing garantit l'absence de paniques face à des entrées corrompues. Enfin, j'ai exploré l'idiomaticité du langage via des tests tabulaires pour centraliser les cas limites et réduire la duplication. L'ajout de benchmarks complète cette approche en évaluant la performance, faisant de cette batterie de tests un investissement durable pour l'évolution du code.
+Go ne permet pas de comparer directement les instances d'erreurs créées avec errors.New. J'ai donc utilisé err.Error() pour valider le message exact retourné, ce qui maintient le déterminisme des assertions. Le choix entre t.Fatalf et t.Errorf a été guidé par la dépendance logique : Fatalf arrête le test lorsqu'un résultat subséquent dépend d'une valeur critique, tandis que Errorf permet de capturer plusieurs échecs dans un même test. J'ai aussi implémenté des tests tabulaires (table-driven) pour réduire la verbosité du code et centraliser les cas limites en un seul point de maintenance. Enfin, j'ai ajouté du fuzz testing pour vérifier l'absence de paniques face à des entrées aléatoires, ainsi que des benchmarks pour mesurer la performance du parsing et du calcul.
 
 ### Liens
 
