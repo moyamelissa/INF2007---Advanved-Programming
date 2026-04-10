@@ -210,7 +210,6 @@ git branch
 ```bash
 git checkout -b count-chars
 ```
-<img width="809" height="54" alt="image" src="https://github.com/user-attachments/assets/df73800f-871e-4642-bd89-d5750bab7c39" />
 
 ### Modifier `main.go` : ajouter `countChars`
 
