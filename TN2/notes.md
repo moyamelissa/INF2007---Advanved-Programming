@@ -120,7 +120,7 @@ warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next t
 - `CRLF` = fin de ligne format Windows (`\r\n`)
 - Git vous informe simplement qu’il pourrait convertir automatiquement les fins de ligne sur Windows.
 - **Ce n’est pas une erreur** et votre projet Go fonctionne quand même.
-- Optionnel :Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
+- Optionnel : Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
   
 ---
 
@@ -364,7 +364,7 @@ go run main.go
 ```
 <img width="1174" height="59" alt="image" src="https://github.com/user-attachments/assets/2de76fb6-dff6-436b-93d0-394e54958f51" />
 
-3) Commit :
+5) Commit :
 
 ```bash
 git add main.go
@@ -495,7 +495,7 @@ Le `README.md` doit contenir au minimum :
 - comment exécuter le programme
 - comment lancer les tests
 
-Contenu :
+Exemple de contenu :
 
 ```markdown
 # Projet : Word Stats (INF2007 – Travail 2)
@@ -514,18 +514,24 @@ Il contient trois fonctions Go permettant de compter :
 - Fusion avec conflit (`count-chars` → `main`) + résolution manuelle
 
 ## Exécution
-```bash
-go run main.go
-```
+
+    go run main.go
 
 ## Tests
+
+    go test -cover
+```
+
+### Commit des fichiers de documentation
+
 ```bash
-go test -cover
+git add history.txt README.md
+git commit -m "Ajout de history.txt et README.md"
 ```
 
 ---
 
-## Tests unitaires 
+## Étape 7 — Tests unitaires
 
 ### Objectif
 Ajouter des tests unitaires pour chaque fonction (`countLines`, `countWords`, `countChars`) ainsi qu'un test pour `main()` afin d'atteindre une couverture de **100 %**.
@@ -645,4 +651,92 @@ coverage: 100.0% of statements
 ok      word-stats
 ```
 
+### Commit des tests
+
+```bash
+git add main_test.go
+git commit -m "Ajout des tests unitaires (couverture 100%)"
+```
+
 ---
+
+## Résumé final
+
+### Fichier `main.go` final
+
+Après toutes les étapes (résolution du conflit incluse), le fichier `main.go` doit ressembler à ceci :
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+// countLines retourne le nombre de lignes dans une chaîne (séparées par '\n').
+func countLines(text string) int {
+	if text == "" {
+		return 0
+	}
+	return len(strings.Split(text, "\n"))
+}
+
+// countWords retourne le nombre de mots dans une chaîne (séparés par des espaces/whitespace).
+func countWords(text string) int {
+	if text == "" {
+		return 0
+	}
+	return len(strings.Fields(text))
+}
+
+// countChars retourne le nombre de caractères en excluant les espaces et les sauts de ligne.
+func countChars(text string) int {
+	count := 0
+	for _, r := range text {
+		if r != ' ' && r != '\n' && r != '\r' && r != '\t' {
+			count++
+		}
+	}
+	return count
+}
+
+func main() {
+	text := "Hello\nWorld\nGolang"
+	fmt.Printf("Nombre de mots : %d\n", countWords(text))
+	fmt.Printf("Nombre de caractères : %d\n", countChars(text))
+}
+```
+
+### Commandes Git utilisées
+
+| Commande | Utilisation |
+|----------|-------------|
+| `git init` | Initialiser le dépôt |
+| `git branch -M main` | Renommer la branche principale |
+| `git add` | Ajouter des fichiers au staging |
+| `git commit -m "..."` | Valider les changements |
+| `git branch` | Lister les branches |
+| `git checkout -b <nom>` | Créer et basculer sur une branche |
+| `git checkout <nom>` | Basculer sur une branche existante |
+| `git merge <nom>` | Fusionner une branche dans la branche courante |
+| `git log --oneline` | Afficher l'historique des commits |
+
+### Structure finale du projet
+
+```
+word-stats/
+├── go.mod
+├── main.go
+├── main_test.go
+├── history.txt
+└── README.md
+```
+
+### Résultat de couverture
+
+```
+PASS
+coverage: 100.0% of statements
+ok      word-stats
+```
