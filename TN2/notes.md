@@ -96,6 +96,7 @@ Enregistrer le fichier et fermer Notepad.
 ```bash
 go run main.go
 ```
+<img width="959" height="55" alt="image" src="https://github.com/user-attachments/assets/cef04d7c-a5ee-4c49-9c0a-e99d0c726a89" />
 
 ### Premier commit
 
@@ -105,7 +106,24 @@ Ajouter et valider le fichier avec Git :
 git add main.go go.mod
 git commit -m "Initial commit: ajout de countLines"
 ```
+<img width="1251" height="176" alt="image" src="https://github.com/user-attachments/assets/dcca8c4c-8727-4e5e-ab32-564a5f9cf2c2" />
 
+#### ⚠️ Avertissement possible (normal sur Windows)
+
+Après `git add`, vous pouvez voir ce message :
+
+```text
+warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next time Git touches it
+```
+
+**Explication :**
+- `LF` = fin de ligne format Linux/macOS (`\n`)
+- `CRLF` = fin de ligne format Windows (`\r\n`)
+- Git vous informe simplement qu’il pourrait convertir automatiquement les fins de ligne sur Windows.
+- **Ce n’est pas une erreur** et votre projet Go fonctionne quand même.
+
+**Optionnel (recommandé pour éviter les warnings) :**
+Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
 ---
 
 ## Étape 2 — Créer la branche `count-words`
@@ -124,6 +142,7 @@ Vérification possible avec :
 ```bash
 git branch
 ```
+<img width="1003" height="129" alt="image" src="https://github.com/user-attachments/assets/e4b1a1c4-3894-4c93-8fd2-906a17ac237d" />
 
 ### Modifier `main.go` : ajouter `countWords`
 
@@ -158,6 +177,7 @@ Enregistrer, fermer Notepad et tester :
 ```bash
 go run main.go
 ```
+<img width="892" height="73" alt="image" src="https://github.com/user-attachments/assets/c9ec3328-3ffb-4de2-8dec-047f3e773380" />
 
 ### Commit
 
@@ -165,6 +185,7 @@ go run main.go
 git add main.go
 git commit -m "Ajout de countWords"
 ```
+<img width="976" height="110" alt="image" src="https://github.com/user-attachments/assets/022a47cb-1213-49de-999a-19b5c96d9ec0" />
 
 ---
 
@@ -190,6 +211,7 @@ git branch
 ```bash
 git checkout -b count-chars
 ```
+<img width="809" height="54" alt="image" src="https://github.com/user-attachments/assets/df73800f-871e-4642-bd89-d5750bab7c39" />
 
 ### Modifier `main.go` : ajouter `countChars`
 
@@ -228,6 +250,7 @@ Enregistrer, fermer Notepad, puis tester :
 ```bash
 go run main.go
 ```
+<img width="799" height="97" alt="image" src="https://github.com/user-attachments/assets/7c024082-06a6-414f-9868-d6c5d8e0e976" />
 
 ### Commit
 
@@ -235,6 +258,7 @@ go run main.go
 git add main.go
 git commit -m "Ajout de countChars"
 ```
+<img width="1016" height="108" alt="image" src="https://github.com/user-attachments/assets/79f8af92-e479-4122-be30-abe20a23ab9c" />
 
 ---
 
@@ -295,6 +319,7 @@ Tester :
 ```bash
 go run main.go
 ```
+<img width="898" height="49" alt="image" src="https://github.com/user-attachments/assets/1faeaff9-7060-455e-8c32-5e7ca84d1efb" />
 
 3) Commit :
 
@@ -302,6 +327,7 @@ go run main.go
 git add main.go
 git commit -m "Affichage caractères dans main()"
 ```
+<img width="974" height="68" alt="image" src="https://github.com/user-attachments/assets/af62dd31-da39-43ec-b1d2-f5e8376828f1" />
 
 ### 5.2 Dans `main` : afficher uniquement les mots
 
@@ -311,21 +337,24 @@ git commit -m "Affichage caractères dans main()"
 git checkout main
 ```
 
-2) Modifier `main()` pour afficher **uniquement** les mots (et pas les caractères).
-
-Ouvrir :
+2) Ouvrir le fichier :
 
 ```bash
 notepad main.go
 ```
 
-Dans `main()`, garder seulement :
+3) Dans la fonction `main()`, **remplacer** les anciens affichages pour ne garder **qu’un seul affichage : les mots**.
+
+La fonction `main()` doit maintenant être :
 
 ```go
-fmt.Printf("Nombre de mots : %d\n", countWords(text))
+func main() {
+	text := "Hello\nWorld\nGolang"
+	fmt.Printf("Nombre de mots : %d\n", countWords(text))
+}
 ```
 
-Tester :
+4) Enregistrer et fermer Notepad, puis tester :
 
 ```bash
 go run main.go
