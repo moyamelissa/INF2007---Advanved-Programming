@@ -34,6 +34,9 @@ cd word-stats
 git init
 ```
 
+<img width="1340" height="135" alt="image" src="https://github.com/user-attachments/assets/d3ceab0c-942f-4844-af74-6d1d36178d1b" />
+
+
 ### (Important) Mettre la branche principale sur `main`
 
 ```bash
