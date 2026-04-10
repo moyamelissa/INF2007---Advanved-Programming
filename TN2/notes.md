@@ -279,12 +279,14 @@ git checkout main
 ```bash
 git merge count-words
 ```
+<img width="1262" height="112" alt="image" src="https://github.com/user-attachments/assets/f2d60ccd-7a5c-4bf1-a3ab-5f99452db7e1" />
 
 ### Tester le programme
 
 ```bash
 go run main.go
 ```
+<img width="1182" height="72" alt="image" src="https://github.com/user-attachments/assets/3597948d-5e35-456b-aaa9-dd38c1a3fa8f" />
 
 ---
 
