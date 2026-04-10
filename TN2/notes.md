@@ -522,7 +522,6 @@ go run main.go
 ```bash
 go test -cover
 ```
-```
 
 ---
 
