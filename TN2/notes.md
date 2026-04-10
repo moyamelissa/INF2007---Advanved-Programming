@@ -248,7 +248,8 @@ Enregistrer, fermer Notepad, puis tester :
 ```bash
 go run main.go
 ```
-<img width="813" height="76" alt="image" src="https://github.com/user-attachments/assets/add5a968-c3e0-4544-906c-ba2fec25b775" />
+
+<img width="1149" height="74" alt="image" src="https://github.com/user-attachments/assets/941d4b89-3d6f-4114-b1a9-56a9330d7000" />
 
 
 ### Commit
