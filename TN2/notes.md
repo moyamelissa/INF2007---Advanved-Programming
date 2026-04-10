@@ -121,9 +121,8 @@ warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next t
 - `CRLF` = fin de ligne format Windows (`\r\n`)
 - Git vous informe simplement qu’il pourrait convertir automatiquement les fins de ligne sur Windows.
 - **Ce n’est pas une erreur** et votre projet Go fonctionne quand même.
-
-**Optionnel (recommandé pour éviter les warnings) :**
-Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
+- Optionnel :Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
+- 
 ---
 
 ## Étape 2 — Créer la branche `count-words`
