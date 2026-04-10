@@ -460,6 +460,11 @@ git commit -m "Résolution du conflit: affichage mots + caractères"
 ```
 <img width="1449" height="48" alt="image" src="https://github.com/user-attachments/assets/24fee318-3bfd-4dc1-ba04-e6a25de3baee" />
 
+```bash
+go run main.go
+```
+<img width="1091" height="78" alt="image" src="https://github.com/user-attachments/assets/8743d10a-bdd4-4ebe-9586-fa92ff3ce98c" />
+
 ---
 
 ## Étape 6 — Historique + README
@@ -524,7 +529,7 @@ go test -cover
 ## Tests unitaires 
 
 ### Objectif
-Ajouter un test unitaire par fonction (`countLines`, `countWords`, `countChars`).
+Ajouter des tests unitaires pour chaque fonction (`countLines`, `countWords`, `countChars`) ainsi qu'un test pour `main()` afin d'atteindre une couverture de **100 %**.
 
 ### Créer `main_test.go`
 
@@ -537,32 +542,108 @@ Copier ce code :
 ```go
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
-func TestCountLines(t *testing.T) {
-	if got := countLines("Hello\nWorld"); got != 2 {
-		t.Errorf("countLines() = %d; want 2", got)
+// TestMainOutput vérifie que la fonction main s'exécute sans erreur.
+func TestMainOutput(t *testing.T) {
+	// Redirige stdout pour éviter l'affichage pendant les tests
+	old := os.Stdout
+	os.Stdout, _ = os.Create(os.DevNull)
+	defer func() { os.Stdout = old }()
+
+	main()
+}
+
+func TestCountLines_Empty(t *testing.T) {
+	if got := countLines(""); got != 0 {
+		t.Errorf("countLines(\"\") = %d; want 0", got)
 	}
 }
 
-func TestCountWords(t *testing.T) {
-	if got := countWords("Hello World Golang"); got != 3 {
-		t.Errorf("countWords() = %d; want 3", got)
+func TestCountLines_TrailingNewline(t *testing.T) {
+	// "a\n" split => ["a", ""] => 2 lines
+	if got := countLines("a\n"); got != 2 {
+		t.Errorf("countLines(\"a\\n\") = %d; want 2", got)
 	}
 }
 
-func TestCountChars(t *testing.T) {
-	if got := countChars("Hi!"); got != 3 {
-		t.Errorf("countChars() = %d; want 3", got)
+func TestCountWords_Empty(t *testing.T) {
+	if got := countWords(""); got != 0 {
+		t.Errorf("countWords(\"\") = %d; want 0", got)
+	}
+}
+
+func TestCountWords_MultipleSpacesAndNewlines(t *testing.T) {
+	// strings.Fields splits on any whitespace
+	if got := countWords(" Hello   World \n Golang "); got != 3 {
+		t.Errorf("countWords(...) = %d; want 3", got)
+	}
+}
+
+func TestCountChars_Empty(t *testing.T) {
+	if got := countChars(""); got != 0 {
+		t.Errorf("countChars(\"\") = %d; want 0", got)
+	}
+}
+
+func TestCountChars_IgnoresSpacesAndNewlines(t *testing.T) {
+	// Only letters count: 'H'(1) 'i'(1) => 2
+	if got := countChars("H i\n"); got != 2 {
+		t.Errorf("countChars(\"H i\\n\") = %d; want 2", got)
+	}
+}
+
+func TestCountWords_OnlySpaces(t *testing.T) {
+	// strings.Fields("   ") => [] so 0
+	if got := countWords("   "); got != 0 {
+		t.Errorf("countWords(\"   \") = %d; want 0", got)
+	}
+}
+
+func TestCountChars_OnlyWhitespace(t *testing.T) {
+	// All characters are whitespace, so count should be 0
+	if got := countChars(" \n\r\t "); got != 0 {
+		t.Errorf("countChars(\" \\\\n\\\\r\\\\t \") = %d; want 0", got)
+	}
+}
+
+func TestCountLines_SingleLine(t *testing.T) {
+	if got := countLines("Hello"); got != 1 {
+		t.Errorf("countLines(\"Hello\") = %d; want 1", got)
 	}
 }
 ```
+
+### Explication des tests
+
+| Test | Fonction testée | Ce qu'il vérifie |
+|------|----------------|------------------|
+| `TestMainOutput` | `main()` | Exécution sans erreur (couvre `main()` pour atteindre 100 %) |
+| `TestCountLines_Empty` | `countLines` | Chaîne vide → 0 lignes |
+| `TestCountLines_TrailingNewline` | `countLines` | Saut de ligne en fin de chaîne |
+| `TestCountLines_SingleLine` | `countLines` | Une seule ligne sans `\n` |
+| `TestCountWords_Empty` | `countWords` | Chaîne vide → 0 mots |
+| `TestCountWords_MultipleSpacesAndNewlines` | `countWords` | Espaces multiples et `\n` |
+| `TestCountWords_OnlySpaces` | `countWords` | Uniquement des espaces → 0 mots |
+| `TestCountChars_Empty` | `countChars` | Chaîne vide → 0 caractères |
+| `TestCountChars_IgnoresSpacesAndNewlines` | `countChars` | Exclut espaces et `\n` |
+| `TestCountChars_OnlyWhitespace` | `countChars` | Tous les types de whitespace → 0 |
 
 ### Lancer les tests + couverture
 
 ```bash
 go test -cover
 ```
-<img width="1064" height="92" alt="image" src="https://github.com/user-attachments/assets/811d230c-e154-4c44-954d-6e96e706cf38" />
+
+Résultat attendu :
+
+```
+PASS
+coverage: 100.0% of statements
+ok      word-stats
+```
 
 ---
