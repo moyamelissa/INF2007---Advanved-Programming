@@ -55,6 +55,12 @@ go mod init word-stats
 
 <img width="1340" height="135" alt="image" src="https://github.com/user-attachments/assets/d3ceab0c-942f-4844-af74-6d1d36178d1b" />
 
+> **Résultat attendu :**
+> ```
+> Initialized empty Git repository in C:/Users/.../word-stats/.git/
+> go: creating new go.mod: module word-stats
+> ```
+
 
 ### Créer `main.go` dans le terminal
 
@@ -97,6 +103,11 @@ go run main.go
 ```
 <img width="959" height="55" alt="image" src="https://github.com/user-attachments/assets/cef04d7c-a5ee-4c49-9c0a-e99d0c726a89" />
 
+> **Résultat attendu :**
+> ```
+> Nombre de lignes : 3
+> ```
+
 ### Premier commit
 
 Ajouter et valider le fichier avec Git :
@@ -106,6 +117,14 @@ git add main.go go.mod
 git commit -m "Initial commit: ajout de countLines"
 ```
 <img width="1251" height="176" alt="image" src="https://github.com/user-attachments/assets/dcca8c4c-8727-4e5e-ab32-564a5f9cf2c2" />
+
+> **Résultat attendu :**
+> ```
+> [main (root-commit) xxxxxxx] Initial commit: ajout de countLines
+>  2 files changed, ...
+>  create mode 100644 go.mod
+>  create mode 100644 main.go
+> ```
 
 #### ⚠️ Avertissement possible (normal sur Windows)
 
@@ -142,6 +161,13 @@ git branch
 ```
 <img width="1003" height="129" alt="image" src="https://github.com/user-attachments/assets/e4b1a1c4-3894-4c93-8fd2-906a17ac237d" />
 
+> **Résultat attendu :**
+> ```
+> Switched to a new branch 'count-words'
+> * count-words
+>   main
+> ```
+
 ### Modifier `main.go` : ajouter `countWords`
 
 Ouvrir le fichier `main.go` :
@@ -177,6 +203,12 @@ go run main.go
 ```
 <img width="892" height="73" alt="image" src="https://github.com/user-attachments/assets/c9ec3328-3ffb-4de2-8dec-047f3e773380" />
 
+> **Résultat attendu :**
+> ```
+> Nombre de lignes : 3
+> Nombre de mots : 3
+> ```
+
 ### Commit
 
 ```bash
@@ -184,6 +216,12 @@ git add main.go
 git commit -m "Ajout de countWords"
 ```
 <img width="976" height="110" alt="image" src="https://github.com/user-attachments/assets/022a47cb-1213-49de-999a-19b5c96d9ec0" />
+
+> **Résultat attendu :**
+> ```
+> [count-words xxxxxxx] Ajout de countWords
+>  1 file changed, ...
+> ```
 
 ---
 
@@ -250,6 +288,12 @@ go run main.go
 
 <img width="1149" height="74" alt="image" src="https://github.com/user-attachments/assets/941d4b89-3d6f-4114-b1a9-56a9330d7000" />
 
+> **Résultat attendu :**
+> ```
+> Nombre de lignes : 3
+> Nombre de caractères : 16
+> ```
+
 
 ### Commit
 
@@ -258,6 +302,12 @@ git add main.go
 git commit -m "Ajout de countChars"
 ```
 <img width="1139" height="108" alt="image" src="https://github.com/user-attachments/assets/d7465a69-72b2-4f9f-ad6d-6c10bc394743" />
+
+> **Résultat attendu :**
+> ```
+> [count-chars xxxxxxx] Ajout de countChars
+>  1 file changed, ...
+> ```
 
 
 ---
@@ -280,6 +330,14 @@ git merge count-words
 ```
 <img width="1262" height="112" alt="image" src="https://github.com/user-attachments/assets/f2d60ccd-7a5c-4bf1-a3ab-5f99452db7e1" />
 
+> **Résultat attendu :**
+> ```
+> Updating xxxxxxx..xxxxxxx
+> Fast-forward
+>  main.go | ...
+>  1 file changed, ...
+> ```
+
 
 ### Tester le programme
 
@@ -287,6 +345,12 @@ git merge count-words
 go run main.go
 ```
 <img width="1182" height="72" alt="image" src="https://github.com/user-attachments/assets/3597948d-5e35-456b-aaa9-dd38c1a3fa8f" />
+
+> **Résultat attendu :**
+> ```
+> Nombre de lignes : 3
+> Nombre de mots : 3
+> ```
 
 ---
 
@@ -324,6 +388,11 @@ go run main.go
 ```
 <img width="1218" height="51" alt="image" src="https://github.com/user-attachments/assets/c052f1e6-c35f-4800-ac15-4608259823dc" />
 
+> **Résultat attendu :**
+> ```
+> Nombre de caractères : 16
+> ```
+
 3) Commit :
 
 ```bash
@@ -331,6 +400,12 @@ git add main.go
 git commit -m "Affichage caractères dans main()"
 ```
 <img width="1273" height="69" alt="image" src="https://github.com/user-attachments/assets/276eeb69-af3b-4862-9086-912ff093f025" />
+
+> **Résultat attendu :**
+> ```
+> [count-chars xxxxxxx] Affichage caractères dans main()
+>  1 file changed, ...
+> ```
 
 ### 5.2 Dans `main` : afficher uniquement les mots
 
@@ -364,6 +439,11 @@ go run main.go
 ```
 <img width="1174" height="59" alt="image" src="https://github.com/user-attachments/assets/2de76fb6-dff6-436b-93d0-394e54958f51" />
 
+> **Résultat attendu :**
+> ```
+> Nombre de mots : 3
+> ```
+
 5) Commit :
 
 ```bash
@@ -371,6 +451,12 @@ git add main.go
 git commit -m "Affichage mots dans main()"
 ```
 <img width="1467" height="75" alt="image" src="https://github.com/user-attachments/assets/9fb7f7b2-baa9-4177-9bcc-e01a812c3439" />
+
+> **Résultat attendu :**
+> ```
+> [main xxxxxxx] Affichage mots dans main()
+>  1 file changed, ...
+> ```
 
 ### 5.3 Fusionner `count-chars` dans `main` (conflit attendu)
 
@@ -381,6 +467,13 @@ git merge count-chars
 Git va signaler un conflit dans `main.go`.
 
 <img width="1602" height="96" alt="image" src="https://github.com/user-attachments/assets/3170a222-16a5-41be-9920-01f84d04bf34" />
+
+> **Résultat attendu :**
+> ```
+> Auto-merging main.go
+> CONFLICT (content): Merge conflict in main.go
+> Automatic merge failed; fix conflicts and then commit the result.
+> ```
 
 
 ### 5.4 Résoudre le conflit (version conforme au devoir)
@@ -460,10 +553,21 @@ git commit -m "Résolution du conflit: affichage mots + caractères"
 ```
 <img width="1449" height="48" alt="image" src="https://github.com/user-attachments/assets/24fee318-3bfd-4dc1-ba04-e6a25de3baee" />
 
+> **Résultat attendu :**
+> ```
+> [main xxxxxxx] Résolution du conflit: affichage mots + caractères
+> ```
+
 ```bash
 go run main.go
 ```
 <img width="1091" height="78" alt="image" src="https://github.com/user-attachments/assets/8743d10a-bdd4-4ebe-9586-fa92ff3ce98c" />
+
+> **Résultat attendu :**
+> ```
+> Nombre de mots : 3
+> Nombre de caractères : 16
+> ```
 
 ---
 
@@ -479,6 +583,16 @@ git log --oneline > history.txt
 notepad history.txt
 ```
 <img width="1879" height="219" alt="image" src="https://github.com/user-attachments/assets/cded39ee-3e7b-4181-85a5-002a9677e601" />
+
+> **Résultat attendu (exemple, les hash seront différents) :**
+> ```
+> xxxxxxx Résolution du conflit: affichage mots + caractères
+> xxxxxxx Affichage mots dans main()
+> xxxxxxx Affichage caractères dans main()
+> xxxxxxx Ajout de countWords
+> xxxxxxx Ajout de countChars
+> xxxxxxx Initial commit: ajout de countLines
+> ```
 
 ### Créer un `README.md`
 
