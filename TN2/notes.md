@@ -318,12 +318,12 @@ Dans `main()`, garder seulement :
 fmt.Printf("Nombre de caractères : %d\n", countChars(text))
 ```
 
-Tester :
+Enregistrer et fermer Notepad, puis tester :
 
 ```bash
 go run main.go
 ```
-<img width="898" height="49" alt="image" src="https://github.com/user-attachments/assets/1faeaff9-7060-455e-8c32-5e7ca84d1efb" />
+<img width="1218" height="51" alt="image" src="https://github.com/user-attachments/assets/c052f1e6-c35f-4800-ac15-4608259823dc" />
 
 3) Commit :
 
@@ -331,7 +331,7 @@ go run main.go
 git add main.go
 git commit -m "Affichage caractères dans main()"
 ```
-<img width="974" height="68" alt="image" src="https://github.com/user-attachments/assets/af62dd31-da39-43ec-b1d2-f5e8376828f1" />
+<img width="1273" height="69" alt="image" src="https://github.com/user-attachments/assets/276eeb69-af3b-4862-9086-912ff093f025" />
 
 ### 5.2 Dans `main` : afficher uniquement les mots
 
@@ -363,6 +363,7 @@ func main() {
 ```bash
 go run main.go
 ```
+<img width="1174" height="59" alt="image" src="https://github.com/user-attachments/assets/2de76fb6-dff6-436b-93d0-394e54958f51" />
 
 3) Commit :
 
@@ -370,6 +371,7 @@ go run main.go
 git add main.go
 git commit -m "Affichage mots dans main()"
 ```
+<img width="1467" height="75" alt="image" src="https://github.com/user-attachments/assets/9fb7f7b2-baa9-4177-9bcc-e01a812c3439" />
 
 ### 5.3 Fusionner `count-chars` dans `main` (conflit attendu)
 
@@ -379,7 +381,12 @@ git merge count-chars
 
 Git va signaler un conflit dans `main.go`.
 
-### 5.4 Résoudre le conflit
+<img width="1602" height="96" alt="image" src="https://github.com/user-attachments/assets/3170a222-16a5-41be-9920-01f84d04bf34" />
+
+
+### 5.4 Résoudre le conflit (version conforme au devoir)
+
+> Objectif : supprimer les marqueurs de conflit et conserver **les deux fonctionnalités** (`countWords` et `countChars`), puis afficher **mots + caractères** dans `main()`.
 
 1) Ouvrir `main.go` :
 
@@ -387,19 +394,61 @@ Git va signaler un conflit dans `main.go`.
 notepad main.go
 ```
 
-2) Repérer les marqueurs de conflit Git :
+2) Repérer les marqueurs de conflit Git (ils ressemblent à ceci) :
 
 ```text
 <<<<<<< HEAD
+... (version de la branche actuelle, ex: main)
 =======
+... (version de l’autre branche, ex: count-chars)
 >>>>>>> count-chars
 ```
 
-3) Remplacer **toute** la section conflictuelle (y compris les marqueurs) par la version finale souhaitée :
+3) Résoudre le conflit en faisant 2 corrections :
+
+#### A) Conserver les deux fonctions
+Dans le fichier, Git a mis en conflit deux blocs (`countWords` d’un côté et `countChars` de l’autre).
+Vous devez :
+- **supprimer** toutes les lignes `<<<<<<<`, `=======`, `>>>>>>>`
+- garder **les deux fonctions complètes** (une après l’autre), par exemple :
+
+```go
+// countWords retourne le nombre de mots dans une chaîne (séparés par des espaces/whitespace).
+func countWords(text string) int {
+	if text == "" {
+		return 0
+	}
+	return len(strings.Fields(text))
+}
+
+// countChars retourne le nombre de caractères en excluant les espaces et les sauts de ligne.
+func countChars(text string) int {
+	count := 0
+	for _, r := range text {
+		if r != ' ' && r != '\n' && r != '\r' && r != '\t' {
+			count++
+		}
+	}
+	return count
+}
+```
+
+#### B) Combiner les affichages dans `main()`
+Dans `main()`, remplacer le bloc en conflit par **les deux affichages** :
 
 ```go
 fmt.Printf("Nombre de mots : %d\n", countWords(text))
 fmt.Printf("Nombre de caractères : %d\n", countChars(text))
+```
+
+Par exemple, `main()` doit ressembler à ceci :
+
+```go
+func main() {
+	text := "Hello\nWorld\nGolang"
+	fmt.Printf("Nombre de mots : %d\n", countWords(text))
+	fmt.Printf("Nombre de caractères : %d\n", countChars(text))
+}
 ```
 
 4) Vérifier qu’il ne reste **aucun** marqueur (`<<<<<<<`, `=======`, `>>>>>>>`), puis enregistrer.
@@ -410,6 +459,7 @@ fmt.Printf("Nombre de caractères : %d\n", countChars(text))
 git add main.go
 git commit -m "Résolution du conflit: affichage mots + caractères"
 ```
+<img width="1449" height="48" alt="image" src="https://github.com/user-attachments/assets/24fee318-3bfd-4dc1-ba04-e6a25de3baee" />
 
 ---
 
@@ -424,6 +474,7 @@ Exporter l’historique et rédiger une documentation minimale.
 git log --oneline > history.txt
 notepad history.txt
 ```
+<img width="1879" height="219" alt="image" src="https://github.com/user-attachments/assets/cded39ee-3e7b-4181-85a5-002a9677e601" />
 
 ### Créer un `README.md`
 
@@ -440,7 +491,7 @@ Le `README.md` doit contenir au minimum :
 - comment exécuter le programme
 - comment lancer les tests
 
-Exemple de contenu :
+Contenu :
 
 ```markdown
 # Projet : Word Stats (INF2007 – Travail 2)
@@ -471,7 +522,7 @@ go test -cover
 
 ---
 
-## Tests unitaires (obligatoires)
+## Tests unitaires 
 
 ### Objectif
 Ajouter un test unitaire par fonction (`countLines`, `countWords`, `countChars`).
@@ -513,5 +564,6 @@ func TestCountChars(t *testing.T) {
 ```bash
 go test -cover
 ```
+<img width="1064" height="92" alt="image" src="https://github.com/user-attachments/assets/811d230c-e154-4c44-954d-6e96e706cf38" />
 
 ---
