@@ -122,7 +122,7 @@ warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next t
 - Git vous informe simplement qu’il pourrait convertir automatiquement les fins de ligne sur Windows.
 - **Ce n’est pas une erreur** et votre projet Go fonctionne quand même.
 - Optionnel :Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
-- 
+  
 ---
 
 ## Étape 2 — Créer la branche `count-words`
@@ -220,7 +220,7 @@ Ouvrir `main.go` :
 notepad main.go
 ```
 
-Ajouter la fonction suivante :
+Ajouter cette fonction **sous** `countLines` :
 
 ```go
 // countChars retourne le nombre de caractères en excluant les espaces et les sauts de ligne.
