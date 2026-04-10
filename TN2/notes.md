@@ -1,5 +1,4 @@
-# Word Stats — Exercices Git & Go (countLines / countWords / countChars)
-
+# TN2 - Word Stats — Exercices Git & Go
 Ce guide décrit, étape par étape, la création d’un petit projet Go permettant de compter :
 - le nombre de lignes (`countLines`)
 - le nombre de mots (`countWords`)
