@@ -248,7 +248,8 @@ Enregistrer, fermer Notepad, puis tester :
 ```bash
 go run main.go
 ```
-<img width="799" height="97" alt="image" src="https://github.com/user-attachments/assets/7c024082-06a6-414f-9868-d6c5d8e0e976" />
+<img width="813" height="76" alt="image" src="https://github.com/user-attachments/assets/add5a968-c3e0-4544-906c-ba2fec25b775" />
+
 
 ### Commit
 
@@ -256,7 +257,8 @@ go run main.go
 git add main.go
 git commit -m "Ajout de countChars"
 ```
-<img width="1016" height="108" alt="image" src="https://github.com/user-attachments/assets/79f8af92-e479-4122-be30-abe20a23ab9c" />
+<img width="1139" height="108" alt="image" src="https://github.com/user-attachments/assets/d7465a69-72b2-4f9f-ad6d-6c10bc394743" />
+
 
 ---
 
