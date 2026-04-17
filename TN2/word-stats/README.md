@@ -25,6 +25,11 @@ word-stats/
 └── README.md       # Ce fichier
 ```
 
+## Prérequis
+
+- Go 1.16+
+- Git
+
 ## Exécution
 
 ```bash
@@ -46,6 +51,12 @@ go test -v
 Avec couverture :
 ```bash
 go test -cover
+```
+
+Résultat :
+```
+PASS
+coverage: 100.0% of statements
 ```
 
 ## Workflow Git
@@ -80,3 +91,11 @@ go test -cover
 4. **Fusion sans conflit** — Merge de `count-words` dans `main` (fast-forward)
 5. **Fusion avec conflit** — Modification de `main()` dans les deux branches (affichages différents), merge de `count-chars` → conflit dans `main.go`
 6. **Résolution du conflit** — Suppression des marqueurs de conflit, combinaison des deux affichages (mots + caractères)
+
+### Résolution du conflit
+
+Lors du merge de `count-chars` dans `main`, Git a signalé un conflit dans `main.go` car la fonction `main()` avait été modifiée différemment dans les deux branches :
+- `main` affichait uniquement les **mots**
+- `count-chars` affichait uniquement les **caractères**
+
+La résolution a consisté à combiner les deux affichages dans `main()` pour conserver les deux fonctionnalités.
