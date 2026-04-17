@@ -6,6 +6,8 @@ Ce guide décrit, étape par étape, la création d’un petit projet Go permett
 
 Il met également en pratique un workflow Git avec création de branches, fusions (avec et sans conflit), historique, README et tests unitaires.
 
+> **Note :** L'expérimentation a été réalisée localement dans `C:\Users\xmeli\Documents\word-stats` via Command Prompt (cmd.exe). Le projet final a ensuite été copié dans le dépôt GitHub pour la remise.
+
 ---
 
 ## Prérequis
