@@ -7,8 +7,8 @@ Ce guide décrit, étape par étape, la création d’un petit projet Go permett
 Il met également en pratique un workflow Git avec création de branches, fusions (avec et sans conflit), historique, README et tests unitaires.
 
 > **Notes :**
-> - L'expérimentation a été réalisée localement dans `C:\Users\xmeli\Documents\word-stats` via Command Prompt (cmd.exe), conformément à la consigne de créer un **dépôt Git local**. Les branches `count-words` et `count-chars` ont été créées, fusionnées et supprimées localement — elles n'apparaissent donc pas sur GitHub. La preuve du workflow est documentée par le fichier `history.txt`, les captures d'écran ci-dessous, et le rapport. Le projet final a ensuite été copié dans le dépôt GitHub pour la remise.
-> - Les identifiants de commits visibles dans les captures d'écran ne correspondent pas à ceux du fichier `history.txt`, car l'expérimentation a été refaite une seconde fois afin de capturer les captures d'écran, la première itération n'ayant pas été documentée visuellement.
+> - L'expérimentation a été réalisée localement dans `C:\Users\xmeli\Documents\word-stats` via Command Prompt (cmd.exe), conformément à la consigne de créer un **dépôt Git local**. Les branches `count-words` et `count-chars` ont été créées, fusionnées et supprimées localement, elles n'apparaissent donc pas sur GitHub. La preuve du workflow est documentée par le fichier `history.txt`, les captures d'écran ci-dessous, et le rapport. Le projet final a ensuite été copié dans le dépôt GitHub pour la remise.
+> - Les identifiants de commits visibles dans les captures d'écran ne correspondent pas à ceux du fichier `history.txt`, car l'expérimentation a été refaite plusieurs fois.
 
 ---
 
