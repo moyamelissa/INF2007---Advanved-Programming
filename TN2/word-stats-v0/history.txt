@@ -1,6 +1,0 @@
-20425ec Résolution du conflit: affichage mots + caractères
-79569f2 Affichage mots dans main()
-6d5d388 Affichage caractères dans main()
-503d70e Ajout de countChars
-681bac2 Ajoutde countWords
-e60f2ed Initial commit: ajout de countLines
