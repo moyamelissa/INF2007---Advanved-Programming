@@ -1,5 +1,8 @@
 # Projet : Word Stats (INF2007 – Travail 2)
 
+![Tests](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn2-coverage.yml/badge.svg)
+[![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn2)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
+
 Ce projet est une simulation d'un **workflow Git collaboratif** dans le cadre du cours INF2007.
 Il s'agit d'une application Go qui génère des statistiques sur un texte donné.
 
