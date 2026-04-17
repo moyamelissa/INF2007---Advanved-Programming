@@ -137,7 +137,13 @@ warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next t
 - Git vous informe simplement qu’il pourrait convertir automatiquement les fins de ligne sur Windows.
 - **Ce n’est pas une erreur** et votre projet Go fonctionne quand même.
 - Optionnel : Vous pouvez forcer des fins de ligne `LF` pour les fichiers du projet avec un fichier `.gitattributes`.
-  
+
+### Preuve d'exécution — Étape 1
+
+![Étape 1a — Initialisation du dépôt](screenshot/step1a.PNG)
+
+![Étape 1b — Premier commit](screenshot/step1b.PNG)
+
 ---
 
 ## Étape 2 — Créer la branche `count-words`
@@ -216,6 +222,10 @@ git commit -m "Ajout de countWords"
 > [count-words xxxxxxx] Ajout de countWords
 >  1 file changed, ...
 > ```
+
+### Preuve d'exécution — Étape 2
+
+![Étape 2 — Branche count-words](screenshot/step2.PNG)
 
 ---
 
@@ -301,6 +311,9 @@ git commit -m "Ajout de countChars"
 >  1 file changed, ...
 > ```
 
+### Preuve d'exécution — Étape 3
+
+![Étape 3 — Branche count-chars](screenshot/step3.PNG)
 
 ---
 
@@ -341,6 +354,10 @@ go run main.go
 > Nombre de lignes : 3
 > Nombre de mots : 3
 > ```
+
+### Preuve d'exécution — Étape 4
+
+![Étape 4 — Fusion sans conflit](screenshot/step4-merge-no-conflict.PNG)
 
 ---
 
@@ -552,6 +569,16 @@ go run main.go
 > Nombre de caractères : 16
 > ```
 
+### Preuve d'exécution — Étape 5
+
+![Étape 5.1 — Modification count-chars](screenshot/step5.1.PNG)
+
+![Étape 5.2 — Modification main](screenshot/step5.2.PNG)
+
+![Étape 5a — Conflit détecté](screenshot/step5a-conflict.PNG)
+
+![Étape 5b — Résolution et commit](screenshot/step5b-conflict_resolution.PNG)
+
 ---
 
 ## Étape 6 — Historique + README
@@ -624,6 +651,10 @@ Il contient trois fonctions Go permettant de compter :
 git add history.txt README.md
 git commit -m "Ajout de history.txt et README.md"
 ```
+
+### Preuve d'exécution — Étape 6
+
+![Étape 6 — Historique et README](screenshot/step6.PNG)
 
 ---
 
@@ -753,6 +784,10 @@ ok      word-stats
 git add main_test.go
 git commit -m "Ajout des tests unitaires (couverture 100%)"
 ```
+
+### Preuve d'exécution — Étape 7
+
+![Étape 7 — Tests et couverture](screenshot/step7.PNG)
 
 ---
 
