@@ -21,5 +21,9 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 ## CI/CD et badges
 
 - « Peux-tu écrire un fichier .yml pour afficher le coverage et passing similaire à coverage.yml mais adapté à mon TN2 ? »
+
+## Guide d'expérimentation et captures d'écran
+
+- « Peux-tu intégrer les captures d'écran que j'ai placées dans le dossier screenshots/ dans mon TN2-Experimentation-Guide.md aux endroits appropriés ? »
   
 ...
