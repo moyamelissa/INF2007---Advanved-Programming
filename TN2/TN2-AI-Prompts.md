@@ -12,7 +12,7 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 ## Documentation
 
 - « Est-ce que mon README est cohérent et complet ? Si non, que recommandes-tu d'ajouter ? »
-- « Peux-tu intégrer les captures d'écran que j'ai placées dans le dossier screenshots/ dans mon TN2-Experimentation-Guide.md aux endroits appropriés ? »
+- « Peux-tu ajouter une section pour les captures d'écran dans mon TN2-Experimentation-Guide.md aux endroits appropriés ? »
 - « Peux-tu ajouter un emoji devant l'avertissement à l'étape 1 dans mon fichier TN2-Experimentation-Guide.md pour le rendre visible ? »
 
 ## Tests unitaires et couverture
