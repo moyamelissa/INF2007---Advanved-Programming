@@ -144,9 +144,11 @@ warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next t
 
 ### Preuve d'exécution — Étape 1
 
-![Étape 1a — Initialisation du dépôt](screenshots/step1a.PNG)
+<img width="964" height="143" alt="image" src="https://github.com/user-attachments/assets/347a0142-a6c9-4860-b91b-7f4b293d5cc0" />
 
-![Étape 1b — Premier commit](screenshots/step1b.PNG)
+
+<img width="1080" height="374" alt="image" src="https://github.com/user-attachments/assets/2275e3be-76da-4c06-8e33-6d9c8de85726" />
+
 
 ---
 
@@ -229,7 +231,8 @@ git commit -m "Ajout de countWords"
 
 ### Preuve d'exécution — Étape 2
 
-![Étape 2 — Branche count-words](screenshots/step2.PNG)
+<img width="1081" height="192" alt="image" src="https://github.com/user-attachments/assets/bd9ceb64-b56e-4ee4-9572-726dd2db276e" />
+
 
 ---
 
@@ -317,7 +320,8 @@ git commit -m "Ajout de countChars"
 
 ### Preuve d'exécution — Étape 3
 
-![Étape 3 — Branche count-chars](screenshots/step3.PNG)
+<img width="1082" height="350" alt="image" src="https://github.com/user-attachments/assets/db1068ea-0403-4d6e-a02b-f9a14e76969c" />
+
 
 ---
 
@@ -361,7 +365,8 @@ go run main.go
 
 ### Preuve d'exécution — Étape 4
 
-![Étape 4 — Fusion sans conflit](screenshots/step4-merge-no-conflict.PNG)
+<img width="1081" height="245" alt="image" src="https://github.com/user-attachments/assets/0493a56d-cc03-4116-a423-f7b7b99f735b" />
+
 
 ---
 
@@ -575,13 +580,17 @@ go run main.go
 
 ### Preuve d'exécution — Étape 5
 
-![Étape 5.1 — Modification count-chars](screenshots/step5.1.PNG)
+<img width="1078" height="274" alt="image" src="https://github.com/user-attachments/assets/d6a9a0dd-fbcf-4602-bc6c-b5d1fa7751f8" />
 
-![Étape 5.2 — Modification main](screenshots/step5.2.PNG)
 
-![Étape 5a — Conflit détecté](screenshots/step5a-conflict.PNG)
+<img width="1077" height="276" alt="image" src="https://github.com/user-attachments/assets/65707894-31d3-492d-b812-5ec5babfd347" />
 
-![Étape 5b — Résolution et commit](screenshots/step5b-conflict_resolution.PNG)
+
+<img width="1078" height="96" alt="image" src="https://github.com/user-attachments/assets/20ba513c-c9bd-4479-83c6-c438cf0fee48" />
+
+
+<img width="1080" height="236" alt="image" src="https://github.com/user-attachments/assets/942edcd6-7132-4a4a-b40e-63a01c5363d8" />
+
 
 ---
 
@@ -658,7 +667,8 @@ git commit -m "Ajout de history.txt et README.md"
 
 ### Preuve d'exécution — Étape 6
 
-![Étape 6 — Historique et README](screenshots/step6.PNG)
+<img width="1073" height="289" alt="image" src="https://github.com/user-attachments/assets/029a5f87-6f40-4035-8303-21b3e0a74903" />
+
 
 ---
 
@@ -791,7 +801,8 @@ git commit -m "Ajout des tests unitaires (couverture 100%)"
 
 ### Preuve d'exécution — Étape 7
 
-![Étape 7 — Tests et couverture](screenshots/step7.PNG)
+<img width="1077" height="284" alt="image" src="https://github.com/user-attachments/assets/6b7b8d18-3209-409e-829a-0490205c7bc5" />
+
 
 ---
 
