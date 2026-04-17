@@ -2,7 +2,7 @@
 Ce guide décrit, étape par étape, la création d’un petit projet Go permettant de compter :
 - le nombre de lignes (`countLines`)
 - le nombre de mots (`countWords`)
-- le nombre de caractères (**hors espaces**) (`countChars`)
+- le nombre de caractères (`countChars`)
 
 Il met également en pratique un workflow Git avec création de branches, fusions (avec et sans conflit), historique, README et tests unitaires.
 
