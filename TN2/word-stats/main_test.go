@@ -9,8 +9,12 @@ import (
 func TestMainOutput(t *testing.T) {
 	// Redirige stdout pour éviter l'affichage pendant les tests
 	old := os.Stdout
-	os.Stdout, _ = os.Create(os.DevNull)
-	defer func() { os.Stdout = old }()
+	devNull, _ := os.Create(os.DevNull)
+	defer func() {
+		os.Stdout = old
+		devNull.Close()
+	}()
+	os.Stdout = devNull
 
 	main()
 }
