@@ -10,4 +10,24 @@ Un conflit de fusion a été provoqué lors de la fusion subséquente de count-c
 Le principal défi technique rencontré a concerné l’atteinte d’une couverture de tests complète. La fonction main(), bien que simple, repose sur des entrées et sorties standard, ce qui complique son intégration dans des tests automatisés. Afin de valider son exécution sans perturber la sortie standard, une redirection explicite de stdout vers os.DevNull a été mise en place. Cette adaptation a permis d’atteindre une couverture de 100 %, illustrant le lien entre validation logicielle et intégration du code dans un contexte de développement contrôlé. L’expérimentation met ainsi en évidence que la qualité de l’historique Git et l’intégration des fonctionnalités doivent être accompagnées d’une stratégie de tests adaptée afin de garantir la cohérence globale du projet.
 
 ---
-*Dépôt GitHub :* [github.com/moyamelissa/Advanced-Programming/tree/main/TN2](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN2)
+
+### Liens
+
+- Dépôt GitHub : [github.com/moyamelissa/Advanced-Programming/tree/main/TN2](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN2)
+- Guide d'expérimentation étape par étape : [TN2-Experimentation-Guide.md](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/TN2-Experimentation-Guide.md)
+
+### Fichiers TN2
+
+- Code source principal : [main.go](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/main.go)
+- Tests unitaires : [main_test.go](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/main_test.go)
+- Historique des commits : [history.txt](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/history.txt)
+- Documentation du projet : [README.md](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/README.md)
+- Prompts IA utilisés : [TN2-AI-Prompts.md](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/TN2-AI-Prompts.md)
+
+### Bibliographie / Sources documentaires
+
+- Manuel INF2007, chapitre 2
+- Documentation Go Testing : https://pkg.go.dev/testing
+- Tutoriel Go sur les tests : https://go.dev/doc/tutorial/add-a-test
+- A Tour of Go : https://tour.golang.org/
+- Outil d'IA : GitHub Copilot — utilisé comme outil d'assistance avec une vérification systématique de chaque suggestion avant intégration. Voir la [liste des prompts utilisés](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/TN2-AI-Prompts.md).
