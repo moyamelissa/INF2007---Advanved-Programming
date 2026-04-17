@@ -142,9 +142,9 @@ warning: in the working copy of 'go.mod', LF will be replaced by CRLF the next t
 
 ### Preuve d'exécution — Étape 1
 
-![Étape 1a — Initialisation du dépôt](screenshot/step1a.PNG)
+![Étape 1a — Initialisation du dépôt](screenshots/step1a.PNG)
 
-![Étape 1b — Premier commit](screenshot/step1b.PNG)
+![Étape 1b — Premier commit](screenshots/step1b.PNG)
 
 ---
 
@@ -227,7 +227,7 @@ git commit -m "Ajout de countWords"
 
 ### Preuve d'exécution — Étape 2
 
-![Étape 2 — Branche count-words](screenshot/step2.PNG)
+![Étape 2 — Branche count-words](screenshots/step2.PNG)
 
 ---
 
@@ -315,7 +315,7 @@ git commit -m "Ajout de countChars"
 
 ### Preuve d'exécution — Étape 3
 
-![Étape 3 — Branche count-chars](screenshot/step3.PNG)
+![Étape 3 — Branche count-chars](screenshots/step3.PNG)
 
 ---
 
@@ -359,7 +359,7 @@ go run main.go
 
 ### Preuve d'exécution — Étape 4
 
-![Étape 4 — Fusion sans conflit](screenshot/step4-merge-no-conflict.PNG)
+![Étape 4 — Fusion sans conflit](screenshots/step4-merge-no-conflict.PNG)
 
 ---
 
@@ -573,13 +573,13 @@ go run main.go
 
 ### Preuve d'exécution — Étape 5
 
-![Étape 5.1 — Modification count-chars](screenshot/step5.1.PNG)
+![Étape 5.1 — Modification count-chars](screenshots/step5.1.PNG)
 
-![Étape 5.2 — Modification main](screenshot/step5.2.PNG)
+![Étape 5.2 — Modification main](screenshots/step5.2.PNG)
 
-![Étape 5a — Conflit détecté](screenshot/step5a-conflict.PNG)
+![Étape 5a — Conflit détecté](screenshots/step5a-conflict.PNG)
 
-![Étape 5b — Résolution et commit](screenshot/step5b-conflict_resolution.PNG)
+![Étape 5b — Résolution et commit](screenshots/step5b-conflict_resolution.PNG)
 
 ---
 
@@ -656,7 +656,7 @@ git commit -m "Ajout de history.txt et README.md"
 
 ### Preuve d'exécution — Étape 6
 
-![Étape 6 — Historique et README](screenshot/step6.PNG)
+![Étape 6 — Historique et README](screenshots/step6.PNG)
 
 ---
 
@@ -789,7 +789,7 @@ git commit -m "Ajout des tests unitaires (couverture 100%)"
 
 ### Preuve d'exécution — Étape 7
 
-![Étape 7 — Tests et couverture](screenshot/step7.PNG)
+![Étape 7 — Tests et couverture](screenshots/step7.PNG)
 
 ---
 
