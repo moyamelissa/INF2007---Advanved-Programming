@@ -9,9 +9,10 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 - « Est-ce que mon projet a été réalisé correctement si tu regardes mon guide et ce qui se trouve dans word-stats ? »
 - « Est-ce que mon TN2-Experimentation suit bien chaque étape de TN2-Homework-Instructions ? »
 
-## Documentation et README
+## Documentation
 
 - « Est-ce que mon README est cohérent et complet ? Si non, que recommandes-tu d'ajouter ? »
+- « Peux-tu intégrer les captures d'écran que j'ai placées dans le dossier screenshots/ dans mon TN2-Experimentation-Guide.md aux endroits appropriés ? »
 
 ## Tests unitaires et couverture
 
@@ -20,10 +21,5 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 
 ## CI/CD et badges
 
-- « Peux-tu écrire un fichier .yml pour afficher le coverage et passing similaire à coverage.yml mais adapté à mon TN2 ? »
-
-## Guide d'expérimentation et captures d'écran
-
-- « Peux-tu intégrer les captures d'écran que j'ai placées dans le dossier screenshots/ dans mon TN2-Experimentation-Guide.md aux endroits appropriés ? »
-  
+- « Peux-tu écrire un fichier .yml pour afficher le coverage et passing similaire à coverage.yml mais adapté à mon TN2 ? »  
 ...
