@@ -6,7 +6,7 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 
 ## Vérification et validation du travail
 
-- « Est-ce que mon homework a été réalisé correctement si tu regardes mon guide et ce qui se trouve dans word-stats ? »
+- « Est-ce que mon projet a été réalisé correctement si tu regardes mon guide et ce qui se trouve dans word-stats ? »
 - « Est-ce que mon TN2-Experimentation suit bien chaque étape de TN2-Homework-Instructions ? »
 
 ## Documentation et README
