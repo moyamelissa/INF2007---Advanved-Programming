@@ -9,10 +9,10 @@ This repository contains homework and practical work for INF2007.
 
 - TN1: [Link to repo](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN1)
 - TN2: [Link to repo](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN2)
-- TN3: Coming soon
-- TN4: Coming soon
-- TN5: Coming soon
-- Programming project: Coming soon
+- TN3: [Link to repo](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN3)
+- TN4: [Link to repo](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN4)
+- TN5: [Link to repo](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN5)
+- Programming project: [Link to repo](https://github.com/moyamelissa/Advanved-Programming/tree/main/MINI-PROJET)
 
 ## Francais
 
@@ -22,7 +22,7 @@ Ce dépôt contient les travaux pratiques et devoirs du cours INF2007.
 
 - TN1: [Lien vers documents](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN1)
 - TN2: [Lien vers documents](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN2)
-- TN3: À venir
-- TN4: À venir
-- TN5: À venir
-- Project de programmation: À venir
+- TN3: [Lien vers documents](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN3)
+- TN4: [Lien vers documents](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN4)
+- TN5: [Lien vers documents](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN5)
+- Project de programmation: [Lien vers documents](https://github.com/moyamelissa/Advanved-Programming/tree/main/MINI-PROJET)
