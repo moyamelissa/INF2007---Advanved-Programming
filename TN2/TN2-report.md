@@ -22,7 +22,6 @@ Le principal défi technique rencontré a concerné l’atteinte d’une couvert
 - Tests unitaires : [main_test.go](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/main_test.go)
 - Historique des commits : [history.txt](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/history.txt)
 - Documentation du projet : [README.md](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/word-stats/README.md)
-- Prompts IA utilisés : [TN2-AI-Prompts.md](https://github.com/moyamelissa/Advanced-Programming/blob/main/TN2/TN2-AI-Prompts.md)
 
 ### Bibliographie / Sources documentaires
 
