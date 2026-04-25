@@ -55,7 +55,7 @@ $$d_{int} = 299\,792\,458 \times \frac{36.0}{1\,000\,000\,000} = 10.8 \text{ mè
 
 $$d_{float} = 299\,792\,458 \times \frac{20.9}{1\,000\,000\,000} = 6.3 \text{ mètres}$$
 
-**Réponse.** La lumière parcourt entre 6 et 11 mètres pendant un seul calcul de sinus, soit la taille d'une pièce d'appartement. On pense que `math.Sin` est instantané, mais la lumière a le temps de traverser un salon pendant ce calcul.
+**Réponse.** La lumière parcourt entre 6 et 11 mètres pendant un seul calcul de sinus, donc ce n'est pas aussi instantané qu'on pourrait le croire.
 
 **Question 2 – Combien de sinus peut-on calculer par tick à 120 fps ?**
 
@@ -65,7 +65,7 @@ $$n_{int} = \frac{8\,333\,333}{36.0} \approx 231\,481 \text{ sinus par tick}$$
 
 $$n_{float} = \frac{8\,333\,333}{20.9} \approx 398\,726 \text{ sinus par tick}$$
 
-**Réponse.** On peut calculer environ 231 000 sinus (Int) ou 399 000 sinus (Float) par tick. En pratique, si on réserve 10 % du budget de frame au calcul de sinus, ça laisse environ 23 100 (Int) ou 39 900 (Float) sinus par tick, ce qui est largement suffisant pour animer un millier d'objets avec des rotations et des oscillations.
+**Réponse:** On peut calculer environ 231 000 sinus (Int) ou 399 000 sinus (Float) par tick. En pratique, si on réserve 10 % du budget de frame au calcul de sinus, ça laisse environ 23 100 (Int) ou 39 900 (Float) sinus par tick, ce qui est largement suffisant pour animer un millier d'objets avec des rotations et des oscillations.
 
 *Pour les détails de chaque calcul, voir [Guide-applications-numeriques.md](Results-and-Instructions/Guide-applications-numeriques.md).*
 
