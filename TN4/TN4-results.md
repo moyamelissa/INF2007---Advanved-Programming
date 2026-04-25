@@ -2,25 +2,33 @@
 
 ## Comment reproduire les résultats
 
-Depuis le dossier `TN4/`, lancer la commande suivante dans un terminal :
+Depuis le dossier `TN4/`, lancer les commandes suivantes dans un terminal.
 
-```bash
-go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
-```
-
-Cette commande exécute uniquement les benchmarks (pas les tests unitaires grâce à `-run="^$"`) avec le reporting mémoire activé (`-benchmem`). Le flag `-count=1` évite les répétitions inutiles.
-
-Pour les tests unitaires seuls :
+**Tests unitaires (4 tests)**
 
 ```bash
 go test -v -run="Test" ./...
 ```
 
-## Sortie brute du terminal
+![Tests unitaires](Resultats/Tests%20unitaires.PNG)
 
-La capture ci-dessous montre la sortie complète des 22 benchmarks (11 paliers pour Int, 11 pour Float) exécutés sur un Intel i5-10300H à 2.50 GHz (Windows/amd64).
+**Benchmarks complets (22 sous-benchmarks)**
 
-![Sortie des benchmarks dans le terminal](benchmark-output.png)
+```bash
+go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
+```
+
+Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting mémoire, et `-count=1` évite les répétitions inutiles.
+
+![Benchmarks complets](Resultats/Benchmarks%20complets.PNG)
+
+**Couverture de code**
+
+```bash
+go test -v -cover ./...
+```
+
+![Couverture de code](Resultats/Couverture%20de%20code.PNG)
 
 ## Tableau des résultats
 
@@ -41,6 +49,12 @@ La capture ci-dessous montre la sortie complète des 22 benchmarks (11 paliers p
 Les valeurs en millisecondes sont converties depuis les ns/op affichés par `go test`. Par exemple, `406203 ns/op` donne `0.41 ms`. Aucune allocation mémoire n'a été mesurée (0 B/op, 0 allocs/op) pour les deux types.
 
 ## Graphique
+
+Le graphique est généré avec Mermaid (syntaxe `xychart-beta`), qui est rendu automatiquement par GitHub dans les fichiers Markdown.
+
+Les données proviennent directement de la colonne `ns/op` de la sortie des benchmarks. Pour convertir en millisecondes, on divise par 1 000 000. Par exemple, pour `BenchmarkSineSumInt/1pct-8` qui affiche `406203 ns/op`, on obtient `406203 / 1000000 = 0.41 ms`.
+
+Les 11 valeurs Int et les 11 valeurs Float sont ensuite placées dans deux tableaux `line [...]` dans le bloc Mermaid, dans le même ordre que les pourcentages sur l'axe X.
 
 ```mermaid
 %%{init: {'theme': 'default', 'themeVariables': {'xyChart': {'backgroundColor': '#ffffff'}}}}%%
