@@ -23,6 +23,10 @@ jobs:
         working-directory: TN6
         run: go test ./... -coverprofile=coverage.out -covermode=atomic
 
+      - name: Fix coverage paths
+        working-directory: TN6
+        run: sed -i 's|webcrawler/|TN6/|g' coverage.out
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
