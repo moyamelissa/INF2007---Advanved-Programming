@@ -27,7 +27,7 @@ TN4/
 ├── TN4-Homework-Instructions.md    # Énoncé du travail
 ├── Results-and-Instructions/       # Résultats, captures d'écran et guides
 │   ├── Resultats-benchmarks-et-captures.md  # Données brutes et tableau complet
-│   ├── Guide-calculs-questions-professeur.md # Comment calculer lumière + 120 fps
+│   ├── Guide-applications-numeriques.md      # Comment calculer lumière + 120 fps
 │   ├── Guide-creation-graphique-Mermaid.md   # Comment créer le graphique Mermaid
 │   ├── Tests unitaires.PNG          # Capture de go test -v
 │   ├── Benchmarks complets.PNG      # Capture de go test -bench
@@ -89,7 +89,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 
 - [Rapport TN4](TN4-report.md)
 - [Résultats et captures](Results-and-Instructions/Resultats-benchmarks-et-captures.md)
-- [Guide calculs](Results-and-Instructions/Guide-calculs-questions-professeur.md)
+- [Guide calculs](Results-and-Instructions/Guide-applications-numeriques.md)
 - [Guide graphique Mermaid](Results-and-Instructions/Guide-creation-graphique-Mermaid.md)
 - [Prompts IA](TN4-AI-Prompts.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN4)

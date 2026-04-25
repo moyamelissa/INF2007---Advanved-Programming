@@ -1,4 +1,4 @@
-# Instructions pour les questions spéciales
+# Guide des applications numériques
 
 ## Question 1 : Distance parcourue par la lumière pendant un sinus
 
