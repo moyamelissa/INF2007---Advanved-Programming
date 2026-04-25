@@ -4,8 +4,9 @@ import (
 	"testing"
 )
 
-// TestAnalyseDonneesValides vérifie le comportement avec des données entièrement valides
-// pour un capteur donné.
+// TestAnalyseDonneesValides vérifie le comptage correct des mesures pour un capteur donné.
+// Inclut plusieurs bits actifs, un autre capteur ignoré, et une entrée sans mesure (valeur=0).
+// Important : c'est le seul test qui valide le résultat numérique du tableau [24]int.
 func TestAnalyseDonneesValides(t *testing.T) {
 	data := []uint32{
 		0x00000105, // ID=5, bit 8=1
@@ -32,8 +33,9 @@ func TestAnalyseDonneesValides(t *testing.T) {
 	}
 }
 
-// TestAnalyseBit7Invalide vérifie qu'une erreur est retournée lorsque le bit 7
-// (bit de validation) est à 1 dans une entrée.
+// TestAnalyseBit7Invalide vérifie qu'une entrée avec le bit 7 à 1 retourne une erreur.
+// L'entrée invalide a un ID différent du capteur demandé, ce qui confirme
+// que la validation est globale (toutes les entrées, pas seulement celles du capteur).
 func TestAnalyseBit7Invalide(t *testing.T) {
 	data := []uint32{
 		0x00000105, // ID=5, valide
@@ -46,8 +48,9 @@ func TestAnalyseBit7Invalide(t *testing.T) {
 	}
 }
 
-// TestAnalysePlusieursBitsValeur vérifie qu'une erreur est retournée lorsque plus
-// d'un bit parmi les bits 8 à 31 est à 1.
+// TestAnalysePlusieursBitsValeur vérifie qu'une erreur est retournée quand plus d'un
+// bit parmi 8–31 est à 1. Cela teste directement l'identité x & (x-1) utilisée pour
+// la détection multi-bits : si la formule était incorrecte, ce test échouerait.
 func TestAnalysePlusieursBitsValeur(t *testing.T) {
 	data := []uint32{
 		0x00000305, // ID=5, bits 8 et 9 à 1 → invalide
@@ -59,8 +62,9 @@ func TestAnalysePlusieursBitsValeur(t *testing.T) {
 	}
 }
 
-// TestAnalyseCapteurInvalide vérifie qu'une erreur est retournée lorsque
-// l'identifiant du capteur dépasse 127.
+// TestAnalyseCapteurInvalide vérifie qu'un capteur > 127 est rejeté avant toute
+// itération sur les données. Important car uint8 accepte 0–255, mais seuls
+// 0–127 sont des identifiants valides (7 bits).
 func TestAnalyseCapteurInvalide(t *testing.T) {
 	data := []uint32{
 		0x00000105,
@@ -72,7 +76,8 @@ func TestAnalyseCapteurInvalide(t *testing.T) {
 	}
 }
 
-// TestAnalyseTableauVide vérifie que la fonction gère correctement un tableau vide.
+// TestAnalyseTableauVide vérifie le cas limite d'un tableau sans données.
+// Doit retourner un tableau de zéros sans erreur, pas de panique ni d'index hors bornes.
 func TestAnalyseTableauVide(t *testing.T) {
 	data := []uint32{}
 	counts, err := Analyse(data, 0)
@@ -86,7 +91,9 @@ func TestAnalyseTableauVide(t *testing.T) {
 	}
 }
 
-// TestAnalyseExempleEnonce reproduit l'exemple donné dans l'énoncé du travail.
+// TestAnalyseExempleEnonce reproduit l'exemple exact de l'énoncé. Garantit que
+// notre implémentation produit le même résultat que celui du professeur, ce qui
+// réduit le risque d'interprétation erronée de la spécification.
 func TestAnalyseExempleEnonce(t *testing.T) {
 	data := []uint32{
 		0x00000105, // ID=5, bit 7=0, bit 8=1 (valide)
