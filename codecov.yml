@@ -1,0 +1,28 @@
+codecov:
+  require_ci_to_pass: no
+
+flags:
+  tn1:
+    paths:
+      - TN1/
+    carryforward: true
+  tn2:
+    paths:
+      - TN2/
+    carryforward: true
+  tn3:
+    paths:
+      - TN3/
+    carryforward: true
+  tn4:
+    paths:
+      - TN4/
+    carryforward: true
+  tn5:
+    paths:
+      - TN5/
+    carryforward: true
+  tn6:
+    paths:
+      - TN6/
+    carryforward: true
