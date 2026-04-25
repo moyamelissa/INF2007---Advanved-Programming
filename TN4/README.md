@@ -24,10 +24,11 @@ TN4/
 ├── sinesum_test.go              # 4 tests unitaires + 22 benchmarks
 ├── TN4-report.md                # Rapport d'analyse avec graphique
 ├── TN4-results.md               # Résultats détaillés et captures
-├── Resultats/                   # Screenshots des sorties terminal
+├── Results-and-Instructions/    # Screenshots and instructions
 │   ├── Tests unitaires.PNG
 │   ├── Benchmarks complets.PNG
-│   └── Couverture de code.PNG
+│   ├── Couverture de code.PNG
+│   └── Instructions-graphique-Mermaid.md
 ├── TN4-AI-Prompts.md            # Prompts IA utilisés
 ├── TN4-Homework-Instructions.md # Énoncé du travail
 └── README.md                    # Ce fichier

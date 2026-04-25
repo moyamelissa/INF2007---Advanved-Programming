@@ -69,4 +69,5 @@ Les résultats détaillés (commandes, capture d'écran du terminal, graphique e
 - Documentation Go `math/rand` https://pkg.go.dev/math/rand
 - Documentation Go `testing` https://pkg.go.dev/testing
 - Documentation Go `flag` https://pkg.go.dev/flag
+- Documentation Mermaid XY Chart https://mermaid.js.org/syntax/xyChart.html
 - Outil d'IA GitHub Copilot, utilisé comme assistant avec vérification systématique des suggestions

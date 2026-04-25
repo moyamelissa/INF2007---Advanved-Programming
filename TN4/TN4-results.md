@@ -10,7 +10,7 @@ Depuis le dossier `TN4/`, lancer les commandes suivantes dans un terminal.
 go test -v -run="Test" ./...
 ```
 
-![Tests unitaires](Resultats/Tests%20unitaires.PNG)
+![Tests unitaires](Results-and-Instructions/Tests%20unitaires.PNG)
 
 **Benchmarks complets (22 sous-benchmarks)**
 
@@ -20,7 +20,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 
 Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting mémoire, et `-count=1` évite les répétitions inutiles.
 
-![Benchmarks complets](Resultats/Benchmarks%20complets.PNG)
+![Benchmarks complets](Results-and-Instructions/Benchmarks%20complets.PNG)
 
 **Couverture de code**
 
@@ -28,7 +28,7 @@ Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting 
 go test -v -cover ./...
 ```
 
-![Couverture de code](Resultats/Couverture%20de%20code.PNG)
+![Couverture de code](Results-and-Instructions/Couverture%20de%20code.PNG)
 
 ## Tableau des résultats
 
