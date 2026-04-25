@@ -25,37 +25,46 @@ import (
 func Analyse(data []uint32, capteur uint8) ([24]int, error) {
 	var counts [24]int
 
-	// Valider l'identifiant du capteur (doit être ≤ 127, c'est-à-dire 7 bits)
+	// Ch3 — Overflow awareness : uint8 va de 0 à 255 (2⁸−1).
+	// Les identifiants valides n'utilisent que 7 bits (0 à 127 = 2⁷−1).
+	// On doit vérifier explicitement car uint8 ne déborde pas à 127.
 	if capteur > 127 {
 		return counts, errors.New("identifiant de capteur invalide : doit être entre 0 et 127")
 	}
 
-	for _, entry := range data {
-		// Extraire l'identifiant du capteur (bits 0–6) avec un masque 0x7F
-		id := entry & 0x7F
+	// Ch4 — Masques : (1<<7)-1 = 0x7F isole les 7 bits de poids faible.
+	// C'est la technique "range of bits" du chapitre 4.
+	const maskID = (1 << 7) - 1                     // 0x7F : bits 0–6
+	const maskBit7 = 1 << 7                         // 0x80 : bit 7 seul
+	const maskValeur = ^uint32(0) &^ ((1 << 8) - 1) // bits 8–31 (AND NOT pour effacer bits 0–7)
 
-		// Vérifier le bit de validation (bit 7) avec un masque 0x80
-		if entry&0x80 != 0 {
+	for _, entry := range data {
+		// Ch4 — AND masking : extraire l'ID capteur (bits 0–6)
+		id := entry & maskID
+
+		// Ch4 — Test d'un bit unique : vérifier le bit de validation (bit 7)
+		if entry&maskBit7 != 0 {
 			return counts, errors.New("bit de validation (bit 7) est à 1 : entrée invalide")
 		}
 
-		// Extraire les bits 8 à 31 (valeur du capteur)
+		// Ch4 — Shift right : décaler les bits 8–31 vers les positions 0–23
+		// Équivalent à diviser par 2⁸ (Ch3 : shift = division par puissance de 2)
 		valeur := entry >> 8
 
-		// Vérifier qu'au plus un bit parmi les bits 8–31 est à 1
-		if bits.OnesCount32(valeur) > 1 {
+		// Ch4 — Bit identity : x & (x-1) efface le bit le plus bas à 1.
+		// Si le résultat est non nul, il y avait au moins 2 bits à 1.
+		// Plus efficace que bits.OnesCount car c'est une seule opération.
+		if valeur&(valeur-1) != 0 {
 			return counts, errors.New("plus d'un bit à 1 parmi les bits 8 à 31 : entrée invalide")
 		}
 
 		// Compter uniquement pour le capteur demandé
 		if id == uint32(capteur) && valeur != 0 {
-			// Trouver quel bit est à 1 et incrémenter le compteur correspondant
-			for i := 0; i < 24; i++ {
-				if valeur&(1<<i) != 0 {
-					counts[i]++
-					break // Un seul bit est à 1, on peut arrêter
-				}
-			}
+			// Ch4 — bits.TrailingZeros : trouver la position du bit à 1
+			// en O(1) sans boucle ni branchement (utilise l'instruction CPU BSF/TZCNT).
+			// Remplace une boucle de 24 itérations par une seule instruction.
+			pos := bits.TrailingZeros32(valeur)
+			counts[pos]++
 		}
 	}
 
