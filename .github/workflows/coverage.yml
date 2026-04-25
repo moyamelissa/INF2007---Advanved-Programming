@@ -29,6 +29,5 @@ jobs:
           files: TN1/coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: tn1
-          slug: moyamelissa/Advanced-Programming
           name: tn1-coverage
           fail_ci_if_error: false
