@@ -73,6 +73,39 @@ func TestComputeSineSumEmpty(t *testing.T) {
 	}
 }
 
+// TestComputeSineSumNegative vérifie que les entiers négatifs sont gérés
+// correctement. math.Sin est une fonction impaire, donc sin(-1) = -sin(1),
+// et la somme sin(-1)+sin(0)+sin(1) doit valoir exactement sin(0) = 0.
+func TestComputeSineSumNegative(t *testing.T) {
+	data := []int{-1, 0, 1}
+	expected := math.Sin(-1) + math.Sin(0) + math.Sin(1)
+
+	result, err := computeSineSum("int", data)
+	if err != nil {
+		t.Fatalf("erreur inattendue : %v", err)
+	}
+	if math.Abs(result-expected) > tolerance {
+		t.Errorf("résultat incorrect : obtenu %.10f, attendu %.10f", result, expected)
+	}
+}
+
+// TestComputeSineSumLargeFloat vérifie la stabilité numérique avec des valeurs
+// proches de la limite de précision float64. Des valeurs comme 1e15 forcent
+// la réduction d'argument de math.Sin à travailler sur de grands multiples de pi,
+// ce qui peut amplifier les erreurs d'arrondi.
+func TestComputeSineSumLargeFloat(t *testing.T) {
+	data := []float64{1e15, 1e-15, 0.0}
+	expected := math.Sin(1e15) + math.Sin(1e-15) + math.Sin(0.0)
+
+	result, err := computeSineSum("float", data)
+	if err != nil {
+		t.Fatalf("erreur inattendue : %v", err)
+	}
+	if math.Abs(result-expected) > tolerance {
+		t.Errorf("résultat incorrect : obtenu %.10f, attendu %.10f", result, expected)
+	}
+}
+
 // ========== Benchmarks ==========
 
 // Pourcentages du tableau à tester
@@ -97,27 +130,33 @@ var percentages = []struct {
 var benchIntArray = generateIntArray(arraySize)
 var benchFloatArray = generateFloatArray(arraySize)
 
-// BenchmarkSineSumInt mesure le temps de computeSineSumInt pour différentes tailles de tableau.
+// BenchmarkSineSumInt mesure le temps de computeSineSum pour des entiers
+// à différentes tailles de tableau. On passe par le dispatch pour benchmarker
+// la fonction telle qu'elle est appelée en production (cf. Ch. 6).
 func BenchmarkSineSumInt(b *testing.B) {
 	for _, p := range percentages {
 		size := int(float64(arraySize) * p.percent)
 		slice := benchIntArray[:size]
 		b.Run(p.name, func(b *testing.B) {
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				computeSineSumInt(slice)
+				computeSineSum("int", slice)
 			}
 		})
 	}
 }
 
-// BenchmarkSineSumFloat mesure le temps de computeSineSumFloat pour différentes tailles de tableau.
+// BenchmarkSineSumFloat mesure le temps de computeSineSum pour des flottants
+// à différentes tailles de tableau. Le dispatch via interface{} ajoute un coût
+// négligeable par rapport à math.Sin, mais on le mesure quand même (cf. Ch. 6).
 func BenchmarkSineSumFloat(b *testing.B) {
 	for _, p := range percentages {
 		size := int(float64(arraySize) * p.percent)
 		slice := benchFloatArray[:size]
 		b.Run(p.name, func(b *testing.B) {
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				computeSineSumFloat(slice)
+				computeSineSum("float", slice)
 			}
 		})
 	}
