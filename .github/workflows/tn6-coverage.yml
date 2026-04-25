@@ -1,0 +1,33 @@
+name: TN6 Coverage
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: TN6/go.mod
+
+      - name: Run tests with coverage
+        working-directory: TN6
+        run: go test ./... -coverprofile=coverage.out -covermode=atomic
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: TN6/coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: tn6
+          name: tn6-coverage
+          fail_ci_if_error: false

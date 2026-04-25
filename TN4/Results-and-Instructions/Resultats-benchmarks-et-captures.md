@@ -4,7 +4,7 @@
 
 Depuis le dossier `TN4/`, lancer les commandes suivantes dans un terminal.
 
-**Tests unitaires (6 tests)**
+**Tests unitaires (13 tests)**
 
 ```bash
 go test -v -run="Test" ./...

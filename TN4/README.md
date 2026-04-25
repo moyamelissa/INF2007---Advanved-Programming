@@ -21,7 +21,7 @@ Ce projet mesure et compare les performances du calcul de la somme des sinus sur
 TN4/
 ├── go.mod                          # Module Go
 ├── sinesum.go                      # Code principal + CLI (flag --type)
-├── sinesum_test.go                 # 6 tests unitaires + 22 benchmarks
+├── sinesum_test.go                 # 13 tests unitaires + 22 benchmarks
 ├── TN4-report.md                   # Rapport d'analyse avec tableau, graphique et calculs
 ├── TN4-AI-Prompts.md               # Prompts IA utilisés
 ├── TN4-Homework-Instructions.md    # Énoncé du travail
@@ -73,6 +73,13 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestComputeSineSumEmpty` | Somme = 0 pour un tableau vide (Int et Float) |
 | `TestComputeSineSumNegative` | Entiers négatifs `[-1, 0, 1]`, propriété d'imparité de sin |
 | `TestComputeSineSumLargeFloat` | Stabilité numérique avec `1e15` (réduction d'argument) |
+| `TestComputeSineSumIntWrongData` | Dispatch "int" avec données `[]float64` retourne erreur |
+| `TestComputeSineSumFloatWrongData` | Dispatch "float" avec données `[]int` retourne erreur |
+| `TestRunInt` | `run("int")` retourne un résultat sans erreur |
+| `TestRunFloat` | `run("float")` retourne un résultat sans erreur |
+| `TestRunInvalidType` | `run("complex")` retourne une erreur |
+| `TestMainFunction` | `main()` s'exécute sans panique (cas nominal) |
+| `TestMainFunctionError` | `main()` gère un type invalide sans panique |
 
 ## Benchmarks disponibles
 

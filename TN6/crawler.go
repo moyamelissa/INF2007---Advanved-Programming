@@ -212,20 +212,15 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 	return results, totalWords, errs
 }
 
-func main() {
-	urls := []string{
-		"https://www.google.com",
-		"https://www.github.com",
-		"https://go.dev",
-		"https://en.wikipedia.org/wiki/Go_(programming_language)",
-	}
-
+// run contient la logique principale du programme, extraite de main pour
+// permettre les tests unitaires.
+func run(urls []string, maxGoroutines int) {
 	fmt.Println("=== Robot d'exploration Web concurrent ===")
 	fmt.Printf("URLs à explorer : %d\n", len(urls))
-	fmt.Printf("Goroutines max  : 8\n\n")
+	fmt.Printf("Goroutines max  : %d\n\n", maxGoroutines)
 
 	start := time.Now()
-	results, total, errs := CrawlURLs(urls, 8)
+	results, total, errs := CrawlURLs(urls, maxGoroutines)
 	elapsed := time.Since(start)
 
 	for urlStr, count := range results {
@@ -241,4 +236,14 @@ func main() {
 
 	fmt.Printf("\nTotal global    : %d mots\n", total)
 	fmt.Printf("Temps d'exécution : %v\n", elapsed)
+}
+
+func main() {
+	urls := []string{
+		"https://www.google.com",
+		"https://www.github.com",
+		"https://go.dev",
+		"https://en.wikipedia.org/wiki/Go_(programming_language)",
+	}
+	run(urls, 8)
 }
