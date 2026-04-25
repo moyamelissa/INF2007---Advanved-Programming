@@ -1,6 +1,6 @@
 # INF2007 – TN3 – Melissa Moya
 
-![Go Coverage Workflow](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/tn3-coverage.yml/badge.svg) ![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg?flag=TN3)
+![Go Coverage Workflow](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/tn3-coverage.yml/badge.svg) ![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
 
 ## Approche pour extraire et valider les bits
 
