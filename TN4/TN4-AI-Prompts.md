@@ -30,4 +30,3 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 
 - « Comment générer un graphique Mermaid `xychart-beta` dans un fichier Markdown pour comparer les courbes Int et Float ? »
 - « Est-ce que je peux forcer un fond blanc sur un graphique Mermaid pour que ça rende bien en mode sombre sur GitHub ? »
-- « Comment calculer la distance parcourue par la lumière pendant un appel à `math.Sin` et le nombre de sinus par frame à 120 fps ? »
