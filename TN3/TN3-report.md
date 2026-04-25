@@ -16,7 +16,7 @@ Les manipulations bit à bit sont particulièrement vulnérables aux erreurs off
 
 ### Liens
 
-- Dépôt GitHub : [github.com/moyamelissa/Advanved-Programming/tree/main/TN3](https://github.com/moyamelissa/Advanved-Programming/tree/main/TN3)
+- Dépôt GitHub : [github.com/moyamelissa/Advanced-Programming/tree/main/TN3](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN3)
 
 ### Fichiers TN3
 
