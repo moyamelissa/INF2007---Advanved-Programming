@@ -28,6 +28,6 @@ jobs:
         with:
           files: TN3/coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: TN3
+          flags: tn3
           name: tn3-coverage
           fail_ci_if_error: false
