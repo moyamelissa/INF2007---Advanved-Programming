@@ -9,7 +9,9 @@ const tolerance = 1e-9
 
 // ========== Tests unitaires ==========
 
-// TestComputeSineSumInt vérifie la correction de computeSineSum pour un petit tableau d'entiers.
+// TestComputeSineSumInt vérifie le calcul pour [1, 2, 3] en comparant au résultat
+// attendu avec une tolérance de 1e-9. Important car la conversion int → float64
+// (instruction CVTSI2SD) pourrait introduire une erreur si mal implémentée.
 func TestComputeSineSumInt(t *testing.T) {
 	data := []int{1, 2, 3}
 	expected := math.Sin(1) + math.Sin(2) + math.Sin(3)
@@ -23,7 +25,9 @@ func TestComputeSineSumInt(t *testing.T) {
 	}
 }
 
-// TestComputeSineSumFloat vérifie la correction de computeSineSum pour un petit tableau de flottants.
+// TestComputeSineSumFloat vérifie le calcul pour [0.1, 0.2, 0.3] sans conversion
+// de type. Valide que math.Sin reçoit directement des float64 et que l'accumulation
+// par addition ne dépasse pas la tolérance de 1e-9 sur 3 éléments.
 func TestComputeSineSumFloat(t *testing.T) {
 	data := []float64{0.1, 0.2, 0.3}
 	expected := math.Sin(0.1) + math.Sin(0.2) + math.Sin(0.3)
@@ -37,7 +41,9 @@ func TestComputeSineSumFloat(t *testing.T) {
 	}
 }
 
-// TestComputeSineSumInvalidType vérifie qu'une erreur est retournée pour un type invalide.
+// TestComputeSineSumInvalidType passe "complex" comme type et vérifie que la
+// fonction retourne une erreur. Sans ce test, un type non supporté pourrait
+// silencieusement retourner 0 au lieu de signaler le problème.
 func TestComputeSineSumInvalidType(t *testing.T) {
 	data := []int{1, 2, 3}
 	_, err := computeSineSum("complex", data)
@@ -46,7 +52,9 @@ func TestComputeSineSumInvalidType(t *testing.T) {
 	}
 }
 
-// TestComputeSineSumEmpty vérifie que la somme est 0 pour un tableau vide.
+// TestComputeSineSumEmpty vérifie que la somme est 0 pour un tableau vide,
+// tant pour les entiers que pour les flottants. Cas limite qui garantit
+// l'absence de panique ou d'index hors bornes sur une slice de taille 0.
 func TestComputeSineSumEmpty(t *testing.T) {
 	resultInt, err := computeSineSum("int", []int{})
 	if err != nil {

@@ -1,141 +1,72 @@
-# TN4 — Rapport : Mesurez et optimisez la somme des sinus en Go
+# INF2007 – TN4 – Melissa Moya
 
-**Cours** : INF2007 — Programmation avancée  
-**Plateforme** : Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
+![Go Coverage Workflow](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn4-coverage.yml/badge.svg) [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn4)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
 
----
+## Approche et structure du programme
 
-## 1. Choix d'implémentation
+Le programme calcule la somme des sinus d'un tableau de 1 000 000 d'éléments, en entiers ou en flottants selon le flag `--type` (package `flag`, cf. Ch. 5). J'ai séparé le code en trois couches. `generateIntArray` et `generateFloatArray` créent les tableaux avec `rand.NewSource(42)` pour que chaque exécution produise exactement les mêmes données. `computeSineSumInt` et `computeSineSumFloat` font le calcul brut dans des boucles spécialisées, et `computeSineSum` sert de dispatch via un `switch` sur le type reçu en `interface{}`.
 
-### Structure du programme
+Ce découpage n'est pas juste esthétique. Les benchmarks appellent directement les fonctions typées, ce qui mesure uniquement la boucle de calcul sans le surcoût du dispatch dynamique ni de l'assertion de type. La seed fixe à 42 (plutôt que `crypto/rand`) est volontaire. `crypto/rand` ferait des appels système à chaque tirage, ce qui fausserait les mesures en mélangeant le coût du calcul avec celui de la génération (cf. Ch. 6).
 
-Le programme accepte un paramètre `--type=int` ou `--type=float` via `flag.String`. J'ai séparé la logique en trois couches :
+## Résultats des benchmarks
 
-- `generateIntArray(n)` / `generateFloatArray(n)` : génèrent des tableaux reproductibles avec `rand.New(rand.NewSource(42))`.
-- `computeSineSumInt(data)` / `computeSineSumFloat(data)` : fonctions spécialisées pour chaque type.
-- `computeSineSum(dataType, data)` : fonction de dispatch qui accepte un `interface{}` et valide le type.
+Les mesures ont été prises avec `go test -bench=. -benchmem -count=1` sur un Intel i5-10300H à 2.50 GHz (Windows/amd64, 8 threads). Aucune allocation mémoire n'a été détectée (0 B/op, 0 allocs/op) pour les deux types, ce qui confirme que les variables `sum` et les itérateurs restent sur la pile.
 
-La séparation en fonctions typées (`computeSineSumInt` vs `computeSineSumFloat`) permet aux benchmarks de mesurer directement la boucle de calcul, sans le surcoût du dispatch dynamique.
+| % du tableau | Éléments | Int (ms) | Float (ms) | Ratio |
+|:---:|:---:|:---:|:---:|:---:|
+| 1 % | 10 000 | 0.41 | 0.21 | 1.94× |
+| 10 % | 100 000 | 3.59 | 2.29 | 1.57× |
+| 20 % | 200 000 | 7.31 | 4.52 | 1.62× |
+| 30 % | 300 000 | 10.63 | 6.21 | 1.71× |
+| 40 % | 400 000 | 17.22 | 8.54 | 2.01× |
+| 50 % | 500 000 | 18.07 | 10.28 | 1.76× |
+| 60 % | 600 000 | 21.63 | 13.78 | 1.57× |
+| 70 % | 700 000 | 25.13 | 14.42 | 1.74× |
+| 80 % | 800 000 | 28.72 | 16.64 | 1.73× |
+| 90 % | 900 000 | 33.18 | 19.47 | 1.70× |
+| 100 % | 1 000 000 | 36.44 | 21.05 | 1.73× |
 
-### Choix de la graine aléatoire
-
-J'utilise `rand.NewSource(42)` pour garantir la **reproductibilité** des benchmarks. Si la graine changeait à chaque exécution, les résultats varieraient légèrement d'un run à l'autre. La valeur 42 est arbitraire mais fixe.
-
-### Boucle de calcul
-
-Pour les entiers, la conversion explicite est inévitable :
-
-```go
-func computeSineSumInt(data []int) float64 {
-    var sum float64
-    for _, v := range data {
-        sum += math.Sin(float64(v))  // conversion int → float64
-    }
-    return sum
-}
+```mermaid
+%%{init: {'theme': 'default', 'themeVariables': {'xyChart': {'backgroundColor': '#ffffff'}}}}%%
+xychart-beta
+    title "Graphique 1 – Temps de calcul selon le pourcentage du tableau (Int vs Float)"
+    x-axis "Pourcentage du tableau" ["1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]
+    y-axis "Temps d'exécution (ms)" 0 --> 40
+    line [0.41, 3.59, 7.31, 10.63, 17.22, 18.07, 21.63, 25.13, 28.72, 33.18, 36.44]
+    line [0.21, 2.29, 4.52, 6.21, 8.54, 10.28, 13.78, 14.42, 16.64, 19.47, 21.05]
 ```
 
-Pour les flottants, aucune conversion n'est nécessaire :
+## Analyse des performances
 
-```go
-func computeSineSumFloat(data []float64) float64 {
-    var sum float64
-    for _, v := range data {
-        sum += math.Sin(v)  // appel direct
-    }
-    return sum
-}
-```
+La progression est quasi linéaire pour les deux types, ce qui confirme la complexité O(n). En passant de 50 % à 100 %, le temps double presque exactement (18.07 → 36.44 ms pour Int, 10.28 → 21.05 ms pour Float).
 
-Cette différence structurelle est exactement ce que les benchmarks mesurent.
+Les flottants sont systématiquement plus rapides, avec un ratio moyen de 1.73×. La différence vient de la conversion `float64(v)` que la version Int exécute à chaque itération. Sur x86-64, cette conversion se traduit par l'instruction `CVTSI2SD` qui ajoute 4 à 5 cycles par élément (cf. Ch. 5). Sur 1 million d'éléments à 2.5 GHz, ça représente environ 2 ms de surcoût pur, mais l'écart observé de ~15 ms suggère que la conversion perturbe aussi le pipeline du processeur en cassant la chaîne de dépendances de données.
 
-## 2. Résultats des benchmarks
+`math.Sin` utilise une réduction de l'argument suivie d'une approximation polynomiale (polynômes de Chebyshev). C'est l'opération qui domine le temps de calcul. Le temps moyen par sinus est de 36.4 ns (Int) et 21.1 ns (Float), l'addition `sum +=` ne prenant qu'environ 1 ns en comparaison.
 
-Les benchmarks ont été exécutés avec `go test -bench=. -benchmem` sur un tableau de 1 000 000 éléments. Aucune allocation mémoire n'a été observée (0 B/op, 0 allocs/op) pour les deux types — tout est sur la pile.
+## Questions spéciales
 
-### Tableau comparatif (ns/op)
+La lumière voyage à environ 299 792 458 m/s. Pendant un seul calcul de sinus, elle parcourt $299\,792\,458 \times 36.4 \times 10^{-9} \approx 10.9$ mètres (Int) et $299\,792\,458 \times 21.1 \times 10^{-9} \approx 6.3$ mètres (Float). C'est la taille d'une pièce d'appartement. On pense que `math.Sin` est instantané, mais la lumière a le temps de traverser un salon pendant ce calcul.
 
-| % du tableau | Éléments  | Int (ns/op)  | Float (ns/op) | Ratio Int/Float |
-|:------------:|:---------:|:------------:|:--------------:|:---------------:|
-| 1 %          | 10 000    | 437 494      | 342 851        | 1.28×           |
-| 10 %         | 100 000   | 4 410 294    | 3 613 594      | 1.22×           |
-| 20 %         | 200 000   | 9 470 669    | 6 711 544      | 1.41×           |
-| 30 %         | 300 000   | 14 053 830   | 11 333 780     | 1.24×           |
-| 40 %         | 400 000   | 18 323 905   | 16 646 386     | 1.10×           |
-| 50 %         | 500 000   | 21 718 398   | 16 902 883     | 1.28×           |
-| 60 %         | 600 000   | 25 966 251   | 20 248 249     | 1.28×           |
-| 70 %         | 700 000   | 33 715 978   | 23 806 892     | 1.42×           |
-| 80 %         | 800 000   | 38 586 420   | 33 308 424     | 1.16×           |
-| 90 %         | 900 000   | 43 307 119   | 36 601 474     | 1.18×           |
-| 100 %        | 1 000 000 | 48 182 164   | 38 946 579     | 1.24×           |
+Pour un jeu à 120 fps, chaque frame dispose de 8.33 ms. À 36.4 ns par sinus (Int), on peut en calculer environ 229 000 par frame. En Float, c'est 395 000. En pratique, si on réserve 10 % du budget de frame au calcul de sinus, ça laisse 23 000 (Int) ou 39 500 (Float) sinus par tick, ce qui est largement suffisant pour animer un millier d'objets avec des rotations et des oscillations.
 
-### Observations clés
+## Annexe
 
-- **Scalabilité linéaire** : en doublant la taille (de 50 % à 100 %), le temps double presque exactement (21.7 ms → 48.2 ms pour int, 16.9 ms → 38.9 ms pour float). Cela confirme la complexité O(n).
-- **Les flottants sont ~20-30 % plus rapides que les entiers**. Le ratio moyen est de 1.24×, ce qui correspond au coût de l'instruction CPU `CVTSI2SD` (conversion int64 → float64) exécutée à chaque itération pour les entiers.
-- **Zéro allocation mémoire** : les deux implémentations n'allouent aucune mémoire sur le tas, ce qui est optimal. La variable `sum` et la variable de boucle restent sur la pile.
+Les résultats détaillés (commandes, capture d'écran du terminal, graphique et explication de lecture) sont dans [TN4-results.md](TN4-results.md).
 
-## 3. Analyse des facteurs de performance
+### Liens
 
-### Coût de la conversion de type (int → float64)
+- Dépôt GitHub [github.com/moyamelissa/Advanced-Programming/tree/main/TN4](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN4)
 
-Pour les entiers, chaque itération nécessite `math.Sin(float64(v))`. Sur x86-64, cette conversion se traduit par une instruction `CVTSI2SD` qui prend 4-5 cycles CPU. Pour 1 million d'éléments, cela représente environ 2 ms de surcoût pur, ce qui correspond bien à la différence observée (48.2 - 38.9 ≈ 9.2 ms — le reste étant attribuable aux effets de cache).
+### Fichiers TN4
 
-### Coût de `math.Sin`
+- Code principal [sinesum.go](sinesum.go)
+- Tests et benchmarks [sinesum_test.go](sinesum_test.go)
 
-La fonction `math.Sin` de Go utilise une réduction de l'argument suivie d'une approximation polynomiale (polynômes de Chebyshev). C'est l'opération qui domine largement le temps de calcul (~40-48 ns par appel). L'addition `sum +=` ne prend qu'environ 1 ns.
+### Bibliographie
 
-### Temps par sinus
-- **Int** : 48 182 164 ns / 1 000 000 = **~48.2 ns/sin**
-- **Float** : 38 946 579 ns / 1 000 000 = **~38.9 ns/sin**
-
-## 4. Questions spéciales
-
-### Distance parcourue par la lumière pendant un seul calcul de sinus
-
-La lumière voyage à $c = 299\,792\,458$ m/s.
-
-- Pour un sinus sur un **entier** (~48.2 ns) :  
-  $d = c \times t = 299\,792\,458 \times 48.2 \times 10^{-9} \approx 14.45$ mètres
-
-- Pour un sinus sur un **flottant** (~38.9 ns) :  
-  $d = 299\,792\,458 \times 38.9 \times 10^{-9} \approx 11.66$ mètres
-
-**La lumière parcourt environ 12 à 14 mètres pendant le calcul d'un seul sinus.** Pour mettre en perspective, c'est la longueur d'une salle de classe. Le calcul d'un sinus est donc très rapide à l'échelle humaine, mais significatif à l'échelle physique.
-
-### Nombre de sinus calculables dans un tick de jeu vidéo à 120 FPS
-
-Un tick = $\frac{1}{120} \approx 8\,333\,333$ ns.
-
-- **Int** : $\frac{8\,333\,333}{48.2} \approx 172\,890$ sinus par tick
-- **Float** : $\frac{8\,333\,333}{38.9} \approx 214\,225$ sinus par tick
-
-**On peut calculer environ 170 000 à 215 000 sinus par tick à 120 FPS** sur cette machine. Concrètement, si un jeu utilise des sinus pour l'animation de 1 000 objets (rotation, oscillation), chaque objet pourrait utiliser environ 170–214 calculs de sinus par frame. En pratique, les jeux vidéo utilisent des **tables de sinus précalculées** (lookup tables) ou l'approximation de Taylor tronquée pour éviter ce coût.
-
-## 5. Méthodologie de benchmarking
-
-J'ai utilisé les sous-benchmarks de `testing.B` pour structurer les mesures :
-
-```go
-func BenchmarkSineSumInt(b *testing.B) {
-    for _, p := range percentages {
-        size := int(float64(arraySize) * p.percent)
-        slice := benchIntArray[:size]  // pré-alloué, pas mesuré
-        b.Run(p.name, func(b *testing.B) {
-            for i := 0; i < b.N; i++ {
-                computeSineSumInt(slice)
-            }
-        })
-    }
-}
-```
-
-Le tableau est **pré-généré** en variable globale (`var benchIntArray = generateIntArray(arraySize)`) pour que le benchmark ne mesure que le calcul, pas la génération. Les 11 sous-benchmarks (1 % à 100 %) permettent de vérifier la linéarité.
-
-## 6. Conclusion
-
-Le benchmarking confirme que :
-1. La performance est **linéaire en O(n)**, dominée par le coût de `math.Sin`.
-2. Les **flottants sont plus performants** (~24 % en moyenne) que les entiers grâce à l'absence de conversion de type.
-3. Le calcul de sinus est relativement coûteux (~40-50 ns), ce qui limite son utilisation intensive dans des applications temps réel.
-4. L'utilisation de `testing.B` avec des sous-benchmarks permet une analyse granulaire et reproductible des performances.
+- Manuel INF2007, chapitres 5 et 6
+- Documentation Go `math/rand` https://pkg.go.dev/math/rand
+- Documentation Go `testing` https://pkg.go.dev/testing
+- Documentation Go `flag` https://pkg.go.dev/flag
+- Outil d'IA GitHub Copilot, utilisé comme assistant avec vérification systématique des suggestions
