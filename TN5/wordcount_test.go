@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -73,6 +75,110 @@ func TestSplitIntoSegments(t *testing.T) {
 }
 
 // ========== Benchmarks ==========
+
+// TestSplitIntoSegmentsNegativeSize vérifie que splitIntoSegments retourne
+// tout le contenu en un seul segment quand la taille est <= 0.
+func TestSplitIntoSegmentsNegativeSize(t *testing.T) {
+	segments := splitIntoSegments("Hello world", -1)
+	if len(segments) != 1 || segments[0] != "Hello world" {
+		t.Errorf("attendu 1 segment complet, obtenu %v", segments)
+	}
+	segments = splitIntoSegments("Hello world", 0)
+	if len(segments) != 1 || segments[0] != "Hello world" {
+		t.Errorf("attendu 1 segment complet pour size=0, obtenu %v", segments)
+	}
+}
+
+// TestRunValidFile vérifie que run fonctionne avec un fichier réel.
+func TestRunValidFile(t *testing.T) {
+	dir := t.TempDir()
+	f := filepath.Join(dir, "test.txt")
+	os.WriteFile(f, []byte("Hello world from Go"), 0644)
+
+	total, err := run([]string{"cmd", f})
+	if err != nil {
+		t.Fatalf("erreur inattendue : %v", err)
+	}
+	if total != 4 {
+		t.Errorf("attendu 4 mots, obtenu %d", total)
+	}
+}
+
+// TestRunWithSegmentSize vérifie que run accepte une taille de segment en argument.
+func TestRunWithSegmentSize(t *testing.T) {
+	dir := t.TempDir()
+	f := filepath.Join(dir, "test.txt")
+	os.WriteFile(f, []byte("Hello world from Go"), 0644)
+
+	total, err := run([]string{"cmd", f, "5"})
+	if err != nil {
+		t.Fatalf("erreur inattendue : %v", err)
+	}
+	if total != 4 {
+		t.Errorf("attendu 4 mots, obtenu %d", total)
+	}
+}
+
+// TestRunNoArgs vérifie que run retourne une erreur sans arguments.
+func TestRunNoArgs(t *testing.T) {
+	_, err := run([]string{"cmd"})
+	if err == nil {
+		t.Fatal("attendu une erreur sans arguments")
+	}
+}
+
+// TestRunInvalidSegmentSize vérifie que run retourne une erreur pour une taille invalide.
+func TestRunInvalidSegmentSize(t *testing.T) {
+	_, err := run([]string{"cmd", "file.txt", "abc"})
+	if err == nil {
+		t.Fatal("attendu une erreur pour taille invalide")
+	}
+	_, err = run([]string{"cmd", "file.txt", "-5"})
+	if err == nil {
+		t.Fatal("attendu une erreur pour taille négative")
+	}
+}
+
+// TestRunMissingFile vérifie que run retourne une erreur pour un fichier inexistant.
+func TestRunMissingFile(t *testing.T) {
+	_, err := run([]string{"cmd", "fichier_inexistant_xyz.txt"})
+	if err == nil {
+		t.Fatal("attendu une erreur pour fichier manquant")
+	}
+}
+
+// TestMainFunction vérifie que main() s'exécute sans panique pour un fichier valide.
+// On remplace exitFunc pour éviter que os.Exit ne tue le processus de test.
+func TestMainFunction(t *testing.T) {
+	oldArgs := os.Args
+	oldExit := exitFunc
+	defer func() { os.Args = oldArgs; exitFunc = oldExit }()
+
+	dir := t.TempDir()
+	f := filepath.Join(dir, "test.txt")
+	os.WriteFile(f, []byte("Hello world"), 0644)
+
+	exitFunc = func(code int) {}
+	os.Args = []string{"cmd", f}
+	main()
+}
+
+// TestMainFunctionError vérifie que main() appelle exitFunc(1) quand aucun fichier
+// n'est fourni, ce qui couvre la branche d'erreur.
+func TestMainFunctionError(t *testing.T) {
+	oldArgs := os.Args
+	oldExit := exitFunc
+	defer func() { os.Args = oldArgs; exitFunc = oldExit }()
+
+	exitCalled := false
+	exitFunc = func(code int) { exitCalled = true }
+	os.Args = []string{"cmd"}
+	main()
+
+	if !exitCalled {
+		t.Fatal("attendu un appel à exitFunc")
+	}
+}
 
 // generateLargeContent génère un contenu de test avec environ n mots.
 func generateLargeContent(nWords int) string {

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"math"
+	"os"
 	"testing"
 )
 
@@ -104,6 +106,69 @@ func TestComputeSineSumLargeFloat(t *testing.T) {
 	if math.Abs(result-expected) > tolerance {
 		t.Errorf("résultat incorrect : obtenu %.10f, attendu %.10f", result, expected)
 	}
+}
+
+// TestComputeSineSumIntWrongData vérifie que passer des données du mauvais type
+// ([]float64 au lieu de []int) retourne une erreur au lieu de paniquer.
+func TestComputeSineSumIntWrongData(t *testing.T) {
+	_, err := computeSineSum("int", []float64{0.1})
+	if err == nil {
+		t.Fatal("attendu une erreur pour type \"int\" avec []float64")
+	}
+}
+
+// TestComputeSineSumFloatWrongData vérifie que passer des données du mauvais type
+// ([]int au lieu de []float64) retourne une erreur.
+func TestComputeSineSumFloatWrongData(t *testing.T) {
+	_, err := computeSineSum("float", []int{1})
+	if err == nil {
+		t.Fatal("attendu une erreur pour type \"float\" avec []int")
+	}
+}
+
+// TestRunInt vérifie que la fonction run s'exécute correctement avec le type int.
+func TestRunInt(t *testing.T) {
+	_, err := run("int")
+	if err != nil {
+		t.Fatalf("erreur inattendue : %v", err)
+	}
+}
+
+// TestRunFloat vérifie que la fonction run s'exécute correctement avec le type float.
+func TestRunFloat(t *testing.T) {
+	_, err := run("float")
+	if err != nil {
+		t.Fatalf("erreur inattendue : %v", err)
+	}
+}
+
+// TestRunInvalidType vérifie que run retourne une erreur pour un type invalide.
+func TestRunInvalidType(t *testing.T) {
+	_, err := run("complex")
+	if err == nil {
+		t.Fatal("attendu une erreur pour un type invalide")
+	}
+}
+
+// TestMainFunction vérifie que main() s'exécute sans panique pour le cas nominal.
+// On réinitialise flag.CommandLine car main() appelle flag.String et flag.Parse.
+func TestMainFunction(t *testing.T) {
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	os.Args = []string{"cmd", "-type", "float"}
+	main()
+}
+
+// TestMainFunctionError vérifie que main() gère un type invalide sans panique.
+func TestMainFunctionError(t *testing.T) {
+	oldArgs := os.Args
+	defer func() { os.Args = oldArgs }()
+
+	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	os.Args = []string{"cmd", "-type", "complex"}
+	main()
 }
 
 // ========== Benchmarks ==========

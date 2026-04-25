@@ -1,4 +1,4 @@
-name: TN2 Coverage
+name: TN1 Coverage
 
 on:
   push:
@@ -17,17 +17,17 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: TN2/word-stats/go.mod
+          go-version-file: TN1/go.mod
 
       - name: Run tests with coverage
-        working-directory: TN2/word-stats
+        working-directory: TN1
         run: go test ./... -coverprofile=coverage.out -covermode=atomic
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: TN2/word-stats/coverage.out
+          files: TN1/coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
-          flags: tn2
-          name: tn2-coverage
+          flags: tn1
+          name: tn1-coverage
           fail_ci_if_error: false

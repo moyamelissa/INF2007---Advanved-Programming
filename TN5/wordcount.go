@@ -87,28 +87,27 @@ func CountWordsConcurrent(content string, segmentSize int) int {
 	return total
 }
 
-func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: go run wordcount.go <fichier> [taille_segment]\n")
-		os.Exit(1)
+// run contient la logique principale du programme, extraite de main pour
+// permettre les tests unitaires. Elle retourne le nombre total de mots et une erreur.
+func run(args []string) (int, error) {
+	if len(args) < 2 {
+		return 0, fmt.Errorf("usage: go run wordcount.go <fichier> [taille_segment]")
 	}
 
-	filePath := os.Args[1]
+	filePath := args[1]
 
 	segmentSize := 1000 // taille par défaut
-	if len(os.Args) >= 3 {
-		s, err := strconv.Atoi(os.Args[2])
+	if len(args) >= 3 {
+		s, err := strconv.Atoi(args[2])
 		if err != nil || s <= 0 {
-			fmt.Fprintf(os.Stderr, "Erreur : taille de segment invalide %q\n", os.Args[2])
-			os.Exit(1)
+			return 0, fmt.Errorf("taille de segment invalide %q", args[2])
 		}
 		segmentSize = s
 	}
 
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Erreur lors de la lecture du fichier : %v\n", err)
-		os.Exit(1)
+		return 0, fmt.Errorf("lecture du fichier : %v", err)
 	}
 
 	content := string(data)
@@ -117,4 +116,18 @@ func main() {
 	fmt.Printf("Nombre total de mots : %d\n", total)
 	fmt.Printf("Taille du fichier    : %d octets\n", len(data))
 	fmt.Printf("Taille des segments  : %d caractères\n", segmentSize)
+
+	return total, nil
+}
+
+// exitFunc permet de remplacer os.Exit dans les tests (cf. Ch. 11).
+var exitFunc = os.Exit
+
+func main() {
+	total, err := run(os.Args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Erreur : %v\n", err)
+		exitFunc(1)
+	}
+	_ = total
 }

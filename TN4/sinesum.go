@@ -74,27 +74,25 @@ func computeSineSum(dataType string, data interface{}) (float64, error) {
 	}
 }
 
-func main() {
-	dataType := flag.String("type", "float", "Type de données : \"int\" ou \"float\"")
-	flag.Parse()
-
-	fmt.Printf("=== Somme des sinus — type=%s, taille=%d ===\n\n", *dataType, arraySize)
+// run contient la logique principale du programme, extraite de main pour
+// permettre les tests unitaires. Elle retourne une erreur si le type est invalide.
+func run(dataType string) (float64, error) {
+	fmt.Printf("=== Somme des sinus — type=%s, taille=%d ===\n\n", dataType, arraySize)
 
 	// Les mesures via time.Since servent uniquement à l'affichage console.
 	// L'analyse de performance repose sur testing.B (cf. Ch. 6).
 	start := time.Now()
 
 	var result float64
-	var err error
 
-	switch *dataType {
+	switch dataType {
 	case "int":
 		data := generateIntArray(arraySize)
 		genTime := time.Since(start)
 		fmt.Printf("Génération du tableau : %v\n", genTime)
 
 		calcStart := time.Now()
-		result, err = computeSineSum("int", data)
+		result = computeSineSumInt(data)
 		calcTime := time.Since(calcStart)
 		fmt.Printf("Calcul de la somme    : %v\n", calcTime)
 
@@ -104,21 +102,26 @@ func main() {
 		fmt.Printf("Génération du tableau : %v\n", genTime)
 
 		calcStart := time.Now()
-		result, err = computeSineSum("float", data)
+		result = computeSineSumFloat(data)
 		calcTime := time.Since(calcStart)
 		fmt.Printf("Calcul de la somme    : %v\n", calcTime)
 
 	default:
-		fmt.Printf("Type invalide : %q. Utilisez \"int\" ou \"float\".\n", *dataType)
-		return
-	}
-
-	if err != nil {
-		fmt.Printf("Erreur : %v\n", err)
-		return
+		return 0, fmt.Errorf("type invalide : %q (utilisez \"int\" ou \"float\")", dataType)
 	}
 
 	totalTime := time.Since(start)
 	fmt.Printf("\nRésultat              : %.6f\n", result)
 	fmt.Printf("Temps total           : %v\n", totalTime)
+	return result, nil
+}
+
+func main() {
+	dataType := flag.String("type", "float", "Type de données : \"int\" ou \"float\"")
+	flag.Parse()
+
+	_, err := run(*dataType)
+	if err != nil {
+		fmt.Printf("Erreur : %v\n", err)
+	}
 }
