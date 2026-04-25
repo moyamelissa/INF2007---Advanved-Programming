@@ -23,12 +23,13 @@ TN4/
 ├── sinesum.go                   # Code principal + CLI (flag --type)
 ├── sinesum_test.go              # 4 tests unitaires + 22 benchmarks
 ├── TN4-report.md                # Rapport d'analyse avec graphique
-├── TN4-results.md               # Résultats détaillés et captures
-├── Results-and-Instructions/    # Screenshots and instructions
+├── Results-and-Instructions/    # Résultats, captures et guides
+│   ├── Resultats-benchmarks-et-captures.md
+│   ├── Guide-calculs-questions-professeur.md
+│   ├── Guide-creation-graphique-Mermaid.md
 │   ├── Tests unitaires.PNG
 │   ├── Benchmarks complets.PNG
-│   ├── Couverture de code.PNG
-│   └── Instructions-graphique-Mermaid.md
+│   └── Couverture de code.PNG
 ├── TN4-AI-Prompts.md            # Prompts IA utilisés
 ├── TN4-Homework-Instructions.md # Énoncé du travail
 └── README.md                    # Ce fichier
@@ -85,6 +86,8 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 ## Liens
 
 - [Rapport TN4](TN4-report.md)
-- [Résultats détaillés](TN4-results.md)
+- [Résultats et captures](Results-and-Instructions/Resultats-benchmarks-et-captures.md)
+- [Guide calculs](Results-and-Instructions/Guide-calculs-questions-professeur.md)
+- [Guide graphique Mermaid](Results-and-Instructions/Guide-creation-graphique-Mermaid.md)
 - [Prompts IA](TN4-AI-Prompts.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN4)
