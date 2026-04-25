@@ -19,20 +19,20 @@ Ce projet mesure et compare les performances du calcul de la somme des sinus sur
 
 ```
 TN4/
-├── go.mod                       # Module Go
-├── sinesum.go                   # Code principal + CLI (flag --type)
-├── sinesum_test.go              # 4 tests unitaires + 22 benchmarks
-├── TN4-report.md                # Rapport d'analyse avec graphique
-├── Results-and-Instructions/    # Résultats, captures et guides
-│   ├── Resultats-benchmarks-et-captures.md
-│   ├── Guide-calculs-questions-professeur.md
-│   ├── Guide-creation-graphique-Mermaid.md
-│   ├── Tests unitaires.PNG
-│   ├── Benchmarks complets.PNG
-│   └── Couverture de code.PNG
-├── TN4-AI-Prompts.md            # Prompts IA utilisés
-├── TN4-Homework-Instructions.md # Énoncé du travail
-└── README.md                    # Ce fichier
+├── go.mod                          # Module Go
+├── sinesum.go                      # Code principal + CLI (flag --type)
+├── sinesum_test.go                 # 6 tests unitaires + 22 benchmarks
+├── TN4-report.md                   # Rapport d'analyse avec tableau, graphique et calculs
+├── TN4-AI-Prompts.md               # Prompts IA utilisés
+├── TN4-Homework-Instructions.md    # Énoncé du travail
+├── Results-and-Instructions/       # Résultats, captures d'écran et guides
+│   ├── Resultats-benchmarks-et-captures.md  # Données brutes et tableau complet
+│   ├── Guide-calculs-questions-professeur.md # Comment calculer lumière + 120 fps
+│   ├── Guide-creation-graphique-Mermaid.md   # Comment créer le graphique Mermaid
+│   ├── Tests unitaires.PNG          # Capture de go test -v
+│   ├── Benchmarks complets.PNG      # Capture de go test -bench
+│   └── Couverture de code.PNG       # Capture de go test -cover
+└── README.md                       # Ce fichier
 ```
 
 ## Prérequis
@@ -71,6 +71,8 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestComputeSineSumFloat` | Correction du calcul pour `[0.1, 0.2, 0.3]` sans conversion |
 | `TestComputeSineSumInvalidType` | Rejet d'un type non supporté (`"complex"`) |
 | `TestComputeSineSumEmpty` | Somme = 0 pour un tableau vide (Int et Float) |
+| `TestComputeSineSumNegative` | Entiers négatifs `[-1, 0, 1]`, propriété d'imparité de sin |
+| `TestComputeSineSumLargeFloat` | Stabilité numérique avec `1e15` (réduction d'argument) |
 
 ## Benchmarks disponibles
 
