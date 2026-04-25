@@ -24,19 +24,20 @@ Les mesures reposent exclusivement sur `testing.B`, le seul outil fiable pour du
 | 90 % | 900 000 | 32.58 | 19.10 | 1.71× |
 | 100 % | 1 000 000 | 36.03 | 20.94 | 1.72× |
 
+Les flottants sont systématiquement plus rapides avec un ratio moyen de 1.75×. En passant de 50 % à 100 %, le temps double presque exactement (18.38 vers 36.03 ms pour Int, 10.60 vers 20.94 ms), ce qui confirme la complexité O(n). Aucune allocation mémoire n'a été détectée (0 B/op), ce qui signifie que `sum` et les itérateurs restent sur la pile.
+
+**Graphique 1 – Temps de calcul selon le pourcentage du tableau (Int vs Float)**
+
 ```mermaid
 %%{init: {'theme': 'default', 'themeVariables': {'xyChart': {'backgroundColor': '#ffffff'}}}}%%
 xychart-beta
-    title "Graphique 1 – Temps de calcul selon le pourcentage du tableau (Int vs Float)"
     x-axis "Pourcentage du tableau" ["1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]
     y-axis "Temps d'exécution (ms)" 0 --> 40
     line [0.39, 3.81, 7.55, 10.92, 15.48, 18.38, 21.71, 25.46, 29.09, 32.58, 36.03]
     line [0.21, 2.11, 4.24, 6.71, 8.38, 10.60, 12.79, 14.72, 17.07, 19.10, 20.94]
 ```
 
-## Analyse des performances
-
-La progression est quasi linéaire pour les deux types. En passant de 50 % à 100 %, le temps double presque exactement (18.38 vers 36.03 ms pour Int, 10.60 vers 20.94 ms), ce qui confirme la complexité O(n). Les flottants sont systématiquement plus rapides avec un ratio moyen de 1.75×. Cette différence s'explique par la conversion `float64(v)` que la version Int exécute à chaque itération. Sur x86-64, cette conversion se traduit par l'instruction `CVTSI2SD` qui ajoute 4 à 5 cycles par élément. Sur 1 million d'éléments à 2.5 GHz, ça représente environ 2 ms de surcoût pur, mais l'écart observé d'environ 15 ms suggère que la conversion perturbe aussi le pipeline du processeur en cassant la chaîne de dépendances de données. `math.Sin` elle-même utilise une réduction de l'argument suivie d'une approximation polynomiale (Chebyshev) et c'est l'opération qui domine le temps de calcul.
+La courbe du haut correspond aux entiers, celle du bas aux flottants. La progression est quasi linéaire pour les deux types, et les courbes restent parallèles sur toute la plage. L'écart entre Int et Float s'explique par la conversion `float64(v)` que la version Int exécute à chaque itération. Sur x86-64, cette conversion se traduit par l'instruction `CVTSI2SD` qui ajoute 4 à 5 cycles par élément. Sur 1 million d'éléments à 2.5 GHz, ça représente environ 2 ms de surcoût pur, mais l'écart observé d'environ 15 ms suggère que la conversion perturbe aussi le pipeline du processeur en cassant la chaîne de dépendances de données. `math.Sin` elle-même utilise une réduction de l'argument suivie d'une approximation polynomiale (Chebyshev) et c'est l'opération qui domine le temps de calcul.
 
 ## Calculs pour les questions du professeur
 
@@ -58,7 +59,7 @@ $$n_{float} = \frac{8\,333\,333}{20.9} \approx 398\,726 \text{ sinus par tick}$$
 
 En pratique, si on réserve 10 % du budget de frame au calcul de sinus, ça laisse environ 23 100 (Int) ou 39 900 (Float) sinus par tick, ce qui est largement suffisant pour animer un millier d'objets avec des rotations et des oscillations.
 
-*Pour les détails de chaque calcul et les instructions de reproduction, voir [Guide-calculs-questions-professeur.md](Results-and-Instructions/Guide-calculs-questions-professeur.md) et [Guide-creation-graphique-Mermaid.md](Results-and-Instructions/Guide-creation-graphique-Mermaid.md).*
+*Pour les détails de chaque calcul, voir [Guide-calculs-questions-professeur.md](Results-and-Instructions/Guide-calculs-questions-professeur.md)
 
 ### Liens
 
