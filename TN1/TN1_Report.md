@@ -1,6 +1,6 @@
 # INF2007 – TN1 – Melissa Moya
 
-![Go Coverage Workflow](https://github.com/moyamelissa/Advanved-Programming/actions/workflows/coverage.yml/badge.svg) ![Codecov](https://codecov.io/gh/moyamelissa/Advanved-Programming/branch/main/graph/badge.svg)
+![Go Coverage Workflow](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/coverage.yml/badge.svg) [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn1)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
 
 ## Justification des cas de test choisis
 
