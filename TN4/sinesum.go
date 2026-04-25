@@ -51,8 +51,10 @@ func computeSineSumFloat(data []float64) float64 {
 	return sum
 }
 
-// computeSineSum calcule la somme des sinus pour un tableau de type "int" ou "float".
-// Retourne la somme et une erreur si le type est invalide ou si data n'est pas du bon type.
+// computeSineSum dispatche le calcul vers la fonction typée appropriée.
+// Le dispatch via interface{} et assertion de type introduit un surcoût
+// négligeable (~1 ns) face à math.Sin (~30 ns), ce qui le rend acceptable
+// pour l'interface utilisateur et les benchmarks (cf. Ch. 6).
 func computeSineSum(dataType string, data interface{}) (float64, error) {
 	switch dataType {
 	case "int":
@@ -78,6 +80,8 @@ func main() {
 
 	fmt.Printf("=== Somme des sinus — type=%s, taille=%d ===\n\n", *dataType, arraySize)
 
+	// Les mesures via time.Since servent uniquement à l'affichage console.
+	// L'analyse de performance repose sur testing.B (cf. Ch. 6).
 	start := time.Now()
 
 	var result float64

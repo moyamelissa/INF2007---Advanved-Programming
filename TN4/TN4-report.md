@@ -1,14 +1,12 @@
 # INF2007 – TN4 – Melissa Moya
 
-![Go Coverage Workflow](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn4-coverage.yml/badge.svg) [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn4)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
-
 ## Approche et structure du programme
 
-Le programme calcule la somme des sinus d'un tableau de 1 000 000 d'éléments, en entiers ou en flottants selon le flag `--type` (package `flag`, cf. Ch. 5). J'ai séparé le code en trois couches. `generateIntArray` et `generateFloatArray` créent les tableaux avec `rand.NewSource(42)` pour que chaque exécution produise exactement les mêmes données, ce qui est essentiel pour la reproductibilité des benchmarks. J'aurais pu utiliser `crypto/rand`, mais celui-ci fait des appels système à chaque tirage, ce qui fausserait les mesures en mélangeant le coût du calcul avec celui de la génération (cf. Ch. 6). `computeSineSumInt` et `computeSineSumFloat` contiennent la boucle de calcul spécialisée pour chaque type, et `computeSineSum` sert de dispatch via un `switch` sur le type reçu en `interface{}`. Les benchmarks passent par `computeSineSum` pour mesurer le programme tel qu'il est réellement exécuté, dispatch inclus. Le surcoût du `switch` et de l'assertion de type est négligeable face à `math.Sin` (~1 ns vs ~30 ns), mais c'est plus fidèle à l'utilisation réelle (cf. Ch. 6).
+Le programme calcule la somme des sinus d'un tableau de 1 000 000 d'éléments, en entiers ou en flottants selon le flag `--type`. J'ai séparé le code en trois couches. `generateIntArray` et `generateFloatArray` créent les tableaux avec `rand.NewSource(42)` pour que chaque exécution produise exactement les mêmes données, ce qui est essentiel pour la reproductibilité des benchmarks. J'aurais pu utiliser `crypto/rand`, mais celui-ci fait des appels système à chaque tirage, ce qui fausserait les mesures en mélangeant le coût du calcul avec celui de la génération. `computeSineSumInt` et `computeSineSumFloat` contiennent la boucle de calcul spécialisée pour chaque type, et `computeSineSum` sert de dispatch via un `switch` sur le type reçu en `interface{}`. Les benchmarks passent par `computeSineSum` pour mesurer le programme tel qu'il est réellement exécuté, dispatch inclus. Le surcoût du `switch` et de l'assertion de type est négligeable face à `math.Sin` (environ 1 ns contre 30 ns), mais c'est plus fidèle à l'utilisation réelle.
 
 ## Résultats des benchmarks
 
-Les mesures reposent exclusivement sur `testing.B`, le seul outil fiable pour du benchmarking en Go (cf. Ch. 6). Les `time.Since` dans `main` ne servent qu'à donner une intuition à l'utilisateur et ne sont pas utilisées dans l'analyse. `testing.B` ajuste automatiquement le nombre d'itérations (`b.N`) pour stabiliser la mesure, et `b.ResetTimer()` est appelé avant chaque boucle pour exclure le setup. Les 22 sous-benchmarks (11 paliers par type) ont été exécutés avec `go test -bench=. -benchmem -count=1` sur un Intel i5-10300H à 2.50 GHz (Windows/amd64, 8 threads). Aucune allocation mémoire n'a été détectée (0 B/op), ce qui confirme que `sum` et les itérateurs restent sur la pile.
+Les mesures reposent exclusivement sur `testing.B`, le seul outil fiable pour du benchmarking en Go. Les `time.Since` dans `main` ne servent qu'à donner une intuition à l'utilisateur et ne sont pas utilisées dans l'analyse. `testing.B` ajuste automatiquement le nombre d'itérations (`b.N`) pour stabiliser la mesure, et `b.ResetTimer()` est appelé avant chaque boucle pour exclure le setup. Les 22 sous-benchmarks (11 paliers par type) ont été exécutés avec `go test -bench=. -benchmem -count=1` sur un Intel i5-10300H à 2.50 GHz sous Windows/amd64 avec 8 threads. Aucune allocation mémoire n'a été détectée (0 B/op), ce qui confirme que `sum` et les itérateurs restent sur la pile. En complément des 4 tests unitaires demandés, j'ai ajouté deux tests sur des valeurs négatives et des flottants extrêmes (`1e15`) pour valider la robustesse numérique de `math.Sin`, notamment sa réduction d'argument sur de grands multiples de pi.
 
 **Tableau 1 – Temps de calcul par type et pourcentage du tableau (1 000 000 éléments)**
 
@@ -38,7 +36,7 @@ xychart-beta
 
 ## Analyse des performances
 
-La progression est quasi linéaire pour les deux types. En passant de 50 % à 100 %, le temps double presque exactement (18.07 → 36.44 ms pour Int, 10.28 → 21.05 ms), ce qui confirme la complexité O(n). Les flottants sont systématiquement plus rapides avec un ratio moyen de 1.73×. Cette différence s'explique par la conversion `float64(v)` que la version Int exécute à chaque itération. Sur x86-64, cette conversion se traduit par l'instruction `CVTSI2SD` qui ajoute 4 à 5 cycles par élément (cf. Ch. 5). Sur 1 million d'éléments à 2.5 GHz, ça représente environ 2 ms de surcoût pur, mais l'écart observé de ~15 ms suggère que la conversion perturbe aussi le pipeline du processeur en cassant la chaîne de dépendances de données. `math.Sin` elle-même utilise une réduction de l'argument suivie d'une approximation polynomiale (Chebyshev) et c'est l'opération qui domine le temps de calcul.
+La progression est quasi linéaire pour les deux types. En passant de 50 % à 100 %, le temps double presque exactement (18.07 vers 36.44 ms pour Int, 10.28 vers 21.05 ms), ce qui confirme la complexité O(n). Les flottants sont systématiquement plus rapides avec un ratio moyen de 1.73×. Cette différence s'explique par la conversion `float64(v)` que la version Int exécute à chaque itération. Sur x86-64, cette conversion se traduit par l'instruction `CVTSI2SD` qui ajoute 4 à 5 cycles par élément. Sur 1 million d'éléments à 2.5 GHz, ça représente environ 2 ms de surcoût pur, mais l'écart observé d'environ 15 ms suggère que la conversion perturbe aussi le pipeline du processeur en cassant la chaîne de dépendances de données. `math.Sin` elle-même utilise une réduction de l'argument suivie d'une approximation polynomiale (Chebyshev) et c'est l'opération qui domine le temps de calcul.
 
 ## Calculs pour les questions du professeur
 
@@ -65,11 +63,10 @@ En pratique, si on réserve 10 % du budget de frame au calcul de sinus, ça lais
 ### Liens
 
 - Dépôt GitHub [github.com/moyamelissa/Advanced-Programming/tree/main/TN4](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN4)
-- Code principal [sinesum.go](sinesum.go), tests et benchmarks [sinesum_test.go](sinesum_test.go)
+- Implémentation [sinesum.go](sinesum.go), tests et benchmarks [sinesum_test.go](sinesum_test.go)
 
 ### Bibliographie
 
-- Manuel INF2007, chapitres 5 et 6
 - Documentation Go `math/rand`, `testing`, `flag` sur https://pkg.go.dev
 - Documentation Mermaid XY Chart https://mermaid.js.org/syntax/xyChart.html
-- Outil d'IA GitHub Copilot, utilisé comme assistant avec vérification systématique des suggestions
+- GitHub Copilot, utilisé comme assistant avec vérification systématique des suggestions
