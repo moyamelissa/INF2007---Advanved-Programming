@@ -28,4 +28,4 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 ## Rapport
 
 - « Est-ce que mon rapport met bien en valeur le travail effectué ou est-ce qu'il est trop descriptif ? »
-- « Peux-tu relire mon paragraphe sur les défis rencontrés et me dire si c'est clair et convaincant ? »
+- « Peux-tu relire mon paragraphe sur les défis rencontrés et me dire si c'est clair ? »
