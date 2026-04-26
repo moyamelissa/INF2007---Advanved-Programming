@@ -68,6 +68,9 @@ xychart-beta
     line [0.24, 2.11, 4.24, 7.79, 8.99, 11.98, 13.61, 14.69, 16.82, 18.96, 20.93]
 ```
 
+> 🟠 **Courbe du haut** — Int (entiers, avec conversion `float64`)  
+> 🟢 **Courbe du bas** — Float (flottants, sans conversion)
+
 La courbe du haut correspond aux entiers (Int), celle du bas aux flottants (Float). Les deux progressent linéairement, ce qui confirme la complexité O(n). Le ratio moyen Int/Float est de 1.85× au palier 100 % (± 1 %), principalement dû à la conversion `float64(v)` exécutée à chaque itération pour les entiers.
 
 ## Lecture des résultats
