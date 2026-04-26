@@ -1,0 +1,54 @@
+﻿=== RUN   TestComputeSineSumInt
+--- PASS: TestComputeSineSumInt (0.00s)
+=== RUN   TestComputeSineSumFloat
+--- PASS: TestComputeSineSumFloat (0.00s)
+=== RUN   TestComputeSineSumInvalidType
+--- PASS: TestComputeSineSumInvalidType (0.00s)
+=== RUN   TestComputeSineSumEmpty
+--- PASS: TestComputeSineSumEmpty (0.00s)
+=== RUN   TestComputeSineSumNegative
+--- PASS: TestComputeSineSumNegative (0.00s)
+=== RUN   TestComputeSineSumLargeFloat
+--- PASS: TestComputeSineSumLargeFloat (0.00s)
+=== RUN   TestComputeSineSumIntWrongData
+--- PASS: TestComputeSineSumIntWrongData (0.00s)
+=== RUN   TestComputeSineSumFloatWrongData
+--- PASS: TestComputeSineSumFloatWrongData (0.00s)
+=== RUN   TestRunInt
+=== Somme des sinus — type=int, taille=1000000 ===
+
+Génération du tableau : 19.9883ms
+Calcul de la somme    : 38.2635ms
+
+Résultat              : -353.973822
+Temps total           : 58.2518ms
+--- PASS: TestRunInt (0.06s)
+=== RUN   TestRunFloat
+=== Somme des sinus — type=float, taille=1000000 ===
+
+Génération du tableau : 9.6228ms
+Calcul de la somme    : 22.6865ms
+
+Résultat              : 460007.368636
+Temps total           : 32.3093ms
+--- PASS: TestRunFloat (0.03s)
+=== RUN   TestRunInvalidType
+=== Somme des sinus — type=complex, taille=1000000 ===
+
+--- PASS: TestRunInvalidType (0.00s)
+=== RUN   TestMainFunction
+=== Somme des sinus — type=float, taille=1000000 ===
+
+Génération du tableau : 6.3015ms
+Calcul de la somme    : 23.4483ms
+
+Résultat              : 460007.368636
+Temps total           : 29.7498ms
+--- PASS: TestMainFunction (0.03s)
+=== RUN   TestMainFunctionError
+=== Somme des sinus — type=complex, taille=1000000 ===
+
+Erreur : type invalide : "complex" (utilisez "int" ou "float")
+--- PASS: TestMainFunctionError (0.00s)
+PASS
+ok  	sinesum	0.972s

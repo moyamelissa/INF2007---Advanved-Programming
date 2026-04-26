@@ -3,7 +3,7 @@
 ## Étape 1. Lancer les benchmarks
 
 ```bash
-go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
+go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
 ```
 
 La sortie ressemble à ceci :

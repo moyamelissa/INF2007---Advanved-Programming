@@ -10,17 +10,19 @@ Depuis le dossier `TN4/`, lancer les commandes suivantes dans un terminal.
 go test -v -run="Test" ./...
 ```
 
-![Tests unitaires](Results-and-Instructions/Tests%20unitaires.PNG)
+Résultats : [tests-output.txt](tests-output.txt)
 
-**Benchmarks complets (22 sous-benchmarks)**
+**Benchmarks complets (22 sous-benchmarks, 6 exécutions analysées par benchstat)**
 
 ```bash
-go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
+go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
+benchstat bench_count6.txt
 ```
 
-Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting mémoire, et `-count=1` évite les répétitions inutiles.
+Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting mémoire, et `-count=6` fournit 6 échantillons pour que `benchstat` calcule les médianes et intervalles de confiance à 95 %.
 
-![Benchmarks complets](Results-and-Instructions/Benchmarks%20complets.PNG)
+Résultats bruts : [bench_count6.txt](bench_count6.txt)
+Analyse benchstat : [benchstat-output.txt](benchstat-output.txt)
 
 **Couverture de code**
 
@@ -28,31 +30,31 @@ Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting 
 go test -v -cover ./...
 ```
 
-![Couverture de code](Results-and-Instructions/Couverture%20de%20code.PNG)
+Résultats : [coverage-output.txt](coverage-output.txt)
 
 ## Tableau des résultats
 
 | % du tableau | Éléments | Int (ms) | Float (ms) | Ratio Int/Float |
 |:---:|:---:|:---:|:---:|:---:|
-| 1 % | 10 000 | 0.39 | 0.21 | 1.86× |
-| 10 % | 100 000 | 3.81 | 2.11 | 1.81× |
-| 20 % | 200 000 | 7.55 | 4.24 | 1.78× |
-| 30 % | 300 000 | 10.92 | 6.71 | 1.63× |
-| 40 % | 400 000 | 15.48 | 8.38 | 1.85× |
-| 50 % | 500 000 | 18.38 | 10.60 | 1.73× |
-| 60 % | 600 000 | 21.71 | 12.79 | 1.70× |
-| 70 % | 700 000 | 25.46 | 14.72 | 1.73× |
-| 80 % | 800 000 | 29.09 | 17.07 | 1.70× |
-| 90 % | 900 000 | 32.58 | 19.10 | 1.71× |
-| 100 % | 1 000 000 | 36.03 | 20.94 | 1.72× |
+| 1 % | 10 000 | 0.44 | 0.24 | 1.86× |
+| 10 % | 100 000 | 4.09 | 2.11 | 1.94× |
+| 20 % | 200 000 | 8.11 | 4.24 | 1.91× |
+| 30 % | 300 000 | 11.83 | 7.79 | 1.52× |
+| 40 % | 400 000 | 15.52 | 8.99 | 1.73× |
+| 50 % | 500 000 | 19.28 | 11.98 | 1.61× |
+| 60 % | 600 000 | 22.98 | 13.61 | 1.69× |
+| 70 % | 700 000 | 26.58 | 14.69 | 1.81× |
+| 80 % | 800 000 | 30.94 | 16.82 | 1.84× |
+| 90 % | 900 000 | 34.78 | 18.96 | 1.83× |
+| 100 % | 1 000 000 | 38.71 | 20.93 | 1.85× |
 
-Les valeurs en millisecondes sont converties depuis les ns/op affichés par `go test`. Par exemple, `386228 ns/op` donne `0.39 ms`. Aucune allocation mémoire n'a été mesurée (0 B/op, 0 allocs/op) pour les deux types.
+Les valeurs en millisecondes proviennent des médianes `benchstat` calculées sur 6 exécutions. Par exemple, `benchstat` reporte `38.71m` pour Int/100pct, soit 38.71 ms. Les paliers 90–100 % affichent une variation de ± 1 %, confirmant la stabilité des mesures. Aucune allocation mémoire n'a été mesurée (0 B/op, 0 allocs/op) pour les deux types.
 
 ## Graphique
 
 Le graphique est généré avec Mermaid (syntaxe `xychart-beta`), qui est rendu automatiquement par GitHub dans les fichiers Markdown.
 
-Les données proviennent directement de la colonne `ns/op` de la sortie des benchmarks. Pour convertir en millisecondes, on divise par 1 000 000. Par exemple, pour `BenchmarkSineSumInt/1pct-8` qui affiche `386228 ns/op`, on obtient `386228 / 1000000 = 0.39 ms`.
+Les données proviennent des médianes calculées par `benchstat` sur 6 exécutions. Par exemple, `benchstat` reporte `437.5µ` pour `SineSumInt/1pct-8`, soit 0.44 ms, et `38.71m` pour `SineSumInt/100pct-8`, soit 38.71 ms.
 
 Les 11 valeurs Int et les 11 valeurs Float sont ensuite placées dans deux tableaux `line [...]` dans le bloc Mermaid, dans le même ordre que les pourcentages sur l'axe X.
 
@@ -61,12 +63,12 @@ Les 11 valeurs Int et les 11 valeurs Float sont ensuite placées dans deux table
 xychart-beta
     title "Graphique 1 – Temps de calcul selon le pourcentage du tableau (Int vs Float)"
     x-axis "Pourcentage du tableau" ["1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]
-    y-axis "Temps d'exécution (ms)" 0 --> 40
-    line [0.39, 3.81, 7.55, 10.92, 15.48, 18.38, 21.71, 25.46, 29.09, 32.58, 36.03]
-    line [0.21, 2.11, 4.24, 6.71, 8.38, 10.60, 12.79, 14.72, 17.07, 19.10, 20.94]
+    y-axis "Temps d'exécution (ms)" 0 --> 42
+    line [0.44, 4.09, 8.11, 11.83, 15.52, 19.28, 22.98, 26.58, 30.94, 34.78, 38.71]
+    line [0.24, 2.11, 4.24, 7.79, 8.99, 11.98, 13.61, 14.69, 16.82, 18.96, 20.93]
 ```
 
-La courbe du haut correspond aux entiers (Int), celle du bas aux flottants (Float). Les deux progressent linéairement, ce qui confirme la complexité O(n). Le ratio moyen Int/Float est de 1.75×, principalement dû à la conversion `float64(v)` exécutée à chaque itération pour les entiers.
+La courbe du haut correspond aux entiers (Int), celle du bas aux flottants (Float). Les deux progressent linéairement, ce qui confirme la complexité O(n). Le ratio moyen Int/Float est de 1.85× au palier 100 % (± 1 %), principalement dû à la conversion `float64(v)` exécutée à chaque itération pour les entiers.
 
 ## Lecture des résultats
 

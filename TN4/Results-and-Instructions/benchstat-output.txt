@@ -1,0 +1,82 @@
+﻿goarch: amd64
+pkg: sinesum
+cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+                      │ bench_count6.txt │
+                      │      sec/op      │
+SineSumInt/1pct-8           437.5µ ± 12%
+SineSumInt/10pct-8          4.091m ± 10%
+SineSumInt/20pct-8          8.106m ±  7%
+SineSumInt/30pct-8          11.83m ±  3%
+SineSumInt/40pct-8          15.52m ±  8%
+SineSumInt/50pct-8          19.28m ±  5%
+SineSumInt/60pct-8          22.98m ±  2%
+SineSumInt/70pct-8          26.58m ± 17%
+SineSumInt/80pct-8          30.94m ±  3%
+SineSumInt/90pct-8          34.78m ±  1%
+SineSumInt/100pct-8         38.71m ±  1%
+SineSumFloat/1pct-8         235.4µ ±  3%
+SineSumFloat/10pct-8        2.112m ± 10%
+SineSumFloat/20pct-8        4.238m ±  3%
+SineSumFloat/30pct-8        7.786m ±  7%
+SineSumFloat/40pct-8        8.989m ±  6%
+SineSumFloat/50pct-8        11.98m ± 10%
+SineSumFloat/60pct-8        13.61m ±  8%
+SineSumFloat/70pct-8        14.69m ±  1%
+SineSumFloat/80pct-8        16.82m ±  1%
+SineSumFloat/90pct-8        18.96m ±  1%
+SineSumFloat/100pct-8       20.93m ±  1%
+geomean                     9.479m
+
+                      │ bench_count6.txt │
+                      │       B/op       │
+SineSumInt/1pct-8           0.000 ± 0%
+SineSumInt/10pct-8          0.000 ± 0%
+SineSumInt/20pct-8          0.000 ± 0%
+SineSumInt/30pct-8          0.000 ± 0%
+SineSumInt/40pct-8          0.000 ± 0%
+SineSumInt/50pct-8          0.000 ± 0%
+SineSumInt/60pct-8          0.000 ± 0%
+SineSumInt/70pct-8          0.000 ± 0%
+SineSumInt/80pct-8          0.000 ± 0%
+SineSumInt/90pct-8          0.000 ± 0%
+SineSumInt/100pct-8         0.000 ± 0%
+SineSumFloat/1pct-8         0.000 ± 0%
+SineSumFloat/10pct-8        0.000 ± 0%
+SineSumFloat/20pct-8        0.000 ± 0%
+SineSumFloat/30pct-8        0.000 ± 0%
+SineSumFloat/40pct-8        0.000 ± 0%
+SineSumFloat/50pct-8        0.000 ± 0%
+SineSumFloat/60pct-8        0.000 ± 0%
+SineSumFloat/70pct-8        0.000 ± 0%
+SineSumFloat/80pct-8        0.000 ± 0%
+SineSumFloat/90pct-8        0.000 ± 0%
+SineSumFloat/100pct-8       0.000 ± 0%
+geomean                                ¹
+¹ summaries must be >0 to compute geomean
+
+                      │ bench_count6.txt │
+                      │    allocs/op     │
+SineSumInt/1pct-8           0.000 ± 0%
+SineSumInt/10pct-8          0.000 ± 0%
+SineSumInt/20pct-8          0.000 ± 0%
+SineSumInt/30pct-8          0.000 ± 0%
+SineSumInt/40pct-8          0.000 ± 0%
+SineSumInt/50pct-8          0.000 ± 0%
+SineSumInt/60pct-8          0.000 ± 0%
+SineSumInt/70pct-8          0.000 ± 0%
+SineSumInt/80pct-8          0.000 ± 0%
+SineSumInt/90pct-8          0.000 ± 0%
+SineSumInt/100pct-8         0.000 ± 0%
+SineSumFloat/1pct-8         0.000 ± 0%
+SineSumFloat/10pct-8        0.000 ± 0%
+SineSumFloat/20pct-8        0.000 ± 0%
+SineSumFloat/30pct-8        0.000 ± 0%
+SineSumFloat/40pct-8        0.000 ± 0%
+SineSumFloat/50pct-8        0.000 ± 0%
+SineSumFloat/60pct-8        0.000 ± 0%
+SineSumFloat/70pct-8        0.000 ± 0%
+SineSumFloat/80pct-8        0.000 ± 0%
+SineSumFloat/90pct-8        0.000 ± 0%
+SineSumFloat/100pct-8       0.000 ± 0%
+geomean                                ¹
+¹ summaries must be >0 to compute geomean

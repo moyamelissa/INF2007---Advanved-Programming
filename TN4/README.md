@@ -25,13 +25,14 @@ TN4/
 ├── TN4-report.md                   # Rapport d'analyse avec tableau, graphique et calculs
 ├── TN4-AI-Prompts.md               # Prompts IA utilisés
 ├── TN4-Homework-Instructions.md    # Énoncé du travail
-├── Results-and-Instructions/       # Résultats, captures d'écran et guides
+├── Results-and-Instructions/       # Résultats et guides
 │   ├── Resultats-benchmarks-et-captures.md  # Données brutes et tableau complet
 │   ├── Guide-applications-numeriques.md      # Comment calculer lumière + 120 fps
 │   ├── Guide-creation-graphique-Mermaid.md   # Comment créer le graphique Mermaid
-│   ├── Tests unitaires.PNG          # Capture de go test -v
-│   ├── Benchmarks complets.PNG      # Capture de go test -bench
-│   └── Couverture de code.PNG       # Capture de go test -cover
+│   ├── bench_count6.txt             # Sortie brute des benchmarks (count=6)
+│   ├── benchstat-output.txt         # Analyse benchstat (médianes ± IC 95 %)
+│   ├── tests-output.txt             # Sortie de go test -v
+│   └── coverage-output.txt          # Sortie de go test -cover (100 %)
 └── README.md                       # Ce fichier
 ```
 
@@ -60,7 +61,7 @@ go test -v -run="Test" ./...
 ## Benchmarks
 
 ```bash
-go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
+go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
 ```
 
 ## Tests disponibles
@@ -87,8 +88,8 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 
 | Résultat clé | Valeur |
 |--------------|--------|
-| Ratio moyen Int/Float | 1.73× |
-| Temps par sinus (Int) | ~36 ns |
+| Ratio Int/Float (100 %) | 1.85× |
+| Temps par sinus (Int) | ~39 ns |
 | Temps par sinus (Float) | ~21 ns |
 | Allocations mémoire | 0 B/op |
 
