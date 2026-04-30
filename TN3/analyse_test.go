@@ -92,7 +92,7 @@ func TestAnalyseTableauVide(t *testing.T) {
 }
 
 // TestAnalyseExempleEnonce reproduit l'exemple exact de l'énoncé. Garantit que
-// notre implémentation produit le même résultat que celui du professeur, ce qui
+// l'implémentation produit le même résultat que celui du professeur, ce qui
 // réduit le risque d'interprétation erronée de la spécification.
 func TestAnalyseExempleEnonce(t *testing.T) {
 	data := []uint32{
