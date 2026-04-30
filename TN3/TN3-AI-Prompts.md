@@ -22,10 +22,7 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 
 ## Style et commentaires
 
-- « Comment écrire professionnellement une référence à un chapitre du cours dans mes commentaires au lieu de la façon dont je le fais présentement, par exemple `Ch4 — Bit identity` ? »
+- « Comment écrire professionnellement une référence à un chapitre du cours dans mes commentaires ? »
 - « Est-ce que mes commentaires dans le code ont l'air trop académiques ? Comment les rendre plus professionnels ? »
 
-## Rapport
-
-- « Est-ce que mon rapport met bien en valeur le travail effectué ou est-ce qu'il est trop descriptif ? »
-- « Peux-tu relire mon paragraphe sur les défis rencontrés et me dire si c'est clair ? »
+...
