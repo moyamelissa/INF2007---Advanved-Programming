@@ -1,7 +1,5 @@
 # INF2007 – TN3 – Melissa Moya
 
-![Go Coverage Workflow](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn3-coverage.yml/badge.svg) [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
-
 ## Approche pour extraire et valider les bits
 
 La structure binaire de chaque entrée 32 bits se divise en trois zones. Les bits 0 à 6 contiennent l'identifiant du capteur, le bit 7 sert de bit de validation et les bits 8 à 31 représentent la valeur mesurée. Pour extraire l'identifiant, j'ai construit un masque avec `(1<<7)-1 = 0x7F` qui isole les 7 bits de poids faible via un AND. Le bit de validation est testé par `entry & (1<<7)`, une opération qui cible un seul bit sans affecter les autres. Pour la valeur, le décalage `entry >> 8` ramène les bits 8 à 31 en positions 0 à 23, ce qui équivaut à une division par 2⁸. La détection de plusieurs bits actifs exploite l'identité `x & (x-1)`, qui efface le bit le plus bas à 1. Si le résultat est non nul, il existait au moins deux bits actifs, ce qui constitue une violation de la spécification. Cette approche remplace un appel à `bits.OnesCount32` par une seule soustraction suivie d'un AND. Enfin, la position du bit actif est obtenue par `bits.TrailingZeros32`, qui se traduit par l'instruction CPU `TZCNT` en un seul cycle, remplaçant une boucle de 24 itérations par une opération O(1).
