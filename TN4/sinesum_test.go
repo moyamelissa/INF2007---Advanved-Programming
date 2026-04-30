@@ -226,3 +226,18 @@ func BenchmarkSineSumFloat(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkSineSumProfile est un benchmark dédié au profilage CPU (pprof).
+// Il appelle computeSineSumFloat directement (sans dispatch) sur le tableau
+// complet pour maximiser le temps passé dans math.Sin et obtenir un profil
+// statistiquement significatif. Lancer avec :
+//
+//	go test -bench=BenchmarkSineSumProfile -cpuprofile=cpu.prof -run=^$
+//	go tool pprof -png cpu.prof > cpu-profile.png
+//	go tool pprof -http=:8080 cpu.prof   (flamegraph interactif)
+func BenchmarkSineSumProfile(b *testing.B) {
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		computeSineSumFloat(benchFloatArray)
+	}
+}
