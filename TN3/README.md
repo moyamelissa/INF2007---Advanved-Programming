@@ -20,7 +20,6 @@ Chaque entrée 32 bits encode un identifiant de capteur (7 bits), un bit de vali
 | `entry & (1<<7)` | Test du bit de validation (bit 7) |
 | `entry >> 8` | Décalage pour extraire la valeur (bits 8–31) |
 | `x & (x-1)` | Détection de plus d'un bit actif (sans boucle) |
-| `&^` (AND NOT) | Construction du masque des bits 8–31 |
 | `bits.TrailingZeros32` | Position du bit actif en O(1) via instruction CPU `TZCNT` |
 
 ## Structure du projet
@@ -61,7 +60,7 @@ go test -v -cover ./...
 | `TestAnalyseBit7Invalide` | Rejet d'une entrée avec bit de validation à 1 |
 | `TestAnalysePlusieursBitsValeur` | Détection de plusieurs bits actifs via `x & (x-1)` |
 | `TestAnalyseExempleEnonce` | Reproduction exacte de l'exemple du professeur |
-| `TestAnalyseAucuneMesure` | Cas valeur = 0 (aucune mesure, pas d'erreur) |
+| `TestAnalyseTableauVide` | Cas limite : tableau vide retourne des zéros sans erreur |
 
 ## Liens
 

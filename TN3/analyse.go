@@ -32,9 +32,8 @@ func Analyse(data []uint32, capteur uint8) ([24]int, error) {
 	}
 
 	// Masques construits par décalage plutôt qu'en dur pour lisibilité. (cf. Ch. 4)
-	const maskID = (1 << 7) - 1                     // 0x7F : bits 0–6
-	const maskBit7 = 1 << 7                         // 0x80 : bit 7 seul
-	const maskValeur = ^uint32(0) &^ ((1 << 8) - 1) // bits 8–31, AND NOT efface les bits 0–7
+	const maskID = (1 << 7) - 1 // 0x7F : bits 0–6
+	const maskBit7 = 1 << 7     // 0x80 : bit 7 seul
 
 	for _, entry := range data {
 		// Extraire l'ID capteur (bits 0–6) par AND masking. (cf. Ch. 4)
