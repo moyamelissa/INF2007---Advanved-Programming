@@ -59,11 +59,10 @@ go test -v -cover ./...
 | `TestAnalyseCapteurInvalide` | Rejet d'un identifiant > 127 |
 | `TestAnalyseBit7Invalide` | Rejet d'une entrée avec bit de validation à 1 |
 | `TestAnalysePlusieursBitsValeur` | Détection de plusieurs bits actifs via `x & (x-1)` |
-| `TestAnalyseExempleEnonce` | Reproduction exacte de l'exemple du professeur |
+| `TestAnalyseExempleEnonce` | Vérifie le rejet de l'exemple contenant des entrées invalides (bit 7 et multi-bits) |
 | `TestAnalyseTableauVide` | Cas limite : tableau vide retourne des zéros sans erreur |
 
 ## Liens
 
 - [Rapport TN3](TN3-report.md)
 - [Prompts IA](TN3-AI-Prompts.md)
-- [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN3)
