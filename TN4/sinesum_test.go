@@ -199,6 +199,7 @@ var benchFloatArray = generateFloatArray(arraySize)
 // à différentes tailles de tableau. On passe par le dispatch pour benchmarker
 // la fonction telle qu'elle est appelée en production (cf. Ch. 6).
 func BenchmarkSineSumInt(b *testing.B) {
+	b.ReportAllocs()
 	for _, p := range percentages {
 		size := int(float64(arraySize) * p.percent)
 		slice := benchIntArray[:size]
@@ -215,6 +216,7 @@ func BenchmarkSineSumInt(b *testing.B) {
 // à différentes tailles de tableau. Le dispatch via interface{} ajoute un coût
 // négligeable par rapport à math.Sin, mais on le mesure quand même (cf. Ch. 6).
 func BenchmarkSineSumFloat(b *testing.B) {
+	b.ReportAllocs()
 	for _, p := range percentages {
 		size := int(float64(arraySize) * p.percent)
 		slice := benchFloatArray[:size]
@@ -236,6 +238,7 @@ func BenchmarkSineSumFloat(b *testing.B) {
 //	go tool pprof -png cpu.prof > cpu-profile.png
 //	go tool pprof -http=:8080 cpu.prof   (flamegraph interactif)
 func BenchmarkSineSumProfile(b *testing.B) {
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		computeSineSumFloat(benchFloatArray)
