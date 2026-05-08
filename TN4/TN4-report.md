@@ -1,4 +1,11 @@
-# INF2007 – TN4 – Melissa Moya
+# Mesure et optimisation de la somme des sinus en Go
+
+**Cours :** INF2007 – Programmation Avancée  
+**Travail :** TN4  
+**Étudiante :** Melissa Moya  
+**Semaine :** 10  
+
+---
 
 ## Approche et structure du programme
 
@@ -8,7 +15,7 @@ Le programme calcule la somme des sinus d'un tableau de 1 000 000 d'éléments, 
 
 ## Résultats des benchmarks
 
-Les mesures reposent sur `testing.B`, l'outil adapté au benchmarking en Go. Les `time.Since` dans `main` ne servent qu'à fournir une indication à l'utilisateur et ne sont pas utilisées pour l'analyse. `testing.B` ajuste automatiquement le nombre d'itérations (`b.N`) pour stabiliser la mesure, et `b.ResetTimer()` est appelé avant chaque boucle afin d'exclure le coût du setup. Les 22 sous-benchmarks (11 paliers par type) ont été exécutés avec `go test -bench=. -benchmem -count=6` sur un Intel i5-10300H à 2.50 GHz sous Windows/amd64 avec 8 threads, puis analysés avec `benchstat` pour obtenir les médianes et les intervalles de confiance à 95 %. Le résultat à `0 B/op` montre qu'aucune allocation mémoire significative n'apparaît dans le chemin mesuré. Le fichier de test contient 13 tests unitaires et atteint une couverture de 100 %. En complément des 4 tests demandés, des tests ont été ajoutés pour les valeurs négatives, les flottants extrêmes (`1e15`), le dispatch avec des données incompatibles, la fonction `run` pour chaque type, et `main` elle-même.
+Les mesures reposent sur `testing.B`, l'outil adapté au benchmarking en Go. Les `time.Since` dans `main` ne servent qu'à fournir une indication à l'utilisateur et ne sont pas utilisées pour l'analyse. `testing.B` ajuste automatiquement le nombre d'itérations (`b.N`) pour stabiliser la mesure, et `b.ResetTimer()` est appelé avant chaque boucle afin d'exclure le coût du setup. Les 22 sous-benchmarks (11 paliers par type) ont été exécutés avec `go test -bench=. -benchmem -count=6` sur un Intel i5-10300H à 2.50 GHz sous Windows/amd64 avec 8 threads, puis analysés avec `benchstat` pour obtenir les médianes et les intervalles de confiance à 95 %. Le résultat à `0 B/op` montre qu'aucune allocation mémoire significative n'apparaît dans le chemin mesuré. Le fichier de test contient 13 tests unitaires et atteint une couverture de 100 %. En complément des 3 tests demandés, des tests ont été ajoutés pour les valeurs négatives, les flottants extrêmes (`1e15`), le dispatch avec des données incompatibles, la fonction `run` pour chaque type, et `main` elle-même.
 
 ### Méthode expérimentale
 
@@ -37,6 +44,7 @@ Les flottants sont systématiquement plus rapides avec un ratio d'environ 1.5 à
 ```mermaid
 %%{init: {'theme': 'default', 'themeVariables': {'xyChart': {'backgroundColor': '#ffffff'}}}}%%
 xychart-beta
+    title "Temps de calcul — Int vs Float (1 000 000 éléments)"
     x-axis "Pourcentage du tableau" ["1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]
     y-axis "Temps d'exécution (ms)" 0 --> 42
     line [0.44, 4.09, 8.11, 11.83, 15.52, 19.28, 22.98, 26.58, 30.94, 34.78, 38.71]
@@ -48,9 +56,13 @@ xychart-beta
 
 *Pour la méthode de construction du graphique, voir [Guide-creation-graphique-Mermaid.md](Results-and-Instructions/Guide-creation-graphique-Mermaid.md).* 
 
-La courbe Int progresse de façon quasi linéaire, tandis que la courbe Float présente de légères irrégularités (notamment aux paliers 30 % et 70 %). Les deux séries restent compatibles avec une complexité linéaire, et ces écarts s'expliquent surtout par le bruit de mesure : les benchmarks Float étant plus rapides, une même perturbation (interruption système, variation de fréquence, effet thermique) a un impact relatif plus visible. Les intervalles de confiance `benchstat` le confirment : Float/30pct affiche ± 7 % contre ± 1 % pour Int/100pct. L'écart entre Int et Float s'explique par la conversion `float64(v)` effectuée à chaque itération. Cette conversion ajoute un coût supplémentaire, mais la différence observée reflète surtout le coût global de la boucle et de `math.Sin`, plutôt qu'un seul effet isolé.
+La courbe Int progresse de façon quasi linéaire, tandis que la courbe Float présente de légères irrégularités (notamment aux paliers 30 % et 70 %). Les deux séries restent compatibles avec une complexité linéaire, et ces écarts s'expliquent surtout par le bruit de mesure : les benchmarks Float étant plus rapides, une même perturbation (interruption système, variation de fréquence, effet thermique) a un impact relatif plus visible. Les intervalles de confiance `benchstat` le confirment : Float/30pct affiche ± 7 % contre ± 1 % pour Int/100pct. Une cause structurelle est également plausible : le palier 30 % correspond à 300 000 éléments, soit ~2.3 MB pour `[]int` et ~2.4 MB pour `[]float64`. Cette taille dépasse la capacité typique d'un cache L2 (~256–512 KB sur l'i5-10300H) mais reste sous celle du L3 (~8 MB). La transition L2→L3 est donc active à ce palier, et comme les benchmarks Float sont plus courts, la latence mémoire représente une fraction relative plus importante de leur temps total — ce qui amplifie la variabilité observée. L'écart entre Int et Float s'explique par la conversion `float64(v)` effectuée à chaque itération. Cette conversion ajoute un coût supplémentaire, mais la différence observée reflète surtout le coût global de la boucle et de `math.Sin`, plutôt qu'un seul effet isolé.
 
 En pratique, les courbes ne reflètent pas seulement le coût de `math.Sin`. Quand le tableau grossit, une plus grande partie des données sort des caches L1 et L2, puis L3, ce qui rend la composante mémoire plus visible. Il est donc nécessaire de commenter la forme de la courbe, et pas seulement une valeur moyenne : le calcul reste séquentiel et favorable au cache, mais les grandes tailles tendent à être davantage influencées par la hiérarchie mémoire et la bande passante.
+
+### Précision des flottants et représentabilité des types
+
+Le type de données influence non seulement la vitesse d'exécution, mais aussi la précision numérique et le comportement de `math.Sin`. Un entier dans [0, 1000] est exactement représentable en `float64` — la mantisse de 53 bits peut représenter sans erreur tout entier jusqu'à $2^{53} \approx 9 \times 10^{15}$, donc la conversion `float64(v)` pour des valeurs ≤ 1000 n'introduit aucune perte de précision. En revanche, pour les entiers, `math.Sin(500)` nécessite de réduire 500 modulo $2\pi \approx 6.28$, soit environ 79 tours complets avant le calcul principal. Cette réduction d'argument nécessite des étapes de calcul supplémentaires, contrairement aux flottants dans [0, 1) qui se situent déjà dans le domaine principal de `sin()` et ne requièrent aucune réduction. Pour les `float64` dans [0, 1), les valeurs sont continûment distribuées sur l'intervalle réel et chaque appel à `math.Sin` est donc légèrement plus direct. Cette différence de comportement de la FPU contribue, en plus de la conversion de type, à l'écart de performance observé entre les deux séries.
 
 ## Applications numériques
 
@@ -77,6 +89,12 @@ $$n_{float} = \frac{8\,333\,333}{20.9} \approx 398\,726 \text{ sinus par tick}$$
 **Réponse.** On peut calculer environ 215 000 sinus (Int) ou 399 000 sinus (Float) par tick. En pratique, si une partie du budget de frame doit être conservée pour le rendu et le reste du moteur, ces valeurs donnent une marge confortable pour des effets visuels simples.
 
 *Pour les détails de chaque calcul, voir [Guide-applications-numeriques.md](Results-and-Instructions/Guide-applications-numeriques.md).*
+
+## Conclusion
+
+Ce travail démontre que le choix du type de données a un impact direct et mesurable sur les performances en Go. Les flottants (`float64`) s'avèrent environ 1.85× plus rapides que les entiers pour le même calcul de sinus, principalement parce que la conversion `float64(v)` à chaque itération ajoute un coût non négligeable sur 1 000 000 d'appels. La complexité est O(n) pour les deux types, ce que confirment les courbes quasi linéaires des benchmarks. Aucune allocation mémoire n'a été détectée (0 B/op), ce qui signifie que la performance est entièrement liée au calcul et à l'accès séquentiel au tableau.
+
+L'utilisation de `testing.B` avec `benchstat` sur 6 exécutions permet d'obtenir des médianes fiables avec des intervalles de confiance à 95 %, une méthode bien supérieure à une mesure manuelle par `time.Since`. Ces résultats montrent qu'une opération courante comme `math.Sin` a un coût de l'ordre de 20–40 ns, soit suffisamment bas pour permettre plusieurs centaines de milliers d'appels par frame à 120 fps.
 
 Au final, même une opération mathématique courante comme `math.Sin` a un coût mesurable à l'échelle du processeur, et ce travail permet de le quantifier de manière reproductible.
 
