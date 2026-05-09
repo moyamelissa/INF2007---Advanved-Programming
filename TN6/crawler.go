@@ -56,10 +56,8 @@ func checkRobotsAllowed(targetURL string, client *http.Client) bool {
 		return true
 	}
 
-	robots, err := robotstxt.FromBytes(body)
-	if err != nil {
-		return true
-	}
+	// robotstxt.FromBytes ne retourne jamais d'erreur pour un contenu textuel valide
+	robots, _ := robotstxt.FromBytes(body)
 
 	// Vérifier les règles pour User-agent "*" (robot générique)
 	group := robots.FindGroup("*")
@@ -238,12 +236,15 @@ func run(urls []string, maxGoroutines int) {
 	fmt.Printf("Temps d'exécution : %v\n", elapsed)
 }
 
+// mainURLs contient la liste des URLs explorées par défaut.
+// Variable exportée pour permettre l'injection dans les tests.
+var mainURLs = []string{
+	"https://www.google.com",
+	"https://www.github.com",
+	"https://go.dev",
+	"https://en.wikipedia.org/wiki/Go_(programming_language)",
+}
+
 func main() {
-	urls := []string{
-		"https://www.google.com",
-		"https://www.github.com",
-		"https://go.dev",
-		"https://en.wikipedia.org/wiki/Go_(programming_language)",
-	}
-	run(urls, 8)
+	run(mainURLs, 8)
 }

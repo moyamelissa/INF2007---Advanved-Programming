@@ -13,14 +13,15 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 | `splitIntoSegments(content, segmentSize)` | Découpe le texte en segments sans couper les mots |
 | `countWordsInSegment(segment, ch)` | Goroutine qui envoie le nombre de mots sur un canal |
 | `CountWordsConcurrent(content, segmentSize)` | Orchestre le fan-out/fan-in et somme les résultats |
-
+| `run(args)` | Logique principale testable, extraite de `main` |
+| `exitFunc` | Variable injectable pour tester la branche d'erreur de `main` |
 ## Structure du projet
 
 ```
-TN5/
-├── go.mod                          # Module Go
+.
+├── go.mod                          # Module Go (wordcount)
 ├── wordcount.go                    # Code principal + CLI
-├── wordcount_test.go               # 6 tests unitaires + benchmarks
+├── wordcount_test.go               # 14 tests unitaires + 13 benchmarks
 ├── input.txt                       # Fichier texte de test
 ├── TN5-report.md                   # Rapport d'analyse
 ├── TN5-AI-Prompts.md               # Prompts IA utilisés
@@ -35,13 +36,13 @@ TN5/
 ## Exécution
 
 ```bash
-go run wordcount.go input.txt
+go run . input.txt
 ```
 
 Avec une taille de segment personnalisée :
 
 ```bash
-go run wordcount.go input.txt 5000
+go run . input.txt 5000
 ```
 
 ## Tests unitaires
@@ -66,10 +67,17 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestCountWordsMultipleSpaces` | Espaces multiples ignorés, 3 mots comptés |
 | `TestCountWordsConsistency` | Résultat identique pour 7 tailles de segment (1 à 500) |
 | `TestSplitIntoSegments` | Les segments contiennent des mots complets |
-
+| `TestSplitIntoSegmentsNegativeSize` | Taille ≤ 0 retourne tout le contenu en un seul segment |
+| `TestRunValidFile` | `run` avec fichier réel retourne le bon compte |
+| `TestRunWithSegmentSize` | `run` accepte une taille de segment en argument |
+| `TestRunNoArgs` | `run` sans arguments retourne une erreur |
+| `TestRunInvalidSegmentSize` | `run` avec taille invalide (`"abc"`, `"-5"`) retourne une erreur |
+| `TestRunMissingFile` | `run` avec fichier inexistant retourne une erreur |
+| `TestMainFunction` | `main()` sans panique pour un fichier valide |
+| `TestMainFunctionError` | `main()` appelle `exitFunc(1)` en cas d'erreur |
 ## Benchmarks disponibles
 
-9 sous-benchmarks par taille de segment (10 à tout-en-un) + 4 comparaisons séquentiel vs concurrent.
+9 sous-benchmarks par taille de segment (10 à tout-en-un) + 4 comparaisons séquentiel vs concurrent (13 au total).
 
 | Résultat clé | Valeur |
 |--------------|--------|

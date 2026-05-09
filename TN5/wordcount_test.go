@@ -217,6 +217,7 @@ func BenchmarkSegmentSize(b *testing.B) {
 
 	for _, s := range sizes {
 		b.Run(s.name, func(b *testing.B) {
+			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				CountWordsConcurrent(benchContent, s.size)
 			}
@@ -227,24 +228,28 @@ func BenchmarkSegmentSize(b *testing.B) {
 // BenchmarkSequentialVsConcurrent compare le comptage séquentiel vs concurrent.
 func BenchmarkSequentialVsConcurrent(b *testing.B) {
 	b.Run("Sequential", func(b *testing.B) {
+		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			countWords(benchContent)
 		}
 	})
 
 	b.Run("Concurrent_1000", func(b *testing.B) {
+		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			CountWordsConcurrent(benchContent, 1000)
 		}
 	})
 
 	b.Run("Concurrent_10000", func(b *testing.B) {
+		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			CountWordsConcurrent(benchContent, 10000)
 		}
 	})
 
 	b.Run("Concurrent_100000", func(b *testing.B) {
+		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			CountWordsConcurrent(benchContent, 100000)
 		}

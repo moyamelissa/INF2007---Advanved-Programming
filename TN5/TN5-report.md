@@ -1,7 +1,10 @@
-# TN5 — Rapport : Comptez les mots avec la concurrence en Go
+# Comptage de mots concurrent en Go
 
-**Cours** : INF2007 — Programmation avancée  
-**Plateforme** : Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
+**Cours :** INF2007 — Programmation Avancée  
+**Travail :** TN5  
+**Étudiante :** Melissa Moya  
+**Semaine :** 12  
+**Plateforme :** Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
 
 ---
 
@@ -91,7 +94,7 @@ Chaque allocation supplémentaire ajoute environ 0.3 µs de surcoût (allocation
 
 ## 4. Tests unitaires
 
-J'ai écrit 6 tests couvrant les cas critiques :
+J'ai écrit 14 tests couvrant les cas critiques :
 
 | Test | Pourquoi ce test est important |
 |------|-------------------------------|
@@ -101,6 +104,14 @@ J'ai écrit 6 tests couvrant les cas critiques :
 | `TestCountWordsMultipleSpaces` | `"  mot1   mot2   mot3  "` → 3, pas 7 (espaces multiples ignorés). |
 | `TestCountWordsConsistency` | **Test le plus important** : vérifie que le résultat est identique pour 7 tailles de segment (1 à 500). Si le split coupait un mot, ce test échouerait. |
 | `TestSplitIntoSegments` | Vérifie directement que les segments contiennent des mots complets. |
+| `TestSplitIntoSegmentsNegativeSize` | Taille ≤ 0 retourne tout le contenu en un seul segment. |
+| `TestRunValidFile` | `run` avec un fichier réel retourne le bon compte de mots. |
+| `TestRunWithSegmentSize` | `run` accepte une taille de segment en argument CLI. |
+| `TestRunNoArgs` | `run` sans argument retourne une erreur explicite. |
+| `TestRunInvalidSegmentSize` | Taille invalide (`"abc"`, `"-5"`) retourne une erreur. |
+| `TestRunMissingFile` | Fichier inexistant retourne une erreur de lecture. |
+| `TestMainFunction` | `main()` s'exécute sans panique pour un fichier valide. |
+| `TestMainFunctionError` | `main()` appelle `exitFunc(1)` en cas d'erreur (branche d'erreur couverte). |
 
 Le test `TestCountWordsConsistency` a été particulièrement utile pendant le développement : une version initiale de `splitIntoSegments` ne sautait pas les espaces entre segments, causant des mots comptés en double.
 

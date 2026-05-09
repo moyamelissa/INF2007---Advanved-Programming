@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -376,11 +377,40 @@ func TestRunFunctionWithErrors(t *testing.T) {
 	run([]string{"http://127.0.0.1:1/page"}, 1)
 }
 
+// TestCheckRobotsReadBodyError vérifie qu'on autorise l'exploration si la lecture
+// du corps de robots.txt échoue (connexion interrompue avant la fin).
+func TestCheckRobotsReadBodyError(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	go func() {
+		conn, _ := ln.Accept()
+		defer conn.Close()
+		// HTTP 200 avec Content-Length 1000 mais seulement 7 octets envoyés
+		_, _ = conn.Write([]byte("HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\npartial"))
+		_ = ln.Close()
+	}()
+	serverURL := "http://" + ln.Addr().String()
+	client := &http.Client{Timeout: 2 * time.Second}
+	if !checkRobotsAllowed(serverURL+"/page", client) {
+		t.Error("attendu true quand la lecture de robots.txt échoue")
+	}
+}
+
 // TestMainFunction vérifie que main s'exécute sans panique.
 func TestMainFunction(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skip main test en mode court (réseau requis)")
-	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/robots.txt" {
+			fmt.Fprint(w, "User-agent: *\nAllow: /\n")
+			return
+		}
+		fmt.Fprint(w, `<html><body><p>Hello world</p></body></html>`)
+	}))
+	defer server.Close()
+	old := mainURLs
+	mainURLs = []string{server.URL + "/"}
+	defer func() { mainURLs = old }()
 	main()
 }
 
@@ -420,6 +450,7 @@ func BenchmarkCrawlGoroutines(b *testing.B) {
 
 	for _, g := range goroutineCounts {
 		b.Run(fmt.Sprintf("%d_goroutines", g), func(b *testing.B) {
+			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				CrawlURLs(urls, g)
 			}
@@ -438,6 +469,7 @@ func BenchmarkCountWordsHTML(b *testing.B) {
 	sb.WriteString("</body></html>")
 	htmlContent := sb.String()
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		countWordsHTML(htmlContent)
