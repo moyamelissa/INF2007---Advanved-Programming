@@ -129,6 +129,8 @@ func countWordsHTML(htmlContent string) int {
 
 // crawlURL explore une URL unique : vérifie robots.txt, récupère la page,
 // et compte les mots. Envoie le résultat sur le canal ch.
+// Un délai de 100 ms est ajouté après la vérification robots.txt pour limiter
+// la fréquence d'exploration et éviter de surcharger les serveurs.
 func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult) {
 	// Vérifier robots.txt avant d'explorer
 	if !checkRobotsAllowed(targetURL, client) {
@@ -138,6 +140,9 @@ func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult) {
 		}
 		return
 	}
+
+	// Délai de politesse : limite la fréquence des requêtes vers chaque serveur
+	time.Sleep(100 * time.Millisecond)
 
 	content, err := fetchPage(targetURL, client)
 	if err != nil {

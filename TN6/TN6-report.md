@@ -1,6 +1,9 @@
 # Mini-Projet — Rapport : Robot d'exploration Web concurrent en Go
 
 **Cours** : INF2007 — Programmation avancée  
+**Travail** : TN6  
+**Étudiante** : Melissa Moya  
+**Semaine** : 15  
 **Plateforme** : Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
 
 ---
@@ -128,6 +131,7 @@ Décisions clés :
 - **robots.txt inaccessible = autorisé** : si la requête échoue (timeout, 404, erreur réseau), on autorise l'exploration par défaut. C'est le comportement standard (RFC 9309) : l'absence de robots.txt signifie « tout est permis ».
 - **Vérification par URL** : `checkRobotsAllowed` est appelé dans chaque goroutine, avant `fetchPage`. Si le chemin est interdit (ex: `Disallow: /private`), la goroutine retourne immédiatement une erreur sans effectuer la requête sur la page.
 - **Bibliothèque `github.com/temoto/robotstxt`** : parse correctement les directives `Allow`, `Disallow`, et les wildcards. Évite de réimplémenter un parser de robots.txt.
+- **Délai de politesse (100 ms)** : un `time.Sleep(100 * time.Millisecond)` est inseré dans `crawlURL` après la vérification robots.txt et avant le fetch. Ce délai limite la fréquence des requêtes vers chaque serveur, conformes aux bonnes pratiques d’exploration éthique et à la directive `Crawl-delay` implicite.
 
 ### Exemple concret testé
 
@@ -145,18 +149,22 @@ Et vérifie que :
 
 ## 3. Cas de test
 
-J'ai écrit **14 tests** utilisant `httptest.NewServer` pour simuler des serveurs HTTP sans requêtes réseau réelles. Voici les plus significatifs :
+J'ai écrit **25 tests** utilisant `httptest.NewServer` pour simuler des serveurs HTTP sans requêtes réseau réelles. Voici les plus significatifs :
 
 | Test | Ce qu'il vérifie concrètement |
 |------|-------------------------------|
 | `TestCountWordsHTMLIgnoreScript` | `<p>Texte visible</p><script>var x = "ignoré";</script><p>Autre texte</p>` → 4 mots, pas 8. Prouve que le parsing HTML fonctionne. |
 | `TestFetchPageTimeout` | Serveur qui dort 5s + client avec timeout 1s → erreur capturée. Vérifie que les serveurs lents ne bloquent pas le crawler indéfiniment. |
+| `TestCheckRobotsAllowed` | robots.txt avec `Disallow: /private/` → `/private/secret` bloqué, `/public/page` autorisé. Prouve la conformité robots.txt. |
+| `TestCheckRobotsReadBodyError` | Serveur TCP qui ferme la connexion après 7 octets (Content-Length: 1000) → `io.ReadAll` échoue, crawl autorisé par défaut. |
 | `TestCrawlURLsIntegration` | 2 pages crawlées en parallèle → `page1: 3 mots`, `page2: 2 mots`, `total: 5`. Test de bout en bout. |
 | `TestCrawlURLsRobotsBlocked` | URL interdite par `Disallow` → erreur, 0 mots comptés, map vide. Prouve que robots.txt est respecté avant le fetch. |
-
-Les 6 tests de comptage HTML couvrent : HTML simple, balises multiples, script ignoré, style ignoré, HTML vide, et HTML sans texte.
+| `TestMainFunction` | Injection de `mainURLs` avec un serveur local → `main()` couverte à 100% sans appel réseau externe. |
 
 ## 4. Résultats des benchmarks
+
+> **Commande utilisée :** `go test -bench=. -benchmem -count=1 ./...`  
+> **Plateforme :** Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
 
 ### Performance selon le nombre de goroutines (8 URLs, serveur local)
 
@@ -202,4 +210,4 @@ Le surcoût provient des stacks des goroutines (~2 Ko chacune), des buffers du s
 
 ## 6. Conclusion
 
-Le robot d'exploration démontre une utilisation combinée de quatre primitives de concurrence Go : goroutines, canaux, mutex et WaitGroup. Le sémaphore contrôle le parallélisme, le canal transmet les résultats de manière type-safe, le mutex protège la map partagée, et le WaitGroup assure la fermeture propre du canal. Le respect de robots.txt est intégré comme première étape de chaque goroutine, avant toute requête sur la page cible. Les 14 tests unitaires, tous basés sur des serveurs locaux (`httptest`), garantissent la correction sans dépendance réseau externe.
+Le robot d'exploration démontre une utilisation combinée de quatre primitives de concurrence Go : goroutines, canaux, mutex et WaitGroup. Le sémaphore contrôle le parallélisme, le canal transmet les résultats de manière type-safe, le mutex protège la map partagée, et le WaitGroup assure la fermeture propre du canal. Le respect de robots.txt est intégré comme première étape de chaque goroutine, avant toute requête sur la page cible. Les 25 tests unitaires, tous basés sur des serveurs locaux (`httptest` et sockets TCP raw), garantissent une couverture de 100% sans dépendance réseau externe.

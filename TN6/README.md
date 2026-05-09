@@ -19,11 +19,11 @@ Ce projet implémente un robot d'exploration Web concurrent en Go. Il récupère
 ## Structure du projet
 
 ```
-TN6/
+.
 ├── go.mod                # Module Go
 ├── go.sum                # Dépendances vérifiées
 ├── crawler.go            # Code principal + CLI
-├── crawler_test.go       # 14 tests unitaires + benchmarks
+├── crawler_test.go       # 25 tests unitaires + benchmarks
 ├── TN6-report.md         # Rapport d'analyse
 ├── TN6-AI-Prompts.md     # Prompts IA utilisés
 └── README.md             # Ce fichier
@@ -36,7 +36,7 @@ TN6/
 ## Exécution
 
 ```bash
-go run crawler.go
+go run .
 ```
 
 ## Tests unitaires
@@ -61,14 +61,25 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestCountWordsHTMLIgnoreStyle` | Contenu de `<style>` ignoré |
 | `TestCountWordsHTMLEmpty` | HTML vide retourne 0 |
 | `TestCountWordsHTMLOnlyTags` | Balises sans texte retourne 0 |
+| `TestCountWordsHTMLNoscript` | Contenu de `<noscript>` ignoré |
 | `TestFetchPageSuccess` | Récupération d'une page via serveur de test |
 | `TestFetchPageInvalidURL` | Gestion d'erreur pour URL invalide |
 | `TestFetchPageTimeout` | Gestion du délai d'expiration |
 | `TestFetchPage404` | Gestion d'un code HTTP 404 |
+| `TestFetchPageReadError` | Gestion d'erreur quand la connexion est interrompue |
 | `TestCheckRobotsAllowed` | Respect des règles Allow/Disallow |
 | `TestCheckRobotsNoFile` | Autorisation par défaut si robots.txt absent |
+| `TestCheckRobotsInvalidURL` | Retourne false pour URL non parseable |
+| `TestCheckRobotsUnreachable` | Autorise si le serveur est injoignable |
+| `TestCheckRobotsInvalidBody` | Corps valide de robots.txt parsé sans erreur |
+| `TestCheckRobotsReadBodyError` | Autorise si la lecture du corps robots.txt échoue |
 | `TestCrawlURLsIntegration` | Crawl complet de 2 pages locales |
 | `TestCrawlURLsRobotsBlocked` | URL bloquée par robots.txt retourne erreur |
+| `TestCrawlURLsZeroGoroutines` | maxGoroutines ≤ 0 traité comme 1 |
+| `TestCrawlURLFetchError` | Erreur HTTP 500 capturée dans CrawlResult |
+| `TestRunFunction` | `run` s'exécute sans panique avec serveur local |
+| `TestRunFunctionWithErrors` | `run` gère les erreurs sans panique |
+| `TestMainFunction` | `main()` couvre le point d'entrée sans appel réseau |
 
 ## Benchmarks disponibles
 
