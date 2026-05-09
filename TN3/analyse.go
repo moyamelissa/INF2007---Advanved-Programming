@@ -5,7 +5,7 @@ import (
 	"math/bits"
 )
 
-// Analyse analyse les données binaires de capteurs IoT pour un capteur donné.
+// Analyse les données binaires de capteurs IoT pour un capteur donné.
 //
 // Chaque entrée dans data est un entier 32 bits structuré comme suit :
 //   - Bits 0 à 6 : Identifiant du capteur (0–127).
