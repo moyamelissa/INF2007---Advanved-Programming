@@ -26,7 +26,7 @@ func Analyse(data []uint32, capteur uint8) ([24]int, error) {
 	var counts [24]int
 
 	// uint8 accepte 0–255, mais les identifiants valides n'utilisent que 7 bits (0–127).
-	// On vérifie explicitement car le type ne contraint pas cette plage. (cf. Ch. 3)
+	// On vérifie explicitement, car le type ne contraint pas cette plage. (cf. Ch. 3)
 	if capteur > 127 {
 		return counts, errors.New("identifiant de capteur invalide : doit être entre 0 et 127")
 	}
