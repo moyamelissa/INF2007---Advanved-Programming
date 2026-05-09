@@ -1,14 +1,39 @@
-Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum.
+Go is an open-source programming language designed for simplicity, reliability, and efficiency.
+It was created at Google by Robert Griesemer, Rob Pike, and Ken Thompson, and released in 2009.
+The language is statically typed, compiled, and built with modern software development in mind.
+Go makes it easy to write software that scales across large teams and distributed systems.
 
-La programmation concurrente en Go repose sur les goroutines et les canaux.
-Les goroutines sont des fils d'exécution légers gérés par le runtime de Go.
-Les canaux permettent la communication sûre entre les goroutines sans partage de mémoire.
-Ce modèle est inspiré du CSP Communicating Sequential Processes de Tony Hoare.
+One of Go's most powerful features is its approach to concurrency.
+Instead of relying on threads and locks, Go introduces goroutines and channels.
+A goroutine is a lightweight function that runs concurrently with other goroutines.
+The Go runtime multiplexes goroutines onto operating system threads automatically.
+This means a Go program can launch thousands of goroutines without exhausting system resources.
 
-Un programme bien conçu utilise la concurrence pour diviser le travail en tâches indépendantes.
-Chaque tâche peut être exécutée en parallèle sur les cœurs disponibles du processeur.
-Le canal sert de point de synchronisation garantissant que les résultats sont collectés correctement.
-Il est important de fermer les canaux quand ils ne sont plus nécessaires pour éviter les fuites de goroutines.
+Channels provide a safe way for goroutines to communicate and synchronize.
+The guiding principle in Go is: do not communicate by sharing memory; share memory by communicating.
+A buffered channel allows a sender to proceed without waiting for a receiver, up to its capacity.
+An unbuffered channel forces synchronization between the sender and the receiver.
+
+The gofmt tool automatically formats Go source code according to a standard style.
+Unlike many languages where formatting is a matter of personal preference, Go enforces consistency.
+This reduces debate in code reviews and makes all Go code instantly familiar to any Go programmer.
+Code that is not formatted with gofmt is considered non-idiomatic in the Go community.
+
+Testing is a first-class citizen in Go.
+The standard library includes the testing package, which provides a framework for writing unit tests.
+Benchmark functions measure the performance of code under controlled conditions.
+The go test command runs tests, benchmarks, and generates code coverage reports in a single step.
+Writing tests alongside production code is not just encouraged in Go, it is the expected practice.
+
+Go's standard library is comprehensive and well-designed.
+It includes packages for HTTP servers, JSON encoding, cryptography, file I/O, and much more.
+The net/http package alone is powerful enough to build production-ready web services.
+External dependencies are managed with Go modules, introduced in Go 1.11 and refined since.
+
+Effective Go, the official style guide from the Go team, teaches idiomatic patterns for the language.
+It covers formatting, naming conventions, control structures, functions, methods, interfaces, and concurrency.
+Understanding these conventions is essential for writing code that other Go programmers can read easily.
+The document emphasizes that a direct translation from Java or C++ into Go rarely produces good results.
+Instead, one must think about problems from a Go perspective to unlock the language's true strengths.
+
+Source: Effective Go — https://go.dev/doc/effective_go
