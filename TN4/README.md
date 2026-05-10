@@ -26,14 +26,19 @@ Mesure et comparaison des performances du calcul de la somme des sinus sur un ta
 ├── TN4-report.md                   # Rapport d'analyse (tableau, graphique, calculs)
 ├── TN4-AI-Prompts.md               # Prompts IA utilisés
 ├── TN4-Homework-Instructions.md    # Énoncé du travail
-└── Results-and-Instructions/
-    ├── bench_count6.txt             # Sortie brute des benchmarks (count=6)
-    ├── benchstat-output.txt         # Analyse benchstat — médianes ± IC 95 %
-    ├── tests-output.txt             # Sortie de go test -v (13 tests PASS)
-    ├── coverage-output.txt          # go test -cover → 100.0 %
-    ├── Resultats-benchmarks-et-captures.md  # Données brutes et tableau complet
-    ├── Guide-applications-numeriques.md     # Détails calculs lumière + 120 fps
-    └── Guide-creation-graphique-Mermaid.md  # Méthode de construction du graphique
+├── chartgen/                       # Générateur de graphique (module Go séparé)
+│   ├── go.mod                      # Module chartgen — dépendance gonum/plot isolée
+│   └── main.go                     # Produit docs/graphique1_int_vs_float.png
+├── docs/                           # Guides et visuels de référence
+│   ├── graphique1_int_vs_float.png          # Graphique Int vs Float (généré par chartgen)
+│   ├── Resultats-benchmarks-et-captures.md # Données brutes et tableau complet
+│   ├── Guide-applications-numeriques.md    # Détails calculs Q1 (lumière) et Q2 (120 fps)
+│   └── Guide-creation-graphique-gonum.md   # Comment régénérer le graphique avec gonum/plot
+└── logs/                           # Sorties brutes des commandes Go
+    ├── bench_count6.txt             # go test -bench … -count=6 (sortie brute)
+    ├── benchstat-output.txt         # benchstat — médianes ± IC 95 %
+    ├── tests-output.txt             # go test -v (13 tests PASS)
+    └── coverage-output.txt          # go test -cover → 100.0 %
 ```
 
 ## Prérequis
@@ -106,9 +111,9 @@ Le code respecte `gofmt` et passe `go vet` sans avertissement. La graine `rand.N
 ## Liens
 
 - [Rapport TN4](TN4-report.md)
-- [Résultats et captures](Results-and-Instructions/Resultats-benchmarks-et-captures.md)
-- [Guide calculs numériques](Results-and-Instructions/Guide-applications-numeriques.md)
-- [Données brutes benchmarks](Results-and-Instructions/bench_count6.txt)
-- [Guide graphique Mermaid](Results-and-Instructions/Guide-creation-graphique-Mermaid.md)
+- [Résultats et captures](docs/Resultats-benchmarks-et-captures.md)
+- [Guide calculs numériques](docs/Guide-applications-numeriques.md)
+- [Guide graphique gonum/plot](docs/Guide-creation-graphique-gonum.md)
+- [Données brutes benchmarks](logs/bench_count6.txt)
 - [Prompts IA](TN4-AI-Prompts.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN4)
