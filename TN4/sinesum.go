@@ -74,54 +74,54 @@ func computeSineSum(dataType string, data interface{}) (float64, error) {
 	}
 }
 
-// run contient la logique principale du programme, extraite de main pour
-// permettre les tests unitaires. Elle retourne une erreur si le type est invalide.
-func run(dataType string) (float64, error) {
-	fmt.Printf("=== Somme des sinus — type=%s, taille=%d ===\n\n", dataType, arraySize)
+// RunResult contient le résultat numérique et les durées mesurées par run.
+type RunResult struct {
+	Result   float64
+	GenTime  time.Duration
+	CalcTime time.Duration
+}
 
-	// Les mesures via time.Since servent uniquement à l'affichage console.
-	// L'analyse de performance repose sur testing.B (cf. Ch. 6).
-	start := time.Now()
-
-	var result float64
+// run contient la logique pure du programme : génération du tableau et calcul
+// de la somme des sinus. Elle ne produit aucun affichage — l'affichage est
+// entièrement délégué à main, conformément à la séparation logique/affichage.
+func run(dataType string) (RunResult, error) {
+	var res RunResult
 
 	switch dataType {
 	case "int":
+		start := time.Now()
 		data := generateIntArray(arraySize)
-		genTime := time.Since(start)
-		fmt.Printf("Génération du tableau : %v\n", genTime)
-
+		res.GenTime = time.Since(start)
 		calcStart := time.Now()
-		result = computeSineSumInt(data)
-		calcTime := time.Since(calcStart)
-		fmt.Printf("Calcul de la somme    : %v\n", calcTime)
-
+		res.Result = computeSineSumInt(data)
+		res.CalcTime = time.Since(calcStart)
 	case "float":
+		start := time.Now()
 		data := generateFloatArray(arraySize)
-		genTime := time.Since(start)
-		fmt.Printf("Génération du tableau : %v\n", genTime)
-
+		res.GenTime = time.Since(start)
 		calcStart := time.Now()
-		result = computeSineSumFloat(data)
-		calcTime := time.Since(calcStart)
-		fmt.Printf("Calcul de la somme    : %v\n", calcTime)
-
+		res.Result = computeSineSumFloat(data)
+		res.CalcTime = time.Since(calcStart)
 	default:
-		return 0, fmt.Errorf("type invalide : %q (utilisez \"int\" ou \"float\")", dataType)
+		return RunResult{}, fmt.Errorf("type invalide : %q (utilisez \"int\" ou \"float\")", dataType)
 	}
-
-	totalTime := time.Since(start)
-	fmt.Printf("\nRésultat              : %.6f\n", result)
-	fmt.Printf("Temps total           : %v\n", totalTime)
-	return result, nil
+	return res, nil
 }
 
 func main() {
 	dataType := flag.String("type", "float", "Type de données : \"int\" ou \"float\"")
 	flag.Parse()
 
-	_, err := run(*dataType)
+	fmt.Printf("=== Somme des sinus — type=%s, taille=%d ===\n\n", *dataType, arraySize)
+	res, err := run(*dataType)
 	if err != nil {
 		fmt.Printf("Erreur : %v\n", err)
+		return
 	}
+	// Les mesures via time.Since servent uniquement à l'affichage console.
+	// L'analyse de performance repose sur testing.B (cf. Ch. 6).
+	fmt.Printf("Génération du tableau : %v\n", res.GenTime)
+	fmt.Printf("Calcul de la somme    : %v\n", res.CalcTime)
+	fmt.Printf("\nRésultat              : %.6f\n", res.Result)
+	fmt.Printf("Temps total           : %v\n", res.GenTime+res.CalcTime)
 }

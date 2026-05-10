@@ -127,6 +127,7 @@ func TestComputeSineSumFloatWrongData(t *testing.T) {
 }
 
 // TestRunInt vérifie que la fonction run s'exécute correctement avec le type int.
+// run() ne produit aucun affichage — elle retourne uniquement le résultat et les durées.
 func TestRunInt(t *testing.T) {
 	_, err := run("int")
 	if err != nil {
@@ -173,7 +174,11 @@ func TestMainFunctionError(t *testing.T) {
 
 // ========== Benchmarks ==========
 
-// Pourcentages du tableau à tester
+// Pourcentages du tableau à tester.
+// Relation avec la hiérarchie mémoire de l'i5-10300H (L1=256 KB, L2=1 MB, L3=8 MB) :
+// paliers 1–10 % (10K–100K éléments, ~80–800 KB) tiennent entièrement en L2 ;
+// à partir de 30 % (~2.4 MB) la pression sur L2 augmente et le L3 prend le relais ;
+// 100 % (1M éléments × 8 octets = 8 MB) atteint exactement la taille du L3.
 var percentages = []struct {
 	name    string
 	percent float64
