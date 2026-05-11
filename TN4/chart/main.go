@@ -14,10 +14,10 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-// Données des benchmarks (médianes benchstat, 6 exécutions)
+// Données des benchmarks (médianes benchstat, 6 exécutions — rerun mai 2026)
 var labels = []string{"1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}
-var intMS = []float64{0.44, 4.09, 8.11, 11.83, 15.52, 19.28, 22.98, 26.58, 30.94, 34.78, 38.71}
-var floatMS = []float64{0.24, 2.11, 4.24, 7.79, 8.99, 11.98, 13.61, 14.69, 16.82, 18.96, 20.93}
+var intMS = []float64{0.376, 3.65, 7.31, 10.88, 14.93, 18.16, 21.93, 25.60, 29.48, 32.79, 36.69}
+var floatMS = []float64{0.218, 2.33, 4.27, 6.13, 8.67, 10.71, 12.97, 16.62, 17.71, 19.63, 21.37}
 
 // Palette mauve (cohérente avec le rapport)
 var (
@@ -68,9 +68,9 @@ func main() {
 
 	// Plage des axes — marge à droite pour les labels de valeur
 	p.Y.Min = 0
-	p.Y.Max = 45
+	p.Y.Max = 42
 	p.X.Min = -0.4
-	p.X.Max = float64(n) + 0.6 // espace pour "38.71 ms"
+	p.X.Max = float64(n) + 0.6 // espace pour "36.69 ms"
 
 	// Ticks Y explicites : multiples de 10
 	p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
@@ -78,7 +78,7 @@ func main() {
 		{Value: 10, Label: "10"}, {Value: 15, Label: "15"},
 		{Value: 20, Label: "20"}, {Value: 25, Label: "25"},
 		{Value: 30, Label: "30"}, {Value: 35, Label: "35"},
-		{Value: 40, Label: "40"},
+		{Value: 40, Label: "40"}, {Value: 42, Label: ""},
 	})
 
 	// Ticks X avec les labels du tableau

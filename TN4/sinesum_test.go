@@ -200,9 +200,9 @@ var percentages = []struct {
 var benchIntArray = generateIntArray(arraySize)
 var benchFloatArray = generateFloatArray(arraySize)
 
-// BenchmarkSineSumInt mesure le temps de computeSineSum pour des entiers
-// à différentes tailles de tableau. On passe par le dispatch pour benchmarker
-// la fonction telle qu'elle est appelée en production (cf. Ch. 6).
+// BenchmarkSineSumInt mesure le pur coût de calcul pour des entiers en appelant
+// directement computeSineSumInt (sans dispatch), conformément aux recommandations
+// du chapitre 6 : isoler la boucle mesurée pour éviter tout bruit externe.
 func BenchmarkSineSumInt(b *testing.B) {
 	for _, p := range percentages {
 		size := int(float64(arraySize) * p.percent)
@@ -211,15 +211,15 @@ func BenchmarkSineSumInt(b *testing.B) {
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				computeSineSum("int", slice)
+				computeSineSumInt(slice)
 			}
 		})
 	}
 }
 
-// BenchmarkSineSumFloat mesure le temps de computeSineSum pour des flottants
-// à différentes tailles de tableau. Le dispatch via interface{} ajoute un coût
-// négligeable par rapport à math.Sin, mais on le mesure quand même (cf. Ch. 6).
+// BenchmarkSineSumFloat mesure le pur coût de calcul pour des flottants en appelant
+// directement computeSineSumFloat (sans dispatch). Cela garantit que les médianes
+// benchstat reflètent uniquement la latence de math.Sin et de l'accumulation (ch. 6).
 func BenchmarkSineSumFloat(b *testing.B) {
 	for _, p := range percentages {
 		size := int(float64(arraySize) * p.percent)
@@ -228,7 +228,7 @@ func BenchmarkSineSumFloat(b *testing.B) {
 			b.ReportAllocs()
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				computeSineSum("float", slice)
+				computeSineSumFloat(slice)
 			}
 		})
 	}
