@@ -61,14 +61,14 @@ Exemple de sortie (`--type=float`) :
 ```
 === Somme des sinus — type=float, taille=1000000 ===
 
-Génération du tableau : 14.2ms
-Calcul de la somme    : 20.9ms
+Génération du tableau : 10.1ms
+Calcul de la somme    : 21.4ms
 
-Résultat              : -103.655941
-Temps total           : 35.1ms
+Résultat              : 460007.368636
+Temps total           : 31.5ms
 ```
 
-Le **résultat** est la somme des sin(x) pour x ∈ [0, 1) — proche de zéro car sin oscille symétriquement. Pour les entiers (`--type=int`), les valeurs dans [0, 1000] couvrent ~159 cycles complets de 2π, ce qui produit également une somme proche de zéro mais avec un calcul ~1,85× plus lent.
+Le **résultat** est la somme des sin(x) pour x ∈ [0, 1) — proche de zéro car sin oscille symétriquement. Pour les entiers (`--type=int`), les valeurs dans [0, 1000] couvrent ~159 cycles complets de 2π, ce qui produit également une somme proche de zéro mais avec un calcul ~1,67× plus lent.
 
 ## Tests
 
@@ -115,9 +115,9 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
 
 | Métrique | Valeur |
 |----------|--------|
-| Temps par sinus — Int | ~38.7 ns |
-| Temps par sinus — Float | ~20.9 ns |
-| Ratio Int/Float à 100 % | 1.85× |
+| Temps par sinus — Int | ~35.8 ns |
+| Temps par sinus — Float | ~21.4 ns |
+| Ratio Int/Float à 100 % | 1.67× |
 | Allocations mémoire | 0 B/op |
 | Couverture de code | 100 % |
 

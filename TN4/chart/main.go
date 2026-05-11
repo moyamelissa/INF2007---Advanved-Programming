@@ -16,8 +16,8 @@ import (
 
 // Données des benchmarks (médianes benchstat, 6 exécutions — rerun mai 2026)
 var labels = []string{"1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}
-var intMS = []float64{0.376, 3.65, 7.31, 10.88, 14.93, 18.16, 21.93, 25.60, 29.48, 32.79, 36.69}
-var floatMS = []float64{0.218, 2.33, 4.27, 6.13, 8.67, 10.71, 12.97, 16.62, 17.71, 19.63, 21.37}
+var intMS = []float64{0.396, 3.57, 7.12, 10.74, 14.31, 17.90, 21.41, 25.11, 28.65, 32.29, 35.76}
+var floatMS = []float64{0.206, 2.06, 4.16, 6.31, 8.56, 11.43, 13.82, 15.91, 17.28, 21.92, 21.40}
 
 // Palette mauve (cohérente avec le rapport)
 var (
@@ -68,17 +68,17 @@ func main() {
 
 	// Plage des axes — marge à droite pour les labels de valeur
 	p.Y.Min = 0
-	p.Y.Max = 45
+	p.Y.Max = 40
 	p.X.Min = -0.4
-	p.X.Max = float64(n) + 0.6 // espace pour "36.69 ms"
+	p.X.Max = float64(n) + 0.6 // espace pour "35.76 ms"
 
-	// Ticks Y explicites : multiples de 10
+	// Ticks Y explicites : multiples de 5
 	p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
 		{Value: 0, Label: "0"}, {Value: 5, Label: "5"},
 		{Value: 10, Label: "10"}, {Value: 15, Label: "15"},
 		{Value: 20, Label: "20"}, {Value: 25, Label: "25"},
 		{Value: 30, Label: "30"}, {Value: 35, Label: "35"},
-		{Value: 40, Label: "40"}, {Value: 45, Label: "45"},
+		{Value: 40, Label: "40"},
 	})
 
 	// Ticks X avec les labels du tableau
