@@ -68,7 +68,7 @@ func main() {
 
 	// Plage des axes — marge à droite pour les labels de valeur
 	p.Y.Min = 0
-	p.Y.Max = 42
+	p.Y.Max = 45
 	p.X.Min = -0.4
 	p.X.Max = float64(n) + 0.6 // espace pour "36.69 ms"
 
@@ -78,7 +78,7 @@ func main() {
 		{Value: 10, Label: "10"}, {Value: 15, Label: "15"},
 		{Value: 20, Label: "20"}, {Value: 25, Label: "25"},
 		{Value: 30, Label: "30"}, {Value: 35, Label: "35"},
-		{Value: 40, Label: "40"}, {Value: 42, Label: ""},
+		{Value: 40, Label: "40"}, {Value: 45, Label: "45"},
 	})
 
 	// Ticks X avec les labels du tableau
