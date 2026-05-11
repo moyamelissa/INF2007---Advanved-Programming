@@ -17,7 +17,7 @@ Temps par sinus = ns/op du benchmark 100pct / 1 000 000
 
 Par exemple, avec nos médianes `benchstat` (count=6) :
 - Int : `35 760 000 ns/op / 1 000 000 = 35.8 ns par sinus`
-- Float : `21 400 000 ns/op / 1 000 000 = 21.4 ns par sinus`
+- Float : `22 640 000 ns/op / 1 000 000 = 22.6 ns par sinus`
 
 ### Calcul de la distance
 
@@ -30,7 +30,7 @@ distance = 299 792 458 m/s × (temps_par_sinus / 1 000 000 000)
 
 Avec nos résultats :
 - Int : 299 792 458 × 35.8 / 1 000 000 000 = 10.7 mètres
-- Float : 299 792 458 × 21.4 / 1 000 000 000 = 6.4 mètres
+- Float : 299 792 458 × 22.6 / 1 000 000 000 = 6.8 mètres
 
 La lumière parcourt entre 6 et 11 mètres pendant un seul calcul de sinus, selon le type.
 
@@ -58,6 +58,6 @@ nombre de sinus = 8 333 333 ns / temps_par_sinus_en_ns
 
 Avec nos résultats :
 - Int : 8 333 333 / 35.8 = environ 233 000 sinus par tick
-- Float : 8 333 333 / 21.4 = environ 389 000 sinus par tick
+- Float : 8 333 333 / 22.6 = environ 369 000 sinus par tick
 
-On peut donc calculer entre 233 000 et 389 000 sinus par frame à 120 fps sur cette machine.
+On peut donc calculer entre 233 000 et 369 000 sinus par frame à 120 fps sur cette machine.

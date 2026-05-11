@@ -68,7 +68,7 @@ Résultat              : 460007.368636
 Temps total           : 31.5ms
 ```
 
-Le **résultat** est la somme des sin(x) pour x ∈ [0, 1) — proche de zéro car sin oscille symétriquement. Pour les entiers (`--type=int`), les valeurs dans [0, 1000] couvrent ~159 cycles complets de 2π, ce qui produit également une somme proche de zéro mais avec un calcul ~1,67× plus lent.
+Le **résultat** est la somme des sin(x) pour x ∈ [0, 1) — proche de zéro car sin oscille symétriquement. Pour les entiers (`--type=int`), les valeurs dans [0, 1000] couvrent ~159 cycles complets de 2π, ce qui produit également une somme proche de zéro mais avec un calcul ~1,58× plus lent.
 
 ## Tests
 
@@ -116,8 +116,8 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
 | Métrique | Valeur |
 |----------|--------|
 | Temps par sinus — Int | ~35.8 ns |
-| Temps par sinus — Float | ~21.4 ns |
-| Ratio Int/Float à 100 % | 1.67× |
+| Temps par sinus — Float | ~22.6 ns |
+| Ratio Int/Float à 100 % | 1.58× |
 | Allocations mémoire | 0 B/op |
 | Couverture de code | 100 % |
 

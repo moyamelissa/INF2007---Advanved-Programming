@@ -40,15 +40,15 @@ Résultats : [coverage.txt](../logs/coverage.txt)
 | 10 % | 100 000 | 3.57 | 2.06 | 1.73× |
 | 20 % | 200 000 | 7.12 | 4.16 | 1.71× |
 | 30 % | 300 000 | 10.74 | 6.31 | 1.70× |
-| 40 % | 400 000 | 14.31 | 8.56 | 1.67× |
+| 40 % | 400 000 | 14.31 | 8.53 | 1.68× |
 | 50 % | 500 000 | 17.90 | 11.43 | 1.57× |
 | 60 % | 600 000 | 21.41 | 13.82 | 1.55× |
-| 70 % | 700 000 | 25.11 | 15.91 | 1.58× |
-| 80 % | 800 000 | 28.65 | 17.28 | 1.66× |
-| 90 % | 900 000 | 32.29 | 21.92 | 1.47× |
-| 100 % | 1 000 000 | 35.76 | 21.40 | 1.67× |
+| 70 % | 700 000 | 25.11 | 15.28 | 1.64× |
+| 80 % | 800 000 | 28.65 | 17.66 | 1.62× |
+| 90 % | 900 000 | 32.29 | 22.52 | 1.43× |
+| 100 % | 1 000 000 | 35.76 | 22.64 | 1.58× |
 
-Les valeurs en millisecondes proviennent des médianes `benchstat` calculées sur 6 exécutions (rerun mai 2026). Par exemple, `benchstat` reporte `35.76m` pour Int/100pct, soit 35.76 ms. Les paliers Int restent stables (±0–7 %). Les paliers Float 30–90 % présentent des IC de ±9–32 % dus au bruit système lors de l'exécution séquentielle des 22 benchmarks (les Float étant plus rapides, une même perturbation a un impact relatif plus grand). Un rerun isolé de Float/70pct (6 exécutions) donne 15,28 ms ±6 %, confirmant la stabilité du code. Aucune allocation mémoire n'a été mesurée (0 B/op, 0 allocs/op) pour les deux types.
+Les valeurs en millisecondes proviennent des médianes `benchstat` calculées sur 6 exécutions (rerun mai 2026). Par exemple, `benchstat` reporte `35.76m` pour Int/100pct, soit 35.76 ms. Les paliers Int restent stables (±0–7 %). Les paliers Float 30–90 % présentent des IC de ±9–32 % dus au bruit système lors de l'exécution séquentielle des 22 benchmarks (les Float étant plus rapides, une même perturbation a un impact relatif plus grand). Les paliers 80, 90 et 100 % Float proviennent d'un rerun isolé (6 exécutions) qui confirme la saturation de la bande passante L3 aux hauts paliers. Aucune allocation mémoire n'a été mesurée (0 B/op, 0 allocs/op) pour les deux types.
 
 ## Graphique
 
@@ -56,7 +56,7 @@ Le graphique est généré avec gonum/plot en Go (`chart/main.go`) et produit `d
 
 ![Graphique 1 – Int vs Float](benchmark-chart.png)
 
-La courbe du haut correspond aux entiers (Int), celle du bas aux flottants (Float). La courbe Int progresse de façon quasi linéaire, tandis que la courbe Float présente de légères irrégularités (notamment aux paliers 30 % et 70 %). Les deux algorithmes sont O(n) : ces écarts proviennent du bruit de mesure. Les benchmarks Float étant plus rapides, une même perturbation (interruption système, throttling thermique du CPU) a un impact relatif plus important. Les intervalles de confiance `benchstat` le confirment : Float/30pct affiche ± 13 % contre ± 1 % pour Int/100pct. Le ratio moyen Int/Float est de 1.67× au palier 100 % (± 1 %), principalement dû à la conversion `float64(v)` exécutée à chaque itération pour les entiers.
+La courbe du haut correspond aux entiers (Int), celle du bas aux flottants (Float). La courbe Int progresse de façon quasi linéaire, tandis que la courbe Float présente de légères irrégularités (notamment aux paliers 30 % et 70 %). Les deux algorithmes sont O(n) : ces écarts proviennent du bruit de mesure. Les benchmarks Float étant plus rapides, une même perturbation (interruption système, throttling thermique du CPU) a un impact relatif plus important. Les intervalles de confiance `benchstat` le confirment : Float/30pct affiche ± 13 % contre ± 1 % pour Int/100pct. Le ratio moyen Int/Float est de 1.58× au palier 100 % (±9 %), principalement dû à la conversion `float64(v)` exécutée à chaque itération pour les entiers. Les paliers Float 80–90–100 % (rerun isolé) confirment la saturation de la bande passante L3 : Float/90 % et Float/100 % sont quasi identiques (22,52 vs 22,64 ms).
 
 ## Lecture des résultats
 

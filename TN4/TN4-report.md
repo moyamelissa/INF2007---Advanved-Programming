@@ -37,15 +37,15 @@ sont pré-générés hors de `b.N`, `b.ResetTimer()` exclut le setup, et
 | 10 % | 100 000 | 3.57 | 2.06 | 1.73× |
 | 20 % | 200 000 | 7.12 | 4.16 | 1.71× |
 | 30 % | 300 000 | 10.74 | 6.31 | 1.70× |
-| 40 % | 400 000 | 14.31 | 8.56 | 1.67× |
+| 40 % | 400 000 | 14.31 | 8.53 | 1.68× |
 | 50 % | 500 000 | 17.90 | 11.43 | 1.57× |
 | 60 % | 600 000 | 21.41 | 13.82 | 1.55× |
-| 70 % | 700 000 | 25.11 | 15.91 | 1.58× |
-| 80 % | 800 000 | 28.65 | 17.28 | 1.66× |
-| 90 % | 900 000 | 32.29 | 21.92 | 1.47× |
-| 100 % | 1 000 000 | 35.76 | 21.40 | 1.67× |
+| 70 % | 700 000 | 25.11 | 15.28 | 1.64× |
+| 80 % | 800 000 | 28.65 | 17.66 | 1.62× |
+| 90 % | 900 000 | 32.29 | 22.52 | 1.43× |
+| 100 % | 1 000 000 | 35.76 | 22.64 | 1.58× |
 
-Les flottants sont systématiquement plus rapides, avec un ratio variant de 1,5 à 1,9×
+Les flottants sont systématiquement plus rapides, avec un ratio variant de 1,4 à 1,9×
 selon le palier. De 50 % à 100 %, le temps double presque exactement pour les entiers
 (17,90 à 35,76 ms, facteur 2,0×), ce qui confirme la complexité O(n). Les paliers
 Float présentent des intervalles de confiance plus élevés que les paliers Int, ce qui
@@ -56,13 +56,14 @@ sur des mesures plus courtes.
 
 ![Graphique 1 – Int vs Float](docs/benchmark-chart.png)
 
-*La zone mauve translucide représente l'écart Int − Float ; l'annotation « 1.67× » indique le ratio à 100 %.*
+*La zone mauve translucide représente l'écart Int − Float et l'annotation indique
+le ratio à 100 %.*
 
 ## 3. Analyse des résultats
 
 **Complexité et écart Int/Float**
 
-Les flottants sont 1,5 à 1,9× plus rapides. L'écart provient de la conversion
+Les flottants sont 1,4 à 1,9× plus rapides. L'écart provient de la conversion
 `float64(v)` à chaque itération et du coût de réduction d'argument de `math.Sin`
 pour les grands entiers : sin(500) nécessite environ 79 réductions modulo 2π, alors
 que les flottants dans [0, 1) se situent déjà dans le domaine principal et n'en
@@ -73,9 +74,12 @@ doublement quasi exact du temps pour les entiers.
 
 L'i5-10300H dispose de 256 KB de L1, 1 MB de L2 et 8 MB de L3. Les petits paliers
 (1 à 10 %, soit 80 à 800 KB) tiennent entièrement en L2. À partir de 30 %
-(environ 2,4 MB), le L2 est dépassé et le L3 prend le relais. Le tableau complet
-(1 000 000 × 8 octets = 8 MB) atteint exactement la limite du L3, ce qui explique
-les légères non-linéarités aux paliers supérieurs à 70 %.
+(environ 2,4 MB), le L2 est dépassé et le L3 prend le relais. À partir de 90 %
+(7,2 MB), le tableau approche la limite du L3 (8 MB) et les deux paliers 90 % et
+100 % affichent des temps quasi identiques pour Float (22,52 vs 22,64 ms, confirmés
+par rerun isolé), ce qui correspond à l'effet de saturation de la bande passante L3.
+Une fois la taille du tableau proche du cache, ajouter 10 % d'éléments
+supplémentaires ne crée plus de ralentissement proportionnel.
 
 **Mécanismes micro-architecturaux**
 
@@ -86,15 +90,19 @@ résultat précédent, ce qui empêche le pipeline FPU de superposer les opérat
 comme dans l'exemple `prefixSum` du chapitre 6. Les appels `math.Sin(v)` sur des
 valeurs indépendantes bénéficient de l'exécution dans le désordre, mais ce gain est
 plafonné par la latence intrinsèque de `math.Sin`, estimée entre 20 et 40 ns.
-Utiliser plusieurs accumulateurs fusionnés en fin de calcul réduirait cette
-dépendance et constituerait la principale piste d'optimisation.
+Les benchmarks Float, étant plus courts, sont davantage sensibles au bruit système
+lors d'une exécution séquentielle des 22 sous-benchmarks. Pour des mesures plus
+stables, il est préférable de relancer les paliers suspects en isolation avec
+`-bench="BenchmarkSineSumFloat/90pct" -count=6`. Utiliser plusieurs accumulateurs
+fusionnés en fin de calcul réduirait la dépendance de données et constituerait la
+principale piste d'optimisation.
+
 
 ## 4. Applications numériques
 
 En prenant les médianes benchstat à 100 % du tableau, on obtient un temps par sinus
-de 35,8 ns pour les entiers (35 760 000 ns ÷ 1 000 000) et de 21,4 ns pour les
-flottants (21 400 000 ns ÷ 1 000 000).
-
+de 35,8 ns pour les entiers (35 760 000 ns ÷ 1 000 000 ≈ 35,8) et de 22,6 ns pour
+les flottants (22 640 000 ns ÷ 1 000 000 ≈ 22,6).
 
 **Q1 — Distance parcourue par la lumière pendant un sinus**
 
@@ -104,7 +112,7 @@ le calcul d'un seul sinus.
 | Type | Temps | Distance |
 |:---:|:---:|:---:|
 | Int | 35,8 ns | $299\,792\,458 \times \frac{35{,}8}{10^9} \approx$ **10,7 m** |
-| Float | 21,4 ns | $299\,792\,458 \times \frac{21{,}4}{10^9} \approx$ **6,4 m** |
+| Float | 22,6 ns | $299\,792\,458 \times \frac{22{,}6}{10^9} \approx$ **6,8 m** |
 
 
 **Q2 — Nombre de sinus par tick à 120 fps**
@@ -116,7 +124,7 @@ possibles par frame.
 | Type | Temps/sinus | Sinus/tick |
 |:---:|:---:|:---:|
 | Int | 35,8 ns | $8\,333\,333 \div 35{,}8 \approx$ **233 000** |
-| Float | 21,4 ns | $8\,333\,333 \div 21{,}4 \approx$ **389 000** |
+| Float | 22,6 ns | $8\,333\,333 \div 22{,}6 \approx$ **369 000** |
 
 ### Bibliographie
 

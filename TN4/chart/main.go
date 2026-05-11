@@ -17,7 +17,7 @@ import (
 // Données des benchmarks (médianes benchstat, 6 exécutions — rerun mai 2026)
 var labels = []string{"1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}
 var intMS = []float64{0.396, 3.57, 7.12, 10.74, 14.31, 17.90, 21.41, 25.11, 28.65, 32.29, 35.76}
-var floatMS = []float64{0.206, 2.06, 4.16, 6.31, 8.56, 11.43, 13.82, 15.91, 17.28, 21.92, 21.40}
+var floatMS = []float64{0.206, 2.06, 4.16, 6.31, 8.53, 11.43, 13.82, 15.28, 17.66, 22.52, 22.64}
 
 // Palette mauve (cohérente avec le rapport)
 var (
