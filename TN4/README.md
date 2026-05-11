@@ -18,7 +18,12 @@ Mesure et comparaison des performances du calcul de la somme des sinus sur un ta
 
 ## Structure du projet
 
-Le programme calcule **Σ sin(xᵢ)** pour i = 1..1 000 000 éléments générés aléatoirement (graine 42). Le résultat numérique est proche de zéro (les valeurs aléatoires couvrent plusieurs cycles de 2π, les contributions positives et négatives s'annulent). L'intérêt du projet est la **performance** : combien de temps prend ce calcul selon que les données sont des `int` ou des `float64` ?
+Le programme calcule **Σ sin(xᵢ)** pour i = 1..1 000 000 éléments générés
+aléatoirement (graine 42). Pour les entiers dans [0, 1000], les contributions
+positives et négatives s'annulent sur ~159 cycles de 2π, produisant une somme
+proche de zéro. Pour les flottants dans [0, 1), tous les sinus sont positifs et
+la somme avoisine 460 000. L'intérêt du projet est la **performance** : combien
+de temps prend ce calcul selon que les données sont des `int` ou des `float64` ?
 
 ```
 .
@@ -68,7 +73,10 @@ Résultat              : 460007.368636
 Temps total           : 31.5ms
 ```
 
-Le **résultat** est la somme des sin(x) pour x ∈ [0, 1) — proche de zéro car sin oscille symétriquement. Pour les entiers (`--type=int`), les valeurs dans [0, 1000] couvrent ~159 cycles complets de 2π, ce qui produit également une somme proche de zéro mais avec un calcul ~1,58× plus lent.
+Le résultat pour `--type=float` est positif car les valeurs dans [0, 1) produisent
+des sinus tous positifs. Pour les entiers (`--type=int`), les valeurs dans [0, 1000]
+couvrent ~159 cycles complets de 2π, ce qui produit une somme proche de zéro mais
+avec un calcul ~1,58× plus lent.
 
 ## Tests
 
@@ -120,10 +128,6 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
 | Ratio Int/Float à 100 % | 1.58× |
 | Allocations mémoire | 0 B/op |
 | Couverture de code | 100 % |
-
-## Qualité du code
-
-Le code respecte `gofmt` et passe `go vet` sans avertissement. La graine `rand.NewSource(42)` garantit des tableaux identiques d'une exécution à l'autre pour assurer la reproductibilité des benchmarks.
 
 ## Liens
 

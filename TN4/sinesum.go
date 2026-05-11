@@ -53,8 +53,9 @@ func computeSineSumFloat(data []float64) float64 {
 
 // computeSineSum dispatche le calcul vers la fonction typée appropriée.
 // Le dispatch via interface{} et assertion de type introduit un surcoût
-// négligeable (~1 ns) face à math.Sin (~30 ns), ce qui le rend acceptable
-// pour l'interface utilisateur et les benchmarks (cf. Ch. 6).
+// négligeable (~1 ns) face à math.Sin (~20–40 ns), ce qui le rend acceptable
+// pour l'interface CLI. Les benchmarks appellent directement les fonctions
+// typées afin d'isoler le pur coût de calcul.
 func computeSineSum(dataType string, data interface{}) (float64, error) {
 	switch dataType {
 	case "int":

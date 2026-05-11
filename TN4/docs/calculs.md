@@ -32,7 +32,7 @@ Avec nos résultats :
 - Int : 299 792 458 × 35.8 / 1 000 000 000 = 10.7 mètres
 - Float : 299 792 458 × 22.6 / 1 000 000 000 = 6.8 mètres
 
-La lumière parcourt entre 6 et 11 mètres pendant un seul calcul de sinus, selon le type.
+La lumière parcourt entre 6,8 m et 10,7 m pendant un seul calcul de sinus, selon le type.
 
 ## Question 2 : Combien de sinus dans un tick à 120 fps
 

@@ -1,13 +1,15 @@
 # Comment créer le graphique avec gonum/plot (Go)
 
-Le graphique est généré en Go avec la bibliothèque `gonum.org/v1/plot`. Il produit un PNG avec zone translucide entre les deux courbes, points avec anneau blanc, annotation du ratio et labels de valeurs finales — fonctionnalités impossibles avec Mermaid `xychart-beta`.
+Le graphique est généré en Go avec la bibliothèque `gonum.org/v1/plot`. Il produit
+un PNG avec zone translucide entre les deux courbes, points avec anneau blanc,
+annotation du ratio et labels de valeurs finales.
 
 ## Étape 1. Lancer les benchmarks et noter les médianes
 
 ```bash
 cd TN4
-go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./... | tee bench_raw.txt
-benchstat bench_raw.txt
+go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./... | tee bench-raw.txt
+benchstat bench-raw.txt
 ```
 
 Relever les médianes `ns/op` de `benchstat` et les diviser par 1 000 000 pour obtenir les millisecondes. Mettre à jour les variables `intMS` et `floatMS` dans `chart/main.go`.

@@ -76,8 +76,9 @@ func TestComputeSineSumEmpty(t *testing.T) {
 }
 
 // TestComputeSineSumNegative vérifie que les entiers négatifs sont gérés
-// correctement. math.Sin est une fonction impaire, donc sin(-1) = -sin(1),
-// et la somme sin(-1)+sin(0)+sin(1) doit valoir exactement sin(0) = 0.
+// correctement. math.Sin est une fonction impaire, donc sin(-1) = -sin(1) :
+// les deux contributions s'annulent et sin(0) = 0, ce qui donne une somme
+// exactement nulle.
 func TestComputeSineSumNegative(t *testing.T) {
 	data := []int{-1, 0, 1}
 	expected := math.Sin(-1) + math.Sin(0) + math.Sin(1)

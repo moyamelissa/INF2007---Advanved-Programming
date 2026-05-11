@@ -64,11 +64,13 @@ le ratio à 100 %.*
 **Complexité et écart Int/Float**
 
 Les flottants sont 1,4 à 1,9× plus rapides. L'écart provient de la conversion
-`float64(v)` à chaque itération et du coût de réduction d'argument de `math.Sin`
-pour les grands entiers : sin(500) nécessite environ 79 réductions modulo 2π, alors
-que les flottants dans [0, 1) se situent déjà dans le domaine principal et n'en
-requièrent aucune. De 50 % à 100 %, la complexité O(n) est confirmée par un
-doublement quasi exact du temps pour les entiers.
+`float64(v)` à chaque itération, qui génère l'instruction CPU `CVTSI2SD`
+(Convert Scalar Integer to Scalar Double), absente du chemin Float, ainsi que du
+coût de réduction d'argument de `math.Sin` pour les grands entiers : sin(500)
+nécessite environ 79 réductions modulo 2π, alors que les flottants dans [0, 1) se
+situent déjà dans le domaine principal et n'en requièrent aucune. De 50 % à 100 %,
+la complexité O(n) est confirmée par un doublement quasi exact du temps pour les
+entiers.
 
 **Hiérarchie mémoire**
 
