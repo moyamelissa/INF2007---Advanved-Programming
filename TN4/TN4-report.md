@@ -44,13 +44,15 @@ et 0 allocs/op pour les deux types.
 
 ## 3. Analyse
 
-Les flottants sont 1,4 à 1,9× plus rapides. L'écart vient de la conversion
-`float64(v)` à chaque itération, qui génère l'instruction CPU `CVTSI2SD`
-(Convert Scalar Integer to Scalar Double) absente du chemin Float, ainsi que du
-coût de réduction d'argument de `math.Sin` pour les grands entiers. sin(500)
-nécessite environ 79 réductions modulo 2π, alors que les flottants dans [0, 1)
-sont déjà dans le domaine principal. De 50 % à 100 %, le temps double presque
-exactement pour les entiers (17,90 à 35,76 ms), confirmant la complexité O(n).
+Les flottants sont 1,4 à 1,9× plus rapides. L'écart ne vient pas de la précision
+numérique, qui reste équivalente puisque `math.Sin` opère toujours sur des
+`float64`, mais de la conversion `float64(v)` à chaque itération pour les entiers.
+Cette conversion génère l'instruction CPU `CVTSI2SD` (Convert Scalar Integer to
+Scalar Double), absente du chemin Float. S'y ajoute le coût de réduction
+d'argument de `math.Sin` pour les grands entiers. sin(500) nécessite environ 79
+réductions modulo 2π, alors que les flottants dans [0, 1) sont déjà dans le
+domaine principal. De 50 % à 100 %, le temps double presque exactement pour les
+entiers (17,90 à 35,76 ms), confirmant la complexité O(n).
 
 La hiérarchie mémoire de l'i5-10300H explique le comportement aux grands paliers.
 Avec 256 KB de L1, 1 MB de L2 et 8 MB de L3, les petits paliers (1 à 10 %, 80 à
