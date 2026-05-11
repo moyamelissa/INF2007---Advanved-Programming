@@ -1,6 +1,6 @@
-// chartgen génère le graphique Int vs Float pour le rapport TN4.
+// chart génère le graphique Int vs Float pour le rapport TN4.
 // Exécuter depuis ce dossier : go run .
-// Sortie : ../docs/graphique1_int_vs_float.png
+// Sortie : ../docs/benchmark-chart.png
 package main
 
 import (
@@ -60,10 +60,7 @@ func main() {
 
 	p := plot.New()
 
-	// Titre et axes
-	p.Title.Text = "Graphique 1 – Temps de calcul : Int vs Float (1 000 000 éléments)"
-	p.Title.TextStyle.Font.Size = vg.Points(12)
-	p.Title.Padding = vg.Points(8)
+	// Axes (titre géré par le rapport, pas dans le PNG)
 	p.X.Label.Text = "Pourcentage du tableau (%)"
 	p.X.Label.TextStyle.Font.Size = vg.Points(10)
 	p.Y.Label.Text = "Temps d'exécution (ms)"
@@ -204,7 +201,7 @@ func main() {
 	ratioLabel.TextStyle[0].Font.Size = vg.Points(9)
 	p.Add(ratioLabel)
 
-	out := "../docs/graphique1_int_vs_float.png"
+	out := "../docs/benchmark-chart.png"
 	if err := p.Save(28*vg.Centimeter, 15*vg.Centimeter, out); err != nil {
 		log.Fatal(err)
 	}

@@ -34,9 +34,9 @@ Les flottants sont systématiquement plus rapides avec un ratio de 1,5 à 1,9×.
 
 **Graphique 1 – Temps de calcul selon le pourcentage du tableau (Int vs Float)**
 
-![Graphique 1 – Int vs Float](docs/graphique1_int_vs_float.png)
+![Graphique 1 – Int vs Float](docs/benchmark-chart.png)
 
-*Généré avec gonum/plot (`chartgen/main.go`). La zone mauve translucide représente l'écart Int − Float ; l'annotation « 1.85× » indique le ratio à 100 %.*
+*Généré avec gonum/plot (`chart/main.go`). La zone mauve translucide représente l'écart Int − Float ; l'annotation « 1.85× » indique le ratio à 100 %.*
 
 ## 3. Analyse des résultats
 
@@ -66,7 +66,7 @@ Temps par sinus (médiane benchstat à 100 %) : Int = 38 710 000 ns ÷ 1 000 000
 
 Environ 215 000 (Int) ou 399 000 (Float) sinus par frame à 120 fps — marge confortable pour des effets visuels simples.
 
-*Détails : [Guide-applications-numeriques.md](docs/Guide-applications-numeriques.md)*
+*Détails : [calculs.md](docs/calculs.md)*
 
 ## 5. Conclusion
 

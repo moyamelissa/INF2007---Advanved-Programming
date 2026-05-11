@@ -1,4 +1,4 @@
-module chartgen
+module chart
 
 go 1.22
 

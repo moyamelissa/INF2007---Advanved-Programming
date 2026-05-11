@@ -46,12 +46,12 @@ go mod tidy          # première fois seulement
 go run .
 ```
 
-Sortie : `TN4/docs/graphique1_int_vs_float.png`
+Sortie : `TN4/docs/benchmark-chart.png`
 
 Le rapport `TN4-report.md` l'intègre avec :
 
 ```markdown
-![Graphique 1 – Int vs Float](graphique1_int_vs_float.png)
+![Graphique 1 – Int vs Float](docs/benchmark-chart.png)
 ```
 
 ## Référence

@@ -26,19 +26,19 @@ Mesure et comparaison des performances du calcul de la somme des sinus sur un ta
 ├── TN4-report.md                   # Rapport d'analyse (tableau, graphique, calculs)
 ├── TN4-AI-Prompts.md               # Prompts IA utilisés
 ├── TN4-Homework-Instructions.md    # Énoncé du travail
-├── chartgen/                       # Générateur de graphique (module Go séparé)
-│   ├── go.mod                      # Module chartgen — dépendance gonum/plot isolée
-│   └── main.go                     # Produit docs/graphique1_int_vs_float.png
+├── chart/                          # Générateur de graphique (module Go séparé)
+│   ├── go.mod                      # Module chart — dépendance gonum/plot isolée
+│   └── main.go                     # Produit docs/benchmark-chart.png
 ├── docs/                           # Guides et visuels de référence
-│   ├── graphique1_int_vs_float.png          # Graphique Int vs Float (généré par chartgen)
-│   ├── Resultats-benchmarks-et-captures.md # Données brutes et tableau complet
-│   ├── Guide-applications-numeriques.md    # Détails calculs Q1 (lumière) et Q2 (120 fps)
-│   └── Guide-creation-graphique-gonum.md   # Comment régénérer le graphique avec gonum/plot
+│   ├── benchmark-chart.png              # Graphique Int vs Float (généré par chart/)
+│   ├── benchmark-results.md            # Données brutes et tableau complet
+│   ├── calculs.md                       # Calculs détaillés Q1 (lumière) et Q2 (120 fps)
+│   └── chart-guide.md                   # Comment régénérer le graphique avec gonum/plot
 └── logs/                           # Sorties brutes des commandes Go
-    ├── bench_count6.txt             # go test -bench … -count=6 (sortie brute)
-    ├── benchstat-output.txt         # benchstat — médianes ± IC 95 %
-    ├── tests-output.txt             # go test -v (13 tests PASS)
-    └── coverage-output.txt          # go test -cover → 100.0 %
+    ├── bench-raw.txt                # go test -bench … -count=6 (sortie brute)
+    ├── benchstat.txt                # benchstat — médianes ± IC 95 %
+    ├── tests.txt                    # go test -v (13 tests PASS)
+    └── coverage.txt                 # go test -cover → 100.0 %
 ```
 
 ## Prérequis
@@ -111,9 +111,9 @@ Le code respecte `gofmt` et passe `go vet` sans avertissement. La graine `rand.N
 ## Liens
 
 - [Rapport TN4](TN4-report.md)
-- [Résultats et captures](docs/Resultats-benchmarks-et-captures.md)
-- [Guide calculs numériques](docs/Guide-applications-numeriques.md)
-- [Guide graphique gonum/plot](docs/Guide-creation-graphique-gonum.md)
-- [Données brutes benchmarks](logs/bench_count6.txt)
+- [Résultats et captures](docs/benchmark-results.md)
+- [Calculs détaillés (Q1 & Q2)](docs/calculs.md)
+- [Guide graphique gonum/plot](docs/chart-guide.md)
+- [Données brutes benchmarks](logs/bench-raw.txt)
 - [Prompts IA](TN4-AI-Prompts.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN4)
