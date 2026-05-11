@@ -28,5 +28,6 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 
 ## Rapport et présentation
 
-- « Comment générer un graphique Mermaid `xychart-beta` dans un fichier Markdown pour comparer les courbes Int et Float ? »
-- « Est-ce que je peux forcer un fond blanc sur un graphique Mermaid pour que ça rende bien en mode sombre sur GitHub ? »
+- « Comment générer un graphique PNG en Go avec gonum/plot pour comparer deux courbes (Int vs Float) avec une zone translucide entre elles ? »
+- « Comment ajouter une annotation de ratio et des labels de valeurs finales sur un graphique gonum/plot ? »
+- « Comment structurer un module Go séparé (`chart/`) pour les dépendances de visualisation afin de ne pas alourdir le module principal `sinesum` ? »
