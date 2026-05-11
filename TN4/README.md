@@ -18,6 +18,8 @@ Mesure et comparaison des performances du calcul de la somme des sinus sur un ta
 
 ## Structure du projet
 
+Le programme calcule **Σ sin(xᵢ)** pour i = 1..1 000 000 éléments générés aléatoirement (graine 42). Le résultat numérique est proche de zéro (les valeurs aléatoires couvrent plusieurs cycles de 2π, les contributions positives et négatives s'annulent). L'intérêt du projet est la **performance** : combien de temps prend ce calcul selon que les données sont des `int` ou des `float64` ?
+
 ```
 .
 ├── go.mod                          # Module Go (sinesum)
@@ -52,6 +54,20 @@ Mesure et comparaison des performances du calcul de la somme des sinus sur un ta
 go run . --type=float   # tableau de nombres à virgule flottante
 go run . --type=int     # tableau d'entiers
 ```
+
+Exemple de sortie (`--type=float`) :
+
+```
+=== Somme des sinus — type=float, taille=1000000 ===
+
+Génération du tableau : 14.2ms
+Calcul de la somme    : 20.9ms
+
+Résultat              : -103.655941
+Temps total           : 35.1ms
+```
+
+Le **résultat** est la somme des sin(x) pour x ∈ [0, 1) — proche de zéro car sin oscille symétriquement. Pour les entiers (`--type=int`), les valeurs dans [0, 1000] couvrent ~159 cycles complets de 2π, ce qui produit également une somme proche de zéro mais avec un calcul ~1,85× plus lent.
 
 ## Tests
 
