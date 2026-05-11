@@ -32,6 +32,13 @@ go test -v -cover ./...
 
 Résultats : [coverage.txt](../logs/coverage.txt)
 
+**Reruns isolés**
+
+Les paliers Float 80, 90 et 100 % ont été relancés en isolation
+([bench-float-high-rerun.txt](../logs/bench-float-high-rerun.txt)) pour confirmer la saturation de la
+bande passante L3. Le palier 70 % a également été relancé séparément
+([bench-float70-rerun.txt](../logs/bench-float70-rerun.txt)).
+
 ## Tableau des résultats
 
 | % du tableau | Éléments | Int (ms) | Float (ms) | Ratio Int/Float |
