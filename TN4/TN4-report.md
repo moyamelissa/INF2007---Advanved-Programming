@@ -10,9 +10,7 @@ Le programme accepte un paramètre `--type` pour choisir entre entiers et flotta
 et génère un tableau de 1 000 000 d'éléments avec `rand.NewSource(42)` pour la
 reproductibilité. Deux fonctions spécialisées, `computeSineSumInt` et
 `computeSineSumFloat`, isolent la boucle de calcul par type afin que les benchmarks
-mesurent uniquement le coût de `math.Sin`. La logique est contenue dans `run()`,
-qui retourne un struct `RunResult` sans affichage, ce qui facilite les tests
-unitaires.
+mesurent uniquement le coût de `math.Sin`.
 
 ## 2. Résultats des benchmarks
 
@@ -20,7 +18,7 @@ Les 22 sous-benchmarks (11 paliers × 2 types) ont été exécutés avec
 `go test -bench=. -benchmem -count=6` sur un Intel i5-10300H à 2,50 GHz
 (Windows/amd64) et analysés avec `benchstat`. Les tableaux sont pré-générés hors
 de `b.N`, `b.ResetTimer()` exclut le setup, et `b.ReportAllocs()` confirme 0 B/op
-et 0 allocs/op pour les deux types.
+et 0 allocs/op.
 
 **Tableau 1 – Temps de calcul par type et pourcentage du tableau**
 
@@ -66,10 +64,9 @@ La boucle `sum += math.Sin(v)` crée une dépendance de données sur l'accumulat
 ce qui empêche le pipeline FPU de superposer les additions, comme dans l'exemple
 `prefixSum` du chapitre 6. Les appels `math.Sin(v)` bénéficient de l'exécution
 dans le désordre mais sont plafonnés par la latence intrinsèque de `math.Sin`.
-Les paliers Float, plus courts, sont sensibles au bruit lors d'exécutions
-séquentielles, et un rerun isolé des paliers 70 % à 100 % a confirmé les valeurs
-du tableau. Utiliser plusieurs accumulateurs fusionnés en fin de calcul réduirait
-la dépendance de données et constituerait la principale piste d'optimisation.
+Un rerun isolé des paliers Float 70 % à 100 % a confirmé les valeurs du tableau.
+Utiliser plusieurs accumulateurs fusionnés en fin de calcul réduirait la
+dépendance de données et constituerait la principale piste d'optimisation.
 
 ## 4. Applications numériques
 
