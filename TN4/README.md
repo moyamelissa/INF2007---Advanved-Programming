@@ -30,6 +30,7 @@ Le programme calcule **Σ sin(xᵢ)** pour i = 1..1 000 000 éléments généré
 ├── TN4-Homework-Instructions.md    # Énoncé du travail
 ├── chart/                          # Générateur de graphique (module Go séparé)
 │   ├── go.mod                      # Module chart — dépendance gonum/plot isolée
+│   ├── go.sum                      # Sommes de contrôle des dépendances (gonum/plot)
 │   └── main.go                     # Produit docs/benchmark-chart.png
 ├── docs/                           # Guides et visuels de référence
 │   ├── benchmark-chart.png              # Graphique Int vs Float (généré par chart/)
