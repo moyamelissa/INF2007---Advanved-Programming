@@ -10,19 +10,19 @@ Depuis le dossier `TN4/`, lancer les commandes suivantes dans un terminal.
 go test -v -run="Test" ./...
 ```
 
-Résultats : [tests-output.txt](tests-output.txt)
+Résultats : [tests.txt](../logs/tests.txt)
 
 **Benchmarks complets (22 sous-benchmarks, 6 exécutions analysées par benchstat)**
 
 ```bash
 go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
-benchstat bench_count6.txt
+benchstat bench-raw.txt
 ```
 
 Le flag `-run="^$"` exclut les tests unitaires, `-benchmem` active le reporting mémoire, et `-count=6` fournit 6 échantillons pour que `benchstat` calcule les médianes et intervalles de confiance à 95 %.
 
-Résultats bruts : [bench_count6.txt](bench_count6.txt)
-Analyse benchstat : [benchstat-output.txt](benchstat-output.txt)
+Résultats bruts : [bench-raw.txt](../logs/bench-raw.txt)
+Analyse benchstat : [benchstat.txt](../logs/benchstat.txt)
 
 **Couverture de code**
 
@@ -30,7 +30,7 @@ Analyse benchstat : [benchstat-output.txt](benchstat-output.txt)
 go test -v -cover ./...
 ```
 
-Résultats : [coverage-output.txt](coverage-output.txt)
+Résultats : [coverage.txt](../logs/coverage.txt)
 
 ## Tableau des résultats
 
@@ -52,24 +52,9 @@ Les valeurs en millisecondes proviennent des médianes `benchstat` calculées su
 
 ## Graphique
 
-Le graphique est généré avec Mermaid (syntaxe `xychart-beta`), qui est rendu automatiquement par GitHub dans les fichiers Markdown.
+Le graphique est généré avec gonum/plot en Go (`chart/main.go`) et produit `docs/benchmark-chart.png`. Voir [chart-guide.md](chart-guide.md) pour régénérer.
 
-Les données proviennent des médianes calculées par `benchstat` sur 6 exécutions. Par exemple, `benchstat` reporte `437.5µ` pour `SineSumInt/1pct-8`, soit 0.44 ms, et `38.71m` pour `SineSumInt/100pct-8`, soit 38.71 ms.
-
-Les 11 valeurs Int et les 11 valeurs Float sont ensuite placées dans deux tableaux `line [...]` dans le bloc Mermaid, dans le même ordre que les pourcentages sur l'axe X.
-
-```mermaid
-%%{init: {'theme': 'default', 'themeVariables': {'xyChart': {'backgroundColor': '#ffffff'}}}}%%
-xychart-beta
-    title "Graphique 1 – Temps de calcul selon le pourcentage du tableau (Int vs Float)"
-    x-axis "Pourcentage du tableau" ["1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"]
-    y-axis "Temps d'exécution (ms)" 0 --> 42
-    line [0.44, 4.09, 8.11, 11.83, 15.52, 19.28, 22.98, 26.58, 30.94, 34.78, 38.71]
-    line [0.24, 2.11, 4.24, 7.79, 8.99, 11.98, 13.61, 14.69, 16.82, 18.96, 20.93]
-```
-
-> **Courbe du haut (claire)** — Int (entiers, avec conversion `float64`)  
-> **Courbe du bas (foncée)** — Float (flottants, sans conversion)
+![Graphique 1 – Int vs Float](benchmark-chart.png)
 
 La courbe du haut correspond aux entiers (Int), celle du bas aux flottants (Float). La courbe Int progresse de façon quasi linéaire, tandis que la courbe Float présente de légères irrégularités (notamment aux paliers 30 % et 70 %). Les deux algorithmes sont O(n) : ces écarts proviennent du bruit de mesure. Les benchmarks Float étant plus rapides, une même perturbation (interruption système, throttling thermique du CPU) a un impact relatif plus important. Les intervalles de confiance `benchstat` le confirment : Float/30pct affiche ± 7 % contre ± 1 % pour Int/100pct. Le ratio moyen Int/Float est de 1.85× au palier 100 % (± 1 %), principalement dû à la conversion `float64(v)` exécutée à chaque itération pour les entiers.
 

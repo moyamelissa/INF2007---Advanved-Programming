@@ -58,4 +58,3 @@ Le rapport `TN4-report.md` l'intègre avec :
 
 - gonum/plot : https://pkg.go.dev/gonum.org/v1/plot
 - Code source : [`chart/main.go`](../chart/main.go)
-- Guide original (archivé) : ce fichier remplace `Guide-creation-graphique-Mermaid.md`
