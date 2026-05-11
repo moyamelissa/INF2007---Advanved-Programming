@@ -40,15 +40,15 @@ Les flottants sont systématiquement plus rapides, avec un ratio de 1,5 à 1,8×
 
 ## 3. Analyse des résultats
 
-### Complexité et écart Int/Float
+**Complexité et écart Int/Float.**
 
 Les flottants sont 1,5 à 1,8× plus rapides. L'écart provient de la conversion `float64(v)` à chaque itération et du coût de réduction d'argument de `math.Sin` pour les grands entiers, notamment sin(500) réduit ~79 tours modulo 2π, alors que les flottants dans [0, 1) se situent déjà dans le domaine principal et ne requièrent aucune réduction. La variabilité exceptionnelle au palier 70 % (Float ±50 %) est une valeur atypique due à une perturbation système ponctuelle lors de cette exécution ; les autres paliers Float restent stables (±3–13 %). Le palier 30 % Float (±3 %) est désormais bien plus régulier que lors de la précédente exécution.
 
-### Hiérarchie mémoire — L1/L2/L3
+**Hiérarchie mémoire — L1/L2/L3.**
 
 L'i5-10300H dispose de L1 = 256 KB, L2 = 1 MB, L3 = 8 MB. Les petits paliers (1–10 %, 80–800 KB) tiennent entièrement en L2 ; le palier 30 % (~2,4 MB) dépasse le L2 et sollicite le L3 ; le tableau complet (1 000 000 × 8 octets = **8 MB**) atteint exactement la limite du L3, limitant les accès par la bande passante, ce qui explique les légères non-linéarités aux paliers 70 %+.
 
-### Mécanismes micro-architecturaux (ch. 6)
+**Mécanismes micro-architecturaux (ch. 6).**
 
 `go build -gcflags=-m` confirme que `math.Sin` est inliné aux lignes 40 et 49 de `sinesum.go`, éliminant le surcoût d'appel de fonction. La boucle `sum += math.Sin(v)` crée une **dépendance de données** sur l'accumulateur `sum` : chaque addition doit attendre le résultat précédent, ce qui empêche le pipeline FPU de superposer les opérations (pas de *pipelining* des additions), identique à l'exemple `prefixSum` du chapitre 6. Les appels `math.Sin(v)` sur des `v` indépendants sont eux exécutés en désordre (*out-of-order execution*), mais ce gain est plafonné par la **latence** intrinsèque de `math.Sin` (~20–40 ns), bien supérieure à son **débit** théorique. Les intervalles de confiance `benchstat` confirment la stabilité globale : Int/100pct affiche ±1 %, les paliers Int restant tous dans ±6 %. La principale exception est Float/70pct (±50 %), valeur atypique liée à une perturbation système ponctuelle. Utiliser plusieurs accumulateurs fusionnés en fin de calcul réduirait la dépendance de données et constituerait la principale piste d'optimisation.
 
