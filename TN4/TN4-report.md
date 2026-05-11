@@ -1,6 +1,6 @@
 # Mesure et optimisation de la somme des sinus en Go
 
-**INF2007 – Programmation Avancée · TN4 · Melissa Moya · Semaine 10**
+**INF2007 – Programmation Avancée · TN4 · Melissa Moya**
 
 ---
 
