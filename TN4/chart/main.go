@@ -14,10 +14,10 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-// Données des benchmarks (médianes benchstat, 6 exécutions — rerun mai 2026)
+// Données des benchmarks (médianes benchstat, 6 exécutions — mai 2026)
 var labels = []string{"1%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"}
-var intMS = []float64{0.396, 3.57, 7.12, 10.74, 14.31, 17.90, 21.41, 25.11, 28.65, 32.29, 35.76}
-var floatMS = []float64{0.206, 2.06, 4.16, 6.31, 8.53, 11.43, 13.82, 15.28, 17.66, 22.52, 22.64}
+var intMS = []float64{0.373, 3.694, 7.377, 11.06, 14.71, 18.49, 22.04, 25.86, 29.47, 33.44, 36.91}
+var floatMS = []float64{0.223, 2.206, 4.457, 6.568, 8.814, 10.87, 13.35, 15.54, 17.82, 19.71, 21.72}
 
 // Palette mauve (cohérente avec le rapport)
 var (

@@ -76,7 +76,7 @@ Temps total           : 31.5ms
 Le résultat pour `--type=float` est positif car les valeurs dans [0, 1) produisent
 des sinus tous positifs. Pour les entiers (`--type=int`), les valeurs dans [0, 1000]
 couvrent ~159 cycles complets de 2π, ce qui produit une somme proche de zéro mais
-avec un calcul ~1,58× plus lent.
+avec un calcul ~1,70× plus lent.
 
 ## Tests
 
@@ -123,9 +123,9 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./...
 
 | Métrique | Valeur |
 |----------|--------|
-| Temps par sinus — Int | ~35.8 ns |
-| Temps par sinus — Float | ~22.6 ns |
-| Ratio Int/Float à 100 % | 1.58× |
+| Temps par sinus — Int | ~36.9 ns |
+| Temps par sinus — Float | ~21.7 ns |
+| Ratio Int/Float à 100 % | 1.70× |
 | Allocations mémoire | 0 B/op |
 | Couverture de code | 100 % |
 
