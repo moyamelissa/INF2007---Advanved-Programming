@@ -8,8 +8,11 @@ annotation du ratio et labels de valeurs finales.
 
 ```bash
 cd TN4
-go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./... | tee bench-raw.txt
-benchstat bench-raw.txt
+# Linux/macOS/PowerShell
+go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./... | tee logs/bench-raw.txt
+# cmd.exe
+go test -bench="Benchmark" -benchmem -run="^$" -count=6 ./... > logs/bench-raw.txt
+benchstat logs/bench-raw.txt
 ```
 
 Relever les médianes `ns/op` de `benchstat` et les diviser par 1 000 000 pour obtenir les millisecondes. Mettre à jour les variables `intMS` et `floatMS` dans `chart/main.go`.

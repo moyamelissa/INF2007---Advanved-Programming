@@ -70,7 +70,7 @@ func main() {
 	p.Y.Min = 0
 	p.Y.Max = 40
 	p.X.Min = -0.4
-	p.X.Max = float64(n) + 0.6 // espace pour "35.76 ms"
+	p.X.Max = float64(n) + 0.6 // espace pour "36.91 ms"
 
 	// Ticks Y explicites : multiples de 5
 	p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
@@ -90,7 +90,7 @@ func main() {
 		return ticks
 	}())
 
-	// Pas de grille — fond propre comme dans le document Word
+	// Pas de grille — fond propre
 
 	// Zone translucide entre les courbes
 	poly, err := plotter.NewPolygon(fillBetween(xs, intMS, floatMS))

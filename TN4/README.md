@@ -51,7 +51,7 @@ de temps prend ce calcul selon que les données sont des `int` ou des `float64` 
 
 ## Prérequis
 
-- Go 1.21+
+- Go 1.26+
 
 ## Démarrage rapide
 
@@ -67,10 +67,10 @@ Exemple de sortie (`--type=float`) :
 === Somme des sinus — type=float, taille=1000000 ===
 
 Génération du tableau : 10.1ms
-Calcul de la somme    : 21.4ms
+Calcul de la somme    : 21.7ms
 
 Résultat              : 460007.368636
-Temps total           : 31.5ms
+Temps total           : 31.8ms
 ```
 
 Le résultat pour `--type=float` est positif car les valeurs dans [0, 1) produisent

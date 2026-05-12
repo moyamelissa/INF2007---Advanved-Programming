@@ -3,6 +3,8 @@
 
 # Coverage artifacts
 cover/
+cover
+coverage
 *.out
 
 # Profiling artifacts
