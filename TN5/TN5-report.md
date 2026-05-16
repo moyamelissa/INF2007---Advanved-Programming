@@ -23,6 +23,10 @@ Mesures effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs physiques /
 8 threads logiques, Windows/amd64), fichier de test d'environ 700 000 caractères
 (100 000 mots), 6 exécutions par configuration analysées avec `benchstat`.
 
+**Graphique 1 – Scaling réel vs linéaire idéal selon le nombre de goroutines**
+
+![Graphique 1 – Réel vs linéaire idéal](data/worker-count-chart.png)
+
 **Tableau 1 – Temps selon la taille des segments**
 
 | Segment | 500 | 1 000 | 5 000 | 10 000 | 50 000 | 100 000 | Tout |
@@ -41,8 +45,6 @@ devient pire que le séquentiel.
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Temps (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Speedup | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
-
-![Graphique 1 – Réel vs linéaire idéal](data/worker-count-chart.png)
 
 ## 3. Analyse de la linéarité
 

@@ -86,7 +86,7 @@ func makeWorkerCountChart() {
 	p.Y.Min = 0
 	p.Y.Max = 12
 	p.X.Min = -0.4
-	p.X.Max = float64(n-1) + 1.1 // espace pour le label final
+	p.X.Max = float64(n-1) + 0.6 // espace pour le label final
 
 	p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
 		{Value: 0, Label: "0"}, {Value: 2, Label: "2"},
@@ -163,7 +163,7 @@ func makeWorkerCountChart() {
 	p.Legend.Add("Réel", actualLine, actualScatterFill)
 	p.Legend.Add("Linéaire idéal", idealLine, idealScatter)
 	p.Legend.Top = true
-	p.Legend.Left = false
+	p.Legend.Left = true
 	p.Legend.Padding = vg.Points(4)
 
 	// Valeur finale (courbe réelle)
@@ -174,14 +174,14 @@ func makeWorkerCountChart() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	endLabel.TextStyle[0].Color = colorEndLabel
+	endLabel.TextStyle[0].Color = colorActual
 	endLabel.TextStyle[0].Font.Size = vg.Points(8.5)
 	p.Add(endLabel)
 
 	// Annotation "plateau ≈ 6 ms" sur la zone de plateau
 	plateauLabel, err := plotter.NewLabels(plotter.XYLabels{
 		XYs:    plotter.XYs{{X: float64(n-1) - 1.7, Y: workerActualMS[n-1] + 0.85}},
-		Labels: []string{"plateau ≈ 6 ms"},
+		Labels: []string{"plateau ~ 6 ms"},
 	})
 	if err != nil {
 		log.Fatal(err)
