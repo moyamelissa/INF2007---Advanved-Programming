@@ -1,120 +1,71 @@
-# Comptage de mots concurrent en Go
+﻿# Comptage concurrent de mots en Go
 
-**Cours :** INF2007 — Programmation Avancée  
-**Travail :** TN5  
-**Étudiante :** Melissa Moya  
-**Semaine :** 12  
-**Plateforme :** Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
+**INF2007 – Programmation Avancée · TN5 · Melissa Moya**
 
 ---
 
-## 1. Architecture concurrente : goroutines et canaux
+## 1. Architecture concurrente
 
-Le programme suit le modèle **fan-out / fan-in** :
+Le programme lit un fichier texte, divise son contenu en segments de taille
+paramétrable, puis compte les mots de chaque segment en parallèle. La fonction
+`splitIntoSegments` décale chaque coupure vers le prochain espace pour ne jamais
+couper un mot. Une goroutine est lancée par segment via `go countWordsInSegment`,
+et les résultats sont collectés sur un canal bufferisé (`chan int`) de capacité
+égale au nombre de segments, ce qui évite tout blocage. La goroutine principale
+itère sur le canal et somme les résultats. L'absence de variable partagée et
+l'usage exclusif du canal garantissent une exécution correcte sans verrou. Une
+variante `CountWordsConcurrentN` permet de fixer le nombre de goroutines pour
+mesurer la linéarité du gain.
 
-1. **Lecture** : le fichier est lu en mémoire (`os.ReadFile`).
-2. **Division** (`splitIntoSegments`) : le contenu est découpé en segments d'environ N caractères.
-3. **Fan-out** : une goroutine est lancée par segment via `go countWordsInSegment(seg, ch)`.
-4. **Fan-in** : chaque goroutine envoie son résultat sur un canal buffered. La goroutine principale somme les résultats.
+## 2. Résultats des benchmarks
 
-### Décision clé : ne pas couper les mots
+Mesures effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs physiques /
+8 threads logiques, Windows/amd64), fichier de test d'environ 700 000 caractères
+(100 000 mots), 6 exécutions par configuration analysées avec `benchstat`.
 
-Le problème principal de la division en segments est qu'un segment de N caractères peut couper un mot en deux. J'ai résolu cela dans `splitIntoSegments` en avançant la coupure jusqu'à la fin du mot courant :
+**Tableau 1 – Temps selon la taille des segments**
 
-```go
-end := segmentSize
-// Avancer jusqu'à la fin du mot courant
-for end < len(content) && content[end] != ' ' && content[end] != '\n' &&
-    content[end] != '\t' && content[end] != '\r' {
-    end++
-}
-segments = append(segments, content[:end])
-// Sauter les espaces entre les segments
-for end < len(content) && (content[end] == ' ' || ...) {
-    end++
-}
-content = content[end:]
-```
+| Segment | 500 | 1 000 | 5 000 | 10 000 | 50 000 | 100 000 | Tout |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Temps (ms) | 8.87 | 2.84 | 4.84 | 4.85 | **1.78** | 1.97 | 4.09 |
 
-Concrètement, pour le texte `"Hello world from Go"` avec `segmentSize=7` : au lieu de couper en `"Hello w"` et `"orld from Go"` (qui fausserait le comptage), on obtient `"Hello world"` et `"from Go"`. Le test `TestCountWordsConsistency` vérifie que le comptage est **identique** pour 7 tailles de segments différentes (1, 5, 10, 20, 50, 100, 500 caractères).
+Le comptage séquentiel de référence prend 5.08 ms. Le concurrent atteint un
+optimum à 50 000 caractères (1.78 ms), soit un gain de 2.85× sur le séquentiel.
+Avec des segments trop petits (500 caractères, environ 1 200 goroutines),
+l'overhead de scheduling dépasse le bénéfice du parallélisme et la performance
+devient pire que le séquentiel.
 
-### Garanties de correction
+**Tableau 2 – Temps selon le nombre de goroutines (`CountWordsConcurrentN`)**
 
-- **Canal buffered** (`make(chan int, len(segments))`) : dimensionné exactement au nombre de goroutines, aucune ne bloque en écriture, évitant les deadlocks.
-- **Pas de mémoire partagée** : chaque goroutine travaille sur sa propre sous-chaîne. Le canal est le seul point de communication, conformément au principe Go « ne communiquez pas en partageant la mémoire ; partagez la mémoire en communiquant ».
-- **Synchronisation implicite** : la boucle `for range segments { total += <-ch }` attend automatiquement la fin de chaque goroutine. Pas besoin de `sync.WaitGroup` dans ce cas, car on connaît le nombre exact de résultats à recevoir.
+| Workers | 1 | 2 | 4 | 8 | 16 | 32 |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Temps (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
+| Speedup | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
 
-## 2. Résultats des benchmarks (100 000 mots)
+![Graphique 1 – Réel vs linéaire idéal](data/worker-count-chart.png)
 
-### Performance en fonction de la taille des segments
+## 3. Analyse de la linéarité
 
-| Taille segment | Goroutines (≈) | ns/op       | Allocs/op | Speedup vs séquentiel |
-|:--------------:|:---------------:|:-----------:|:---------:|:---------------------:|
-| 10 chars       | ~100 000        | 37 312 282  | 100 037   | 0.12× (plus lent)     |
-| 100 chars      | ~13 000         | 5 098 136   | 13 017    | 0.86×                 |
-| 500 chars      | ~2 700          | 2 174 825   | 2 701     | 2.02×                 |
-| 1 000 chars    | ~1 350          | 1 895 688   | 1 355     | 2.32×                 |
-| **5 000 chars**| **~280**        | **1 480 232** | **279** | **2.97× (optimal)**   |
-| 10 000 chars   | ~144            | 1 570 571   | 144       | 2.80×                 |
-| 50 000 chars   | ~34             | 1 747 235   | 34        | 2.51×                 |
-| 100 000 chars  | ~19             | 2 000 042   | 19        | 2.20×                 |
-| Tout-en-un     | 1               | 4 374 865   | 4         | 1.00× (séquentiel)    |
+La performance ne croît pas linéairement avec le nombre de goroutines. Sur
+4 cœurs physiques disponibles, le speedup mesuré n'atteint que 1.67× au lieu
+des 4× théoriques, et atteint un plateau dès 16 workers. Quatre facteurs
+expliquent cet écart. Premièrement, `strings.Fields` est une opération
+séquentielle interne rapide (un seul balayage du segment), donc le travail par
+goroutine est trop court pour amortir le coût de création et d'orchestration.
+Deuxièmement, le canal partagé crée un point de contention naturel à la collecte
+des résultats. Troisièmement, la pression mémoire amplifie cet overhead :
+l'allocation passe de 1 alloc/op pour la version séquentielle à 71 pour 32
+workers, et jusqu'à 2 700 pour des segments de 500 caractères — chaque goroutine
+entraîne des allocations supplémentaires pour sa pile et le canal. Quatrièmement, la loi d'Amdahl s'applique : la lecture du
+fichier, le découpage en segments et la sommation finale restent séquentiels. En
+appliquant la formule d'Amdahl au speedup maximum observé (1.67×), on déduit
+qu'environ 40 % du travail est parallélisable et 60 % est intrinsèquement
+séquentiel. Pour atteindre un scaling linéaire, il faudrait soit une charge CPU
+plus lourde par segment (ex. analyse syntaxique au lieu d'un simple comptage),
+soit éliminer la contention sur le canal (ex. sommation locale par worker puis
+fusion). Le choix optimal pour ce workload reste donc d'utiliser un segment de
+50 000 caractères, qui équilibre parallélisme et overhead.
 
-### Séquentiel vs concurrent
-
-| Mode               | ns/op       | Speedup |
-|:------------------:|:-----------:|:-------:|
-| Séquentiel         | 4 393 525   | 1.00×   |
-| Concurrent (1 000) | 2 163 028   | 2.03×   |
-| Concurrent (10 000)| 1 809 859   | 2.43×   |
-| Concurrent (100 000)| 2 205 570  | 1.99×   |
-
-## 3. Analyse : la performance croît-elle linéairement ?
-
-**Non, la performance ne croît pas linéairement avec le nombre de goroutines.** Les résultats montrent une courbe en U inversé avec trois régimes distincts :
-
-### Trop de goroutines (segment = 10 chars → ~100k goroutines)
-Le programme est **8× plus lent** que le séquentiel. Chaque goroutine en Go a une pile initiale de ~2-8 Ko. Avec 100 000 goroutines, cela représente ~200 Mo–800 Mo rien qu'en piles. De plus, le runtime Go doit planifier 100 000 goroutines sur 8 threads OS, ce qui génère un surcoût massif de context switching. Les 100 037 allocations mémoire confirment ce problème.
-
-### Point optimal (~5 000 chars → ~280 goroutines)
-Le speedup atteint **~3×** sur 8 threads logiques (4 cœurs physiques). Pourquoi 3× et non 4× ? Parce que `strings.Fields` effectue un scan linéaire de la mémoire, et le goulot d'étranglement devient la **bande passante du bus mémoire** (lecture séquentielle depuis le cache L3). Avec 280 goroutines et seulement 279 allocations, le surcoût de coordination est minimal.
-
-### Trop peu de goroutines (segment = 100k chars → ~19 goroutines)
-Le speedup redescend à 2.2×. Avec 19 goroutines sur 8 threads, certains cœurs finissent avant les autres et restent inactifs. Le déséquilibre de charge (load imbalance) empêche d'exploiter pleinement le processeur.
-
-### Corrélation allocations / performance
-
-On observe une corrélation directe entre le nombre d'allocations et la dégradation :
-- 279 allocs → 1.48 ms (optimal)
-- 1 355 allocs → 1.90 ms
-- 13 017 allocs → 5.10 ms
-- 100 037 allocs → 37.31 ms
-
-Chaque allocation supplémentaire ajoute environ 0.3 µs de surcoût (allocation + GC).
-
-## 4. Tests unitaires
-
-J'ai écrit 14 tests couvrant les cas critiques :
-
-| Test | Pourquoi ce test est important |
-|------|-------------------------------|
-| `TestCountWordsEmpty` | Vérifie que `""` retourne 0, pas un panic sur un slice vide. |
-| `TestCountWordsSingleWord` | Cas minimal : un seul mot sans espace. |
-| `TestCountWordsMultipleLines` | Vérifie que `\n` est bien traité comme séparateur (3 lignes × 3 mots = 9). |
-| `TestCountWordsMultipleSpaces` | `"  mot1   mot2   mot3  "` → 3, pas 7 (espaces multiples ignorés). |
-| `TestCountWordsConsistency` | **Test le plus important** : vérifie que le résultat est identique pour 7 tailles de segment (1 à 500). Si le split coupait un mot, ce test échouerait. |
-| `TestSplitIntoSegments` | Vérifie directement que les segments contiennent des mots complets. |
-| `TestSplitIntoSegmentsNegativeSize` | Taille ≤ 0 retourne tout le contenu en un seul segment. |
-| `TestRunValidFile` | `run` avec un fichier réel retourne le bon compte de mots. |
-| `TestRunWithSegmentSize` | `run` accepte une taille de segment en argument CLI. |
-| `TestRunNoArgs` | `run` sans argument retourne une erreur explicite. |
-| `TestRunInvalidSegmentSize` | Taille invalide (`"abc"`, `"-5"`) retourne une erreur. |
-| `TestRunMissingFile` | Fichier inexistant retourne une erreur de lecture. |
-| `TestMainFunction` | `main()` s'exécute sans panique pour un fichier valide. |
-| `TestMainFunctionError` | `main()` appelle `exitFunc(1)` en cas d'erreur (branche d'erreur couverte). |
-
-Le test `TestCountWordsConsistency` a été particulièrement utile pendant le développement : une version initiale de `splitIntoSegments` ne sautait pas les espaces entre segments, causant des mots comptés en double.
-
-## 5. Conclusion
-
-Les goroutines et canaux de Go permettent une implémentation concurrente correcte et élégante du comptage de mots. Le choix de la taille de segment est critique : un segment de ~5 000 caractères offre le meilleur compromis entre parallélisme et surcoût sur cette machine (speedup 3× avec 280 goroutines). Le modèle fan-out/fan-in garantit l'absence de race conditions sans nécessiter de mutex. La performance ne croît **pas** linéairement — elle suit une courbe en cloche dictée par l'équilibre entre parallélisme, surcoût de coordination et bande passante mémoire.
+### Bibliographie
+- Manuel INF2007, chapitre 8.
+- Documentation Go : https://pkg.go.dev/sync, https://pkg.go.dev/testing

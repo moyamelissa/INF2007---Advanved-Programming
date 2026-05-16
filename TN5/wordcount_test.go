@@ -74,8 +74,6 @@ func TestSplitIntoSegments(t *testing.T) {
 	}
 }
 
-// ========== Benchmarks ==========
-
 // TestSplitIntoSegmentsNegativeSize vérifie que splitIntoSegments retourne
 // tout le contenu en un seul segment quand la taille est <= 0.
 func TestSplitIntoSegmentsNegativeSize(t *testing.T) {
@@ -197,6 +195,8 @@ func generateLargeContent(nWords int) string {
 
 var benchContent = generateLargeContent(100_000) // ~100k mots
 
+// ========== Benchmarks ==========
+
 // BenchmarkSegmentSize mesure la performance en fonction de la taille des segments.
 // Plus le segment est petit, plus il y a de goroutines lancées.
 func BenchmarkSegmentSize(b *testing.B) {
@@ -254,4 +254,56 @@ func BenchmarkSequentialVsConcurrent(b *testing.B) {
 			CountWordsConcurrent(benchContent, 100000)
 		}
 	})
+}
+
+// TestCountWordsConcurrentN vérifie que CountWordsConcurrentN retourne le bon
+// résultat pour différents nombres de goroutines, y compris les cas limites.
+func TestCountWordsConcurrentN(t *testing.T) {
+	content := "La programmation concurrente en Go repose sur les goroutines et les canaux pour une exécution efficace"
+	expected := len(strings.Fields(content))
+
+	for _, n := range []int{1, 2, 4, 8, 16} {
+		result := CountWordsConcurrentN(content, n)
+		if result != expected {
+			t.Errorf("workers=%d : attendu %d mots, obtenu %d", n, expected, result)
+		}
+	}
+
+	// Contenu vide → 0
+	if CountWordsConcurrentN("", 4) != 0 {
+		t.Error("attendu 0 pour contenu vide")
+	}
+	// Zéro workers → 0
+	if CountWordsConcurrentN("hello world", 0) != 0 {
+		t.Error("attendu 0 pour 0 workers")
+	}
+	// Plus de workers que de caractères → doit fonctionner
+	if CountWordsConcurrentN("hi", 100) != 1 {
+		t.Error("attendu 1 mot pour 'hi' avec 100 workers")
+	}
+}
+
+// BenchmarkWorkerCount mesure la performance en fonction du nombre de goroutines.
+// Répond directement à la question de l'énoncé : "Est-ce que la performance
+// croît linéairement avec le nombre de goroutines ?"
+func BenchmarkWorkerCount(b *testing.B) {
+	workers := []struct {
+		name  string
+		count int
+	}{
+		{"1worker", 1},
+		{"2workers", 2},
+		{"4workers", 4},
+		{"8workers", 8},
+		{"16workers", 16},
+		{"32workers", 32},
+	}
+	for _, w := range workers {
+		b.Run(w.name, func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				CountWordsConcurrentN(benchContent, w.count)
+			}
+		})
+	}
 }

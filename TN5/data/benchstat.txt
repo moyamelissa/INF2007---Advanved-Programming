@@ -1,0 +1,65 @@
+﻿goarch: amd64
+pkg: wordcount
+cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+                                           │ data\bench-raw.txt │
+                                           │       sec/op       │
+SegmentSize/500chars-8                            8.867m ±  42%
+SegmentSize/1000chars-8                           2.841m ± 228%
+SegmentSize/5000chars-8                           4.843m ±  55%
+SegmentSize/10000chars-8                          4.852m ±  29%
+SegmentSize/50000chars-8                          1.778m ±  54%
+SegmentSize/100000chars-8                         1.973m ±   3%
+SegmentSize/AllInOne-8                            4.092m ±  13%
+SequentialVsConcurrent/Sequential-8               5.075m ± 131%
+SequentialVsConcurrent/Concurrent_1000-8          7.518m ±  29%
+SequentialVsConcurrent/Concurrent_10000-8         6.713m ±  34%
+SequentialVsConcurrent/Concurrent_100000-8        7.296m ±  18%
+WorkerCount/1worker-8                             10.39m ±  54%
+WorkerCount/2workers-8                            9.021m ±  24%
+WorkerCount/4workers-8                            8.473m ±  14%
+WorkerCount/8workers-8                            6.926m ±  26%
+WorkerCount/16workers-8                           6.307m ±   4%
+WorkerCount/32workers-8                           6.208m ±   8%
+geomean                                           5.461m
+
+                                           │ data\bench-raw.txt │
+                                           │        B/op        │
+SegmentSize/500chars-8                             1.747Mi ± 0%
+SegmentSize/1000chars-8                            1.779Mi ± 0%
+SegmentSize/5000chars-8                            1.590Mi ± 0%
+SegmentSize/10000chars-8                           1.587Mi ± 0%
+SegmentSize/50000chars-8                           1.587Mi ± 0%
+SegmentSize/100000chars-8                          1.532Mi ± 0%
+SegmentSize/AllInOne-8                             1.531Mi ± 0%
+SequentialVsConcurrent/Sequential-8                1.531Mi ± 0%
+SequentialVsConcurrent/Concurrent_1000-8           1.779Mi ± 0%
+SequentialVsConcurrent/Concurrent_10000-8          1.587Mi ± 0%
+SequentialVsConcurrent/Concurrent_100000-8         1.532Mi ± 0%
+WorkerCount/1worker-8                              1.531Mi ± 0%
+WorkerCount/2workers-8                             1.531Mi ± 0%
+WorkerCount/4workers-8                             1.532Mi ± 0%
+WorkerCount/8workers-8                             1.563Mi ± 0%
+WorkerCount/16workers-8                            1.626Mi ± 0%
+WorkerCount/32workers-8                            1.752Mi ± 0%
+geomean                                            1.604Mi
+
+                                           │ data\bench-raw.txt │
+                                           │     allocs/op      │
+SegmentSize/500chars-8                              2.706k ± 0%
+SegmentSize/1000chars-8                             1.355k ± 1%
+SegmentSize/5000chars-8                              279.0 ± 0%
+SegmentSize/10000chars-8                             144.0 ± 0%
+SegmentSize/50000chars-8                             34.00 ± 0%
+SegmentSize/100000chars-8                            19.00 ± 0%
+SegmentSize/AllInOne-8                               4.000 ± 0%
+SequentialVsConcurrent/Sequential-8                  1.000 ± 0%
+SequentialVsConcurrent/Concurrent_1000-8            1.357k ± 0%
+SequentialVsConcurrent/Concurrent_10000-8            144.0 ± 0%
+SequentialVsConcurrent/Concurrent_100000-8           19.00 ± 0%
+WorkerCount/1worker-8                                4.000 ± 0%
+WorkerCount/2workers-8                               7.000 ± 0%
+WorkerCount/4workers-8                               12.00 ± 0%
+WorkerCount/8workers-8                               21.00 ± 0%
+WorkerCount/16workers-8                              38.00 ± 0%
+WorkerCount/32workers-8                              71.00 ± 0%
+geomean                                              47.03

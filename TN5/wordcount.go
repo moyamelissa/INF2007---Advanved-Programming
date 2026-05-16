@@ -87,6 +87,21 @@ func CountWordsConcurrent(content string, segmentSize int) int {
 	return total
 }
 
+// CountWordsConcurrentN divise le contenu en numWorkers segments de taille
+// approximativement égale et lance une goroutine par segment. Contrairement à
+// CountWordsConcurrent, le nombre de goroutines est contrôlé directement, ce
+// qui permet de mesurer la linéarité du gain de performance.
+func CountWordsConcurrentN(content string, numWorkers int) int {
+	if len(content) == 0 || numWorkers <= 0 {
+		return 0
+	}
+	segmentSize := len(content) / numWorkers
+	if segmentSize == 0 {
+		segmentSize = len(content)
+	}
+	return CountWordsConcurrent(content, segmentSize)
+}
+
 // run contient la logique principale du programme, extraite de main pour
 // permettre les tests unitaires. Elle retourne le nombre total de mots et une erreur.
 func run(args []string) (int, error) {
