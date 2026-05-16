@@ -24,13 +24,13 @@ var workerActualMS = []float64{10.39, 9.021, 8.473, 6.926, 6.307, 6.208}
 var (
 	colorActual   = color.RGBA{R: 106, G: 62, B: 160, A: 255}  // violet foncé (courbe principale)
 	colorIdeal    = color.RGBA{R: 160, G: 132, B: 210, A: 255} // lavande moyenne (courbe idéale)
-	colorSeq      = color.RGBA{R: 80, G: 30, B: 140, A: 220}   // violet annotation (référence séquentielle)
 	colorFill     = color.NRGBA{R: 185, G: 165, B: 225, A: 75} // fill translucide
 	colorEndLabel = color.RGBA{R: 60, G: 60, B: 80, A: 220}    // gris ardoise
 	colorAnnot    = color.RGBA{R: 80, G: 30, B: 140, A: 255}   // violet annotation
 	colorWhiteBg  = color.RGBA{R: 255, G: 255, B: 255, A: 255} // fond blanc pur
 )
 
+// xyPoints convertit deux tranches parallèles (abscisses, ordonnées) en points gonum.
 func xyPoints(xs, ys []float64) plotter.XYs {
 	pts := make(plotter.XYs, len(xs))
 	for i := range xs {
@@ -54,6 +54,7 @@ func fillBetween(xs, top, bottom []float64) plotter.XYs {
 	return pts
 }
 
+// buildXS génère une tranche d'entiers [0, 1, …, n-1] en float64 pour l'axe X.
 func buildXS(n int) []float64 {
 	xs := make([]float64, n)
 	for i := range xs {

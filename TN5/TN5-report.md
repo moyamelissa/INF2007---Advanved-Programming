@@ -56,7 +56,9 @@ Deuxièmement, le canal partagé crée un point de contention naturel à la coll
 des résultats. Troisièmement, la pression mémoire amplifie cet overhead :
 l'allocation passe de 1 alloc/op pour la version séquentielle à 71 pour 32
 workers, et jusqu'à 2 700 pour des segments de 500 caractères — chaque goroutine
-entraîne des allocations supplémentaires pour sa pile et le canal. Quatrièmement, la loi d'Amdahl s'applique : la lecture du
+entraîne des allocations supplémentaires pour sa pile et le canal.
+
+Quatrièmement, la loi d'Amdahl s'applique : la lecture du
 fichier, le découpage en segments et la sommation finale restent séquentiels. En
 appliquant la formule d'Amdahl au speedup maximum observé (1.67×), on déduit
 qu'environ 40 % du travail est parallélisable et 60 % est intrinsèquement
