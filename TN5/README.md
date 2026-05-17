@@ -21,7 +21,7 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 ```
 .
 ├── go.mod                          # Module Go (wordcount)
-├── wordcount.go                    # Code principal + CLI
+├── wordcount.go                    # Code principal + interface en ligne de commande
 ├── wordcount_test.go               # 15 tests unitaires + 19 sous-benchmarks
 ├── input.txt                       # Fichier texte de test
 ├── data/                           # Graphique et logs des benchmarks
@@ -86,12 +86,12 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestCountWordsConcurrentN` | `CountWordsConcurrentN` avec 1, 2, 4, 8, 16 workers + cas limites |
 ## Benchmarks disponibles
 
-19 sous-benchmarks au total : 7 tailles de segment (`BenchmarkSegmentSize`), 4 comparaisons séquentiel vs concurrent (`BenchmarkSequentialVsConcurrent`), 6 comptes de workers (`BenchmarkWorkerCount`).
+19 sous-benchmarks au total : 7 tailles de segment (`BenchmarkSegmentSize`), 4 comparaisons séquentiel vs concurrent (`BenchmarkSequentialVsConcurrent`), 6 nombres de goroutines (`BenchmarkWorkerCount`).
 
 | Résultat clé | Valeur |
 |--------------|--------|
-| Speedup optimal | 2.85× (segment 50 000 chars, ~14 goroutines) |
-| Point de dégradation | < 1 000 chars (trop de goroutines, surcharge scheduler) |
+| Accélération optimale | 2.85× (segment 50 000 caract., ~14 goroutines) |
+| Point de dégradation | < 1 000 caract. (trop de goroutines, surcharge d'ordonnancement) |
 | Allocations au point optimal | 34 |
 
 ## Liens

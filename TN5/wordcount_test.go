@@ -28,7 +28,6 @@ func TestCountWordsSingleWord(t *testing.T) {
 // TestCountWordsMultipleLines vérifie le comptage pour plusieurs lignes.
 func TestCountWordsMultipleLines(t *testing.T) {
 	content := "Bonjour le monde\nComment allez vous\nTrès bien merci"
-	// 3 + 3 + 3 = 9 mots
 	result := CountWordsConcurrent(content, 10)
 	if result != 9 {
 		t.Errorf("attendu 9 mots, obtenu %d", result)
@@ -64,7 +63,7 @@ func TestSplitIntoSegments(t *testing.T) {
 	content := "Hello world from Go"
 
 	segments := splitIntoSegments(content, 7)
-	// Chaque segment devrait contenir des mots complets
+	// Chaque segment contient des mots complets — aucun mot n'est coupé
 	totalWords := 0
 	for _, seg := range segments {
 		totalWords += countWords(seg)
@@ -198,7 +197,7 @@ var benchContent = generateLargeContent(100_000) // ~100k mots
 // ========== Benchmarks ==========
 
 // BenchmarkSegmentSize mesure la performance en fonction de la taille des segments.
-// Plus le segment est petit, plus il y a de goroutines lancées.
+// Plus le segment est grand, moins il y a de goroutines lancées.
 func BenchmarkSegmentSize(b *testing.B) {
 	sizes := []struct {
 		name string

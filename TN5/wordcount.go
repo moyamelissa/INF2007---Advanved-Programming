@@ -56,15 +56,8 @@ func countWordsInSegment(segment string, ch chan<- int) {
 }
 
 // CountWordsConcurrent divise le contenu en segments et lance une goroutine par
-// segment pour compter les mots en parallèle. Les résultats sont collectés via
-// un canal et sommés dans la goroutine principale.
-//
-// Paramètres :
-//   - content : le texte complet à analyser.
-//   - segmentSize : taille approximative de chaque segment en caractères.
-//
-// Retour :
-//   - int : le nombre total de mots dans le contenu.
+// segment pour compter les mots en parallèle. Les résultats sont récupérés via
+// un canal bufferisé et sommés dans la goroutine principale.
 func CountWordsConcurrent(content string, segmentSize int) int {
 	segments := splitIntoSegments(content, segmentSize)
 	if len(segments) == 0 {
@@ -78,7 +71,7 @@ func CountWordsConcurrent(content string, segmentSize int) int {
 		go countWordsInSegment(seg, ch)
 	}
 
-	// Collecter les résultats depuis le canal
+	// Récupérer les résultats depuis le canal
 	total := 0
 	for range segments {
 		total += <-ch
@@ -135,7 +128,7 @@ func run(args []string) (int, error) {
 	return total, nil
 }
 
-// exitFunc permet de remplacer os.Exit dans les tests (cf. Ch. 11).
+// exitFunc permet de remplacer os.Exit dans les tests unitaires.
 var exitFunc = os.Exit
 
 func main() {

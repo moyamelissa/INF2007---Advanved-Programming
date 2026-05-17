@@ -24,7 +24,7 @@ var workerActualMS = []float64{10.39, 9.021, 8.473, 6.926, 6.307, 6.208}
 var (
 	colorActual   = color.RGBA{R: 106, G: 62, B: 160, A: 255}  // violet foncé (courbe principale)
 	colorIdeal    = color.RGBA{R: 160, G: 132, B: 210, A: 255} // lavande moyenne (courbe idéale)
-	colorFill     = color.NRGBA{R: 185, G: 165, B: 225, A: 75} // fill translucide
+	colorFill     = color.NRGBA{R: 185, G: 165, B: 225, A: 75} // aplat translucide
 	colorEndLabel = color.RGBA{R: 60, G: 60, B: 80, A: 220}    // gris ardoise
 	colorAnnot    = color.RGBA{R: 80, G: 30, B: 140, A: 255}   // violet annotation
 	colorWhiteBg  = color.RGBA{R: 255, G: 255, B: 255, A: 255} // fond blanc pur
@@ -69,7 +69,7 @@ func makeWorkerCountChart() {
 	n := len(workerLabels)
 	xs := buildXS(n)
 
-	// Scaling idéal : temps[0] / nb_workers
+	// Passage à l'échelle idéal : temps[0] / nb_goroutines
 	divisors := []float64{1, 2, 4, 8, 16, 32}
 	idealMS := make([]float64, n)
 	for i, d := range divisors {
