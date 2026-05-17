@@ -39,7 +39,7 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 
 ## Prérequis
 
-- Go 1.21+
+- Go 1.26.1
 
 ## Exécution
 
@@ -86,7 +86,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestCountWordsConcurrentN` | `CountWordsConcurrentN` avec 1, 2, 4, 8, 16 workers + cas limites |
 ## Benchmarks disponibles
 
-19 sous-benchmarks au total, soit 7 tailles de segment testées par `BenchmarkSegmentSize`, 4 comparaisons séquentiel contre concurrent par `BenchmarkSequentialVsConcurrent`, et 6 nombres de goroutines par `BenchmarkWorkerCount`.
+19 sous-benchmarks au total, soit 9 tailles de segment testées par `BenchmarkSegmentSize`, 4 comparaisons séquentiel contre concurrent par `BenchmarkSequentialVsConcurrent`, et 6 nombres de goroutines par `BenchmarkWorkerCount`.
 
 | Résultat clé | Valeur |
 |--------------|--------|
