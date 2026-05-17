@@ -12,9 +12,7 @@ jamais couper un mot. Une goroutine est lancée par segment avec
 `go countWordsInSegment`, et chaque goroutine envoie son résultat partiel sur un
 canal partagé (`chan int`).
 
-La correction de l'exécution concurrente repose sur trois mécanismes. D'abord, il faut préciser qu’aucune variable n’est partagée entre les goroutines. Chaque goroutine calcule son total local dans une variable de pile, puis l’envoie sur le canal, ce qui élimine toute condition de course sans nécessiter l’usage d’un mutex. Ensuite, le canal est bufferisé à
-la capacité exacte du nombre de segments, donc tous les envois aboutissent sans
-blocage. Enfin, la boucle `for range segments` dans la goroutine principale
+La correction de l'exécution concurrente repose sur trois mécanismes. D'abord, il faut préciser qu’aucune variable n’est partagée entre les goroutines. Chaque goroutine calcule son total local dans une variable de pile, puis l’envoie sur le canal, ce qui élimine toute condition de course sans nécessiter l’usage d’un mutex. Ensuite, le canal est en mémoire tampon avec une capacité égale au nombre de segments, donc tous les envois aboutissent sans blocage. Enfin, la boucle `for range segments` dans la goroutine principale
 consomme exactement N résultats avant de retourner, ce qui garantit que toutes les
 goroutines ont terminé avant la sommation finale. L'addition étant commutative,
 l'ordre d'arrivée n'affecte pas le résultat.
