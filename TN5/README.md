@@ -13,6 +13,7 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 | `splitIntoSegments(content, segmentSize)` | Découpe le texte en segments sans couper les mots |
 | `countWordsInSegment(segment, ch)` | Goroutine qui envoie le nombre de mots sur un canal |
 | `CountWordsConcurrent(content, segmentSize)` | Orchestre le fan-out/fan-in et somme les résultats |
+| `CountWordsConcurrentN(content, n)` | Variante avec n goroutines explicites pour mesurer la linéarité |
 | `run(args)` | Logique principale testable, extraite de `main` |
 | `exitFunc` | Variable injectable pour tester la branche d'erreur de `main` |
 ## Structure du projet
@@ -21,8 +22,15 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 .
 ├── go.mod                          # Module Go (wordcount)
 ├── wordcount.go                    # Code principal + CLI
-├── wordcount_test.go               # 14 tests unitaires + 13 benchmarks
+├── wordcount_test.go               # 15 tests unitaires + 19 sous-benchmarks
 ├── input.txt                       # Fichier texte de test
+├── data/                           # Graphique et logs des benchmarks
+│   ├── worker-count-chart.png
+│   ├── bench-raw.txt
+│   └── benchstat.txt
+├── chart/                          # Générateur de graphique (module Go séparé)
+│   ├── go.mod
+│   └── main.go
 ├── TN5-report.md                   # Rapport d'analyse
 ├── TN5-AI-Prompts.md               # Prompts IA utilisés
 ├── TN5-Homework-Instructions.md    # Énoncé du travail
@@ -75,15 +83,16 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestRunMissingFile` | `run` avec fichier inexistant retourne une erreur |
 | `TestMainFunction` | `main()` sans panique pour un fichier valide |
 | `TestMainFunctionError` | `main()` appelle `exitFunc(1)` en cas d'erreur |
+| `TestCountWordsConcurrentN` | `CountWordsConcurrentN` avec 1, 2, 4, 8, 16 workers + cas limites |
 ## Benchmarks disponibles
 
-9 sous-benchmarks par taille de segment (10 à tout-en-un) + 4 comparaisons séquentiel vs concurrent (13 au total).
+19 sous-benchmarks au total : 7 tailles de segment (`BenchmarkSegmentSize`), 4 comparaisons séquentiel vs concurrent (`BenchmarkSequentialVsConcurrent`), 6 comptes de workers (`BenchmarkWorkerCount`).
 
 | Résultat clé | Valeur |
 |--------------|--------|
-| Speedup optimal | ~3× (segment 5 000 chars, ~280 goroutines) |
-| Point de dégradation | < 100 chars (trop de goroutines) |
-| Allocations au point optimal | 279 |
+| Speedup optimal | 2.85× (segment 50 000 chars, ~14 goroutines) |
+| Point de dégradation | < 1 000 chars (trop de goroutines, surcharge scheduler) |
+| Allocations au point optimal | 34 |
 
 ## Liens
 

@@ -24,7 +24,7 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 ## Benchmarks et performance
 
 - « Pourquoi est-ce que 100 000 goroutines (segment de 10 caractères) est plus lent que le séquentiel ? Est-ce le coût de création des goroutines ou le scheduling ? »
-- « Comment expliquer que le speedup plafonne à 3× sur 8 threads logiques au lieu de 4× ou 8× ? Est-ce un problème de bande passante mémoire ? »
+- « Comment expliquer que le speedup plafonne à 1.67× au lieu des 4× théoriques sur 4 cœurs physiques ? La loi d'Amdahl est-elle un cadre approprié ici ? »
 - « Est-ce que la performance devrait croître linéairement avec le nombre de goroutines ? L'énoncé demande d'essayer. »
 
 ## Tests

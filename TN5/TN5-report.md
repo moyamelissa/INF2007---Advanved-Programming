@@ -6,26 +6,43 @@
 
 ## 1. Architecture concurrente
 
-Le programme lit un fichier texte, divise son contenu en segments de taille
-paramétrable, puis compte les mots de chaque segment en parallèle. La fonction
-`splitIntoSegments` décale chaque coupure vers le prochain espace pour ne jamais
-couper un mot. Une goroutine est lancée par segment via `go countWordsInSegment`,
-et les résultats sont collectés sur un canal bufferisé (`chan int`) de capacité
-égale au nombre de segments, ce qui évite tout blocage. La goroutine principale
-itère sur le canal et somme les résultats. L'absence de variable partagée et
-l'usage exclusif du canal garantissent une exécution correcte sans verrou. Une
-variante `CountWordsConcurrentN` permet de fixer le nombre de goroutines pour
-mesurer la linéarité du gain.
+Le programme divise le contenu du fichier en segments de taille paramétrable via
+`splitIntoSegments`, qui décale chaque coupure vers le prochain espace pour ne
+jamais couper un mot. Une goroutine est lancée par segment avec
+`go countWordsInSegment`, et chaque goroutine envoie son résultat partiel sur un
+canal partagé (`chan int`).
+
+La correction de l'exécution concurrente repose sur trois mécanismes. D'abord,
+aucune variable n'est partagée entre les goroutines : chaque goroutine calcule son
+total local dans une variable de pile et l'envoie sur le canal, ce qui élimine
+toute race condition sans recourir à un mutex. Ensuite, le canal est bufferisé à
+la capacité exacte du nombre de segments, donc tous les envois aboutissent sans
+blocage. Enfin, la boucle `for range segments` dans la goroutine principale
+consomme exactement N résultats avant de retourner, ce qui garantit que toutes les
+goroutines ont terminé avant la sommation finale. L'addition étant commutative,
+l'ordre d'arrivée n'affecte pas le résultat.
+
+Une variante `CountWordsConcurrentN` permet de fixer explicitement le nombre de
+goroutines, ce qui sert à mesurer la linéarité du gain de performance.
 
 ## 2. Résultats des benchmarks
 
-Mesures effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs physiques /
-8 threads logiques, Windows/amd64), fichier de test d'environ 700 000 caractères
-(100 000 mots), 6 exécutions par configuration analysées avec `benchstat`.
+Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
+physiques et 8 threads logiques, Windows/amd64) avec un fichier de test d'environ
+700 000 caractères (100 000 mots). Chaque configuration a été lancée 6 fois avec
+`go test -bench=. -count=6` puis analysée avec `benchstat` pour obtenir la médiane
+et l'intervalle de confiance à 95 %. `b.ResetTimer()` exclut le setup et
+`b.ReportAllocs()` rapporte les allocations mémoire.
 
 **Graphique 1 – Scaling réel vs linéaire idéal selon le nombre de goroutines**
 
 ![Graphique 1 – Réel vs linéaire idéal](data/worker-count-chart.png)
+
+Le graphique compare la courbe réelle (pleine) au scaling linéaire idéal
+(pointillée) qu'on obtiendrait si chaque goroutine ajoutée doublait la vitesse.
+La zone violette mesure la perte de performance par rapport à cet idéal. Elle se
+creuse à mesure que le nombre de workers augmente, et la courbe réelle atteint un
+plateau autour de 6 ms dès 16 workers.
 
 **Tableau 1 – Temps selon la taille des segments**
 
@@ -46,29 +63,30 @@ devient pire que le séquentiel.
 | Temps (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Speedup | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
 
+Le passage de 1 à 8 workers réduit le temps de 33 % (10.39 à 6.93 ms), mais le
+gain devient marginal au-delà. Doubler le nombre de goroutines de 16 à 32
+n'économise que 0.1 ms supplémentaire. Cette stagnation confirme visuellement le
+plateau observé sur le graphique et appelle l'analyse théorique de la section
+suivante.
+
 ## 3. Analyse de la linéarité
 
 La performance ne croît pas linéairement avec le nombre de goroutines. Sur
-4 cœurs physiques disponibles, le speedup mesuré n'atteint que 1.67× au lieu
-des 4× théoriques, et atteint un plateau dès 16 workers. Quatre facteurs
-expliquent cet écart. Premièrement, `strings.Fields` est une opération
-séquentielle interne rapide (un seul balayage du segment), donc le travail par
-goroutine est trop court pour amortir le coût de création et d'orchestration.
-Deuxièmement, le canal partagé crée un point de contention naturel à la collecte
-des résultats. Troisièmement, la pression mémoire amplifie cet overhead :
-l'allocation passe de 1 alloc/op pour la version séquentielle à 71 pour 32
-workers, et jusqu'à 2 700 pour des segments de 500 caractères — chaque goroutine
-entraîne des allocations supplémentaires pour sa pile et le canal.
+4 cœurs physiques, le speedup mesuré atteint 1.67× au lieu des 4× théoriques et
+plafonne dès 16 workers. Quatre facteurs expliquent cet écart. D'abord,
+`strings.Fields` est une opération séquentielle rapide (un seul balayage du
+segment), donc le travail par goroutine est trop court pour amortir le coût de
+création et d'orchestration. Ensuite, le canal partagé crée un point de contention
+à la collecte des résultats.
 
-Quatrièmement, la loi d'Amdahl s'applique : la lecture du
-fichier, le découpage en segments et la sommation finale restent séquentiels. En
-appliquant la formule d'Amdahl au speedup maximum observé (1.67×), on déduit
-qu'environ 40 % du travail est parallélisable et 60 % est intrinsèquement
-séquentiel. Pour atteindre un scaling linéaire, il faudrait soit une charge CPU
-plus lourde par segment (ex. analyse syntaxique au lieu d'un simple comptage),
-soit éliminer la contention sur le canal (ex. sommation locale par worker puis
-fusion). Le choix optimal pour ce workload reste donc d'utiliser un segment de
-50 000 caractères, qui équilibre parallélisme et overhead.
+La pression mémoire amplifie cet overhead : les allocations passent de 1/op en
+séquentiel à 71 pour 32 workers et jusqu'à 2 700 pour des segments de 500
+caractères, car chaque goroutine alloue sa pile et son entrée sur le canal. Enfin,
+la loi d'Amdahl s'applique puisque la lecture du fichier, le découpage et la
+sommation finale restent séquentiels. Appliquée au speedup maximum observé (1.67×),
+elle indique qu'environ 40 % du travail est parallélisable et 60 % intrinsèquement
+séquentiel. Pour ce workload, le segment optimal reste 50 000 caractères, qui
+équilibre parallélisme et overhead.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
