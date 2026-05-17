@@ -6,33 +6,32 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 
 ## Compréhension de l'énoncé
 
-- « L'énoncé dit de diviser le contenu en segments de N caractères, mais qu'un segment peut se terminer au milieu d'un mot. Est-ce qu'on doit tronquer au mot précédent ou étendre au mot suivant ? »
-- « Est-ce que "un mot est une séquence séparée par des espaces" inclut les tabulations et retours à la ligne, ou seulement les espaces simples ? »
+- « Si la coupure tombe au milieu d'un mot, faut-il reculer au mot précédent ou avancer au prochain espace ? »
+- « Est-ce que `strings.Fields` considère les tabulations et retours à la ligne comme séparateurs de mots ? »
 
 ## Architecture et concurrence
 
-- « Comment structurer le programme en fan-out / fan-in avec des goroutines et un canal buffered ? Est-ce qu'un `sync.WaitGroup` est nécessaire en plus du canal ? »
-- « Est-ce qu'un canal buffered de taille `len(segments)` est suffisant pour éviter les deadlocks, ou faut-il un canal non buffered avec une goroutine de collecte ? »
-- « Pourquoi ne pas utiliser un mutex et un compteur partagé au lieu d'un canal pour sommer les résultats ? »
+- « Comment structurer un fan-out / fan-in avec des goroutines et un canal en mémoire tampon ? »
+- « Un canal de taille `len(segments)` suffit-il pour éviter les interblocages sans goroutine de collecte séparée ? »
+- « Pourquoi préférer un canal plutôt qu'un mutex avec un compteur partagé ? »
 
 ## Gestion du split et des mots coupés
 
-- « Dans `splitIntoSegments`, si la position de coupure tombe au milieu d'un mot, est-ce qu'il vaut mieux reculer au dernier espace ou avancer au prochain espace ? »
-- « Comment gérer le cas où le segment contient uniquement des espaces après la coupure ? »
-- « Est-ce que `strings.Fields` gère correctement les tabulations, retours chariot et espaces multiples ? »
+- « Dans `splitIntoSegments`, vaut-il mieux reculer au dernier espace ou avancer au prochain pour ne pas couper un mot ? »
+- « Comment gérer un segment qui ne contient que des espaces après la coupure ? »
 
 ## Benchmarks et performance
 
-- « Pourquoi est-ce que 100 000 goroutines (segment de 10 caractères) est plus lent que le séquentiel ? Est-ce le coût de création des goroutines ou le scheduling ? »
-- « Comment expliquer que le speedup plafonne à 1.67× au lieu des 4× théoriques sur 4 cœurs physiques ? La loi d'Amdahl est-elle un cadre approprié ici ? »
-- « Est-ce que la performance devrait croître linéairement avec le nombre de goroutines ? L'énoncé demande d'essayer. »
+- « Pourquoi un segment de 10 caractères (environ 100 000 goroutines) est-il plus lent que le séquentiel ? »
+- « Comment expliquer que l'accélération plafonne à 1.67× au lieu des 4× théoriques sur 4 cœurs ? La loi d'Amdahl s'applique-t-elle ici ? »
+- « La performance devrait-elle croître linéairement avec le nombre de goroutines ? »
 
 ## Tests
 
-- « Mon test `TestCountWordsConsistency` vérifie le résultat pour 7 tailles de segment différentes. Est-ce que c'est suffisant pour garantir que le split ne perd pas de mots ? »
-- « Est-ce qu'il faut tester le cas d'un fichier qui ne contient que des espaces et retours à la ligne ? »
+- « Mon test `TestCountWordsConsistency` couvre 7 tailles de segment. Est-ce suffisant pour garantir que le split ne perd aucun mot ? »
+- « Faut-il tester un fichier contenant uniquement des espaces et des retours à la ligne ? »
 
 ## Rapport
 
-- « Comment expliquer la courbe en U inversé du speedup en fonction du nombre de goroutines de manière concise pour un rapport d'une page ? »
-- « Est-ce que la corrélation allocations/performance est un bon indicateur à mentionner dans le rapport ? »
+- « Comment expliquer le plateau d'accélération de façon concise pour un rapport d'une page ? »
+- « La corrélation entre le nombre d'allocations et la performance est-elle pertinente à mentionner dans le rapport ? »
