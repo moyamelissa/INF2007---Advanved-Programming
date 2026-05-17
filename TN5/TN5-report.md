@@ -26,14 +26,14 @@ Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
 physiques et 8 threads logiques, Windows/amd64) avec un fichier de test d'environ
 700 000 caractères (100 000 mots). Chaque configuration a été lancée 6 fois avec
 `go test -bench=. -count=6` puis analysée avec `benchstat` pour obtenir la médiane
-et l'intervalle de confiance à 95 %. `b.ResetTimer()` exclut le setup et
+et l'intervalle de confiance à 95 %. `b.ResetTimer()` exclut l'initialisation et
 `b.ReportAllocs()` rapporte les allocations mémoire.
 
-**Graphique 1 – Scaling réel vs linéaire idéal selon le nombre de goroutines**
+**Graphique 1 – Passage à l'échelle réel vs linéaire idéal selon le nombre de goroutines**
 
-![Graphique 1 – Réel vs linéaire idéal](data/worker-count-chart.png)
+![Graphique 1 – Passage à l'échelle réel vs linéaire idéal](data/worker-count-chart.png)
 
-Le graphique compare la courbe réelle (pleine) au scaling linéaire idéal
+Le graphique compare la courbe réelle (pleine) au passage à l'échelle linéaire idéal
 (pointillée) qu'on obtiendrait si chaque goroutine ajoutée doublait la vitesse.
 La zone violette mesure la perte de performance par rapport à cet idéal. Elle se
 creuse à mesure que le nombre de workers augmente, et la courbe réelle atteint un
@@ -48,7 +48,7 @@ plateau autour de 6 ms dès 16 workers.
 Le comptage séquentiel de référence prend 5.08 ms. Le concurrent atteint un
 optimum à 50 000 caractères (1.78 ms), soit un gain de 2.85× sur le séquentiel.
 Avec des segments trop petits (500 caractères, environ 1 200 goroutines),
-l'overhead de scheduling dépasse le bénéfice du parallélisme et la performance
+la surcharge d'ordonnancement dépasse le bénéfice du parallélisme et la performance
 devient pire que le séquentiel.
 
 **Tableau 2 – Temps selon le nombre de goroutines (`CountWordsConcurrentN`)**
@@ -56,7 +56,7 @@ devient pire que le séquentiel.
 | Workers | 1 | 2 | 4 | 8 | 16 | 32 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Temps (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
-| Speedup | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
+| Accélération | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
 
 Le passage de 1 à 8 workers réduit le temps de 33 % (10.39 à 6.93 ms), mais le
 gain devient marginal au-delà. Doubler le nombre de goroutines de 16 à 32
@@ -67,21 +67,21 @@ suivante.
 ## 3. Analyse de la linéarité
 
 La performance ne croît pas linéairement avec le nombre de goroutines. Sur
-4 cœurs physiques, le speedup mesuré atteint 1.67× au lieu des 4× théoriques et
+4 cœurs physiques, l'accélération mesurée atteint 1.67× au lieu des 4× théoriques et
 plafonne dès 16 workers. Quatre facteurs expliquent cet écart. D'abord,
 `strings.Fields` est une opération séquentielle rapide (un seul balayage du
 segment), donc le travail par goroutine est trop court pour amortir le coût de
 création et d'orchestration. Ensuite, le canal partagé crée un point de contention
 à la collecte des résultats.
 
-La pression mémoire amplifie cet overhead : les allocations passent de 1/op en
+La pression mémoire amplifie cette surcharge : les allocations passent de 1/op en
 séquentiel à 71 pour 32 workers et jusqu'à 2 700 pour des segments de 500
 caractères, car chaque goroutine alloue sa pile et son entrée sur le canal. Enfin,
 la loi d'Amdahl s'applique puisque la lecture du fichier, le découpage et la
 sommation finale restent séquentiels. Appliquée au speedup maximum observé (1.67×),
 elle indique qu'environ 40 % du travail est parallélisable et 60 % intrinsèquement
-séquentiel. Pour ce workload, le segment optimal reste 50 000 caractères, qui
-équilibre parallélisme et overhead.
+séquentiel. Pour cette charge de travail, le segment optimal reste 50 000 caractères, qui
+équilibre parallélisme et surcharge.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.

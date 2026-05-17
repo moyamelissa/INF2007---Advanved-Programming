@@ -63,7 +63,7 @@ func buildXS(n int) []float64 {
 	return xs
 }
 
-// makeWorkerCountChart trace le temps réel vs le scaling linéaire idéal
+// makeWorkerCountChart trace le temps réel vs le passage à l'échelle linéaire idéal
 // pour BenchmarkWorkerCount (1–32 goroutines, texte 100k mots).
 func makeWorkerCountChart() {
 	n := len(workerLabels)
