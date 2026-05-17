@@ -6,19 +6,9 @@
 
 ## 1. Architecture concurrente
 
-Le programme divise le contenu du fichier en segments de taille paramétrable via
-`splitIntoSegments`, qui décale chaque coupure vers le prochain espace pour ne
-jamais couper un mot. Une goroutine est lancée par segment avec
-`go countWordsInSegment`, et chaque goroutine envoie son résultat partiel sur un
-canal partagé (`chan int`).
+Le programme divise le contenu du fichier en segments de taille paramétrable via splitIntoSegments, qui décale chaque coupure vers le prochain espace pour ne jamais couper un mot. Une goroutine est lancée par segment avec go countWordsInSegment, et chaque goroutine envoie son résultat partiel sur un canal partagé (chan int). Une variante CountWordsConcurrentN permet en outre de fixer explicitement le nombre de goroutines, ce qui sert à mesurer la linéarité du gain de performance.
 
-La correction de l'exécution concurrente repose sur trois mécanismes. D'abord, il faut préciser qu’aucune variable n’est partagée entre les goroutines. Chaque goroutine calcule son total local dans une variable de pile, puis l’envoie sur le canal, ce qui élimine toute condition de course sans nécessiter l’usage d’un mutex. Ensuite, le canal est en mémoire tampon avec une capacité égale au nombre de segments, donc tous les envois aboutissent sans blocage. Enfin, la boucle `for range segments` dans la goroutine principale
-consomme exactement N résultats avant de retourner, ce qui garantit que toutes les
-goroutines ont terminé avant la sommation finale. L'addition étant commutative,
-l'ordre d'arrivée n'affecte pas le résultat.
-
-Une variante `CountWordsConcurrentN` permet de fixer explicitement le nombre de
-goroutines, ce qui sert à mesurer la linéarité du gain de performance.
+La correction de l'exécution concurrente repose sur trois mécanismes. D'abord, aucune variable n'est partagée entre les goroutines : chaque goroutine calcule son total local dans une variable de pile, puis l'envoie sur le canal, ce qui élimine toute condition de course sans mutex. Ensuite, le canal est en mémoire tampon avec une capacité égale au nombre de segments, donc tous les envois aboutissent sans blocage. Enfin, la boucle for range segments dans la goroutine principale consomme exactement N résultats avant de retourner, ce qui garantit que toutes les goroutines ont terminé avant la sommation finale. L'addition étant commutative, l'ordre d'arrivée n'affecte pas le résultat.
 
 ## 2. Résultats des benchmarks
 
