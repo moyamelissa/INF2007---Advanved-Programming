@@ -26,8 +26,8 @@ et l'intervalle de confiance à 95 %. `b.ResetTimer()` exclut l'initialisation e
 Le graphique compare la courbe réelle (pleine) au passage à l'échelle linéaire idéal
 (pointillée) qu'on obtiendrait si chaque goroutine ajoutée doublait la vitesse.
 La zone violette mesure la perte de performance par rapport à cet idéal. Elle se
-creuse à mesure que le nombre de workers augmente, et la courbe réelle atteint un
-plateau autour de 6 ms dès 16 workers.
+creuse à mesure que le nombre de goroutines augmente, et la courbe réelle atteint un
+plateau autour de 6 ms dès 16 goroutines.
 
 **Tableau 1 – Temps selon la taille des segments**
 
