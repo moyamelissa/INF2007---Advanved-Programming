@@ -1,0 +1,60 @@
+goos: windows
+goarch: amd64
+pkg: webcrawler
+cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+BenchmarkCrawlGoroutines/1_goroutines-8 	     411	   2868345 ns/op	  221993 B/op	    1679 allocs/op
+BenchmarkCrawlGoroutines/1_goroutines-8 	     422	   2876231 ns/op	  221869 B/op	    1678 allocs/op
+BenchmarkCrawlGoroutines/1_goroutines-8 	     422	   2849183 ns/op	  221683 B/op	    1678 allocs/op
+BenchmarkCrawlGoroutines/1_goroutines-8 	     415	   2861910 ns/op	  221825 B/op	    1678 allocs/op
+BenchmarkCrawlGoroutines/1_goroutines-8 	     416	   3021986 ns/op	  221963 B/op	    1678 allocs/op
+BenchmarkCrawlGoroutines/1_goroutines-8 	     420	   3118871 ns/op	  221805 B/op	    1678 allocs/op
+BenchmarkCrawlGoroutines/2_goroutines-8 	     624	   1824162 ns/op	  221950 B/op	    1678 allocs/op
+BenchmarkCrawlGoroutines/2_goroutines-8 	     684	   1712646 ns/op	  222075 B/op	    1679 allocs/op
+BenchmarkCrawlGoroutines/2_goroutines-8 	     705	   1703060 ns/op	  222141 B/op	    1679 allocs/op
+BenchmarkCrawlGoroutines/2_goroutines-8 	     708	   1636671 ns/op	  222106 B/op	    1679 allocs/op
+BenchmarkCrawlGoroutines/2_goroutines-8 	     756	   1604333 ns/op	  222180 B/op	    1679 allocs/op
+BenchmarkCrawlGoroutines/2_goroutines-8 	     747	   1612368 ns/op	  222026 B/op	    1679 allocs/op
+BenchmarkCrawlGoroutines/4_goroutines-8 	     644	   1882118 ns/op	  317325 B/op	    2155 allocs/op
+BenchmarkCrawlGoroutines/4_goroutines-8 	     632	   1907827 ns/op	  316941 B/op	    2153 allocs/op
+BenchmarkCrawlGoroutines/4_goroutines-8 	     607	   1907969 ns/op	  317496 B/op	    2154 allocs/op
+BenchmarkCrawlGoroutines/4_goroutines-8 	     637	   9904716 ns/op	  302637 B/op	    2185 allocs/op
+BenchmarkCrawlGoroutines/4_goroutines-8 	     100	  11063028 ns/op	  307187 B/op	    2209 allocs/op
+BenchmarkCrawlGoroutines/4_goroutines-8 	     100	  10289760 ns/op	  266464 B/op	    2156 allocs/op
+BenchmarkCrawlGoroutines/8_goroutines-8 	     100	  10050316 ns/op	  268766 B/op	    2170 allocs/op
+BenchmarkCrawlGoroutines/8_goroutines-8 	     100	  12249566 ns/op	  271417 B/op	    2178 allocs/op
+BenchmarkCrawlGoroutines/8_goroutines-8 	     100	  11753053 ns/op	  290888 B/op	    2191 allocs/op
+BenchmarkCrawlGoroutines/8_goroutines-8 	     100	  11307146 ns/op	  266786 B/op	    2172 allocs/op
+BenchmarkCrawlGoroutines/8_goroutines-8 	     100	  10761479 ns/op	  267903 B/op	    2170 allocs/op
+BenchmarkCrawlGoroutines/8_goroutines-8 	     100	  12113774 ns/op	  262838 B/op	    2168 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/1_goroutines-8         	     427	   3180354 ns/op	  220298 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/1_goroutines-8         	     384	   3153248 ns/op	  220335 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/1_goroutines-8         	     364	   3190609 ns/op	  220287 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/1_goroutines-8         	     429	   2883127 ns/op	  220349 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/1_goroutines-8         	     424	   2787615 ns/op	  220317 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/1_goroutines-8         	     434	   2771567 ns/op	  220299 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/2_goroutines-8         	     800	   1537347 ns/op	  220266 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/2_goroutines-8         	     817	   1510442 ns/op	  220269 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/2_goroutines-8         	     800	   1509155 ns/op	  220253 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/2_goroutines-8         	     784	   1508640 ns/op	  220231 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/2_goroutines-8         	     800	   1592355 ns/op	  220241 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/2_goroutines-8         	     794	   1535152 ns/op	  220232 B/op	    1673 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/4_goroutines-8         	    1328	    918548 ns/op	  220249 B/op	    1672 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/4_goroutines-8         	    1281	    920883 ns/op	  220229 B/op	    1672 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/4_goroutines-8         	    1335	    924135 ns/op	  220239 B/op	    1672 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/4_goroutines-8         	    1300	    928579 ns/op	  220226 B/op	    1672 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/4_goroutines-8         	    1216	    913814 ns/op	  220230 B/op	    1672 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/4_goroutines-8         	    1324	    921637 ns/op	  220236 B/op	    1672 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/8_goroutines-8         	    1725	    676404 ns/op	  220162 B/op	    1664 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/8_goroutines-8         	    1808	    666507 ns/op	  220161 B/op	    1663 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/8_goroutines-8         	    1831	    848895 ns/op	  220168 B/op	    1663 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/8_goroutines-8         	    1285	    913829 ns/op	  220166 B/op	    1662 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/8_goroutines-8         	    1429	    864724 ns/op	  220166 B/op	    1662 allocs/op
+BenchmarkCrawlGoroutinesMultiServer/8_goroutines-8         	    1490	    877575 ns/op	  220134 B/op	    1662 allocs/op
+BenchmarkCountWordsHTML-8                                  	    6906	    170099 ns/op	   49144 B/op	     204 allocs/op
+BenchmarkCountWordsHTML-8                                  	    7538	    170766 ns/op	   49144 B/op	     204 allocs/op
+BenchmarkCountWordsHTML-8                                  	    7015	    172610 ns/op	   49144 B/op	     204 allocs/op
+BenchmarkCountWordsHTML-8                                  	    7449	    182548 ns/op	   49144 B/op	     204 allocs/op
+BenchmarkCountWordsHTML-8                                  	    7011	    173740 ns/op	   49144 B/op	     204 allocs/op
+BenchmarkCountWordsHTML-8                                  	    7377	    187145 ns/op	   49144 B/op	     204 allocs/op
+PASS
+ok  	webcrawler	83.072s

@@ -3,18 +3,23 @@
 ![Tests](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn6-coverage.yml/badge.svg)
 [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn6)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
 
-Ce projet implémente un robot d'exploration Web concurrent en Go. Il récupère des pages HTML, compte les mots visibles et respecte les règles de `robots.txt`. La concurrence est gérée par des goroutines, un canal de résultats et un sémaphore (canal buffered).
+Ce projet implémente un robot d'exploration Web concurrent en Go. Il récupère
+des pages HTML, compte les mots visibles et respecte les règles de `robots.txt`.
+La concurrence est gérée par des goroutines, un canal de résultats et un sémaphore
+(canal bufferisé).
 
 ## Fonctions implémentées
 
 | Fonction | Description |
 |----------|-------------|
-| `newHTTPClient()` | Crée un client HTTP avec timeout de 10 s |
+| `newHTTPClient()` | Crée un client HTTP avec délai d'expiration de 10 s |
 | `checkRobotsAllowed(url, client)` | Vérifie si `robots.txt` autorise l'exploration |
 | `fetchPage(url, client)` | Récupère le contenu HTML d'une URL |
 | `countWordsHTML(html)` | Compte les mots visibles (ignore `<script>`, `<style>`, `<noscript>`) |
 | `crawlURL(url, client, ch)` | Explore une URL et envoie le résultat sur un canal |
-| `CrawlURLs(urls, maxGoroutines)` | Orchestre le crawl concurrent avec sémaphore |
+| `CrawlURLs(urls, maxGoroutines)` | Orchestre l'exploration concurrente avec sémaphore |
+| `politenessDelay` | Délai de politesse configurable (100 ms par défaut) |
+| `mainURLs` | Liste d'URLs injectable pour les tests |
 
 ## Structure du projet
 
@@ -22,8 +27,8 @@ Ce projet implémente un robot d'exploration Web concurrent en Go. Il récupère
 .
 ├── go.mod                # Module Go
 ├── go.sum                # Dépendances vérifiées
-├── crawler.go            # Code principal + CLI
-├── crawler_test.go       # 25 tests unitaires + benchmarks
+├── crawler.go            # Code principal
+├── crawler_test.go       # 27 tests unitaires + 3 bancs d'essai
 ├── TN6-report.md         # Rapport d'analyse
 ├── TN6-AI-Prompts.md     # Prompts IA utilisés
 └── README.md             # Ce fichier
@@ -45,7 +50,7 @@ go run .
 go test -v -run="Test" ./...
 ```
 
-## Benchmarks
+## Bancs d'essai
 
 ```bash
 go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
@@ -66,27 +71,39 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestFetchPageInvalidURL` | Gestion d'erreur pour URL invalide |
 | `TestFetchPageTimeout` | Gestion du délai d'expiration |
 | `TestFetchPage404` | Gestion d'un code HTTP 404 |
-| `TestFetchPageReadError` | Gestion d'erreur quand la connexion est interrompue |
+| `TestFetchPageReadError` | Gestion d'erreur si connexion interrompue |
 | `TestCheckRobotsAllowed` | Respect des règles Allow/Disallow |
 | `TestCheckRobotsNoFile` | Autorisation par défaut si robots.txt absent |
 | `TestCheckRobotsInvalidURL` | Retourne false pour URL non parseable |
 | `TestCheckRobotsUnreachable` | Autorise si le serveur est injoignable |
 | `TestCheckRobotsInvalidBody` | Corps valide de robots.txt parsé sans erreur |
 | `TestCheckRobotsReadBodyError` | Autorise si la lecture du corps robots.txt échoue |
-| `TestCrawlURLsIntegration` | Crawl complet de 2 pages locales |
-| `TestCrawlURLsRobotsBlocked` | URL bloquée par robots.txt retourne erreur |
+| `TestCheckRobotsInvalidURLParse` | Retourne false pour URL avec octet nul |
+| `TestCrawlURLsIntegration` | Exploration complète de 2 pages locales |
+| `TestCrawlURLsRobotsBlocked` | URL bloquée par robots.txt retourne une erreur |
 | `TestCrawlURLsZeroGoroutines` | maxGoroutines ≤ 0 traité comme 1 |
 | `TestCrawlURLFetchError` | Erreur HTTP 500 capturée dans CrawlResult |
 | `TestRunFunction` | `run` s'exécute sans panique avec serveur local |
 | `TestRunFunctionWithErrors` | `run` gère les erreurs sans panique |
+| `TestRunFunctionMixedResults` | `run` gère résultats et erreurs simultanément |
 | `TestMainFunction` | `main()` couvre le point d'entrée sans appel réseau |
 
-## Benchmarks disponibles
+## Bancs d'essai disponibles
 
-| Benchmark | Description |
-|-----------|-------------|
-| `BenchmarkCrawlGoroutines` | Compare 1, 2, 4, 8 goroutines sur 8 URLs |
-| `BenchmarkCountWordsHTML` | Parsing HTML de ~1 900 mots |
+| Banc d'essai | Description |
+|--------------|-------------|
+| `BenchmarkCrawlGoroutines` | Compare 1, 2, 4, 8 goroutines sur 8 URLs via serveur unique |
+| `BenchmarkCrawlGoroutinesMultiServer` | Compare 1, 2, 4, 8 goroutines sur 8 serveurs distincts |
+| `BenchmarkCountWordsHTML` | Analyse HTML de ~1 900 mots avec balises ignorées |
+
+## Résultats clés
+
+| Mesure | Valeur |
+|--------|--------|
+| Couverture de code | 100 % |
+| Accélération optimale (multi-serveurs) | 3.52× (8 goroutines) |
+| Temps d'analyse HTML (~1 900 mots) | ~173 µs |
+| Délai de politesse | 100 ms par URL |
 
 ## Liens
 

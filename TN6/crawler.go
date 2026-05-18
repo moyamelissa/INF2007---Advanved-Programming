@@ -13,6 +13,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+// politenessDelay est le délai de politesse entre les requêtes vers un même serveur.
+// Modifiable dans les tests et bancs d'essai pour mesurer la vraie performance du crawl.
+var politenessDelay = 100 * time.Millisecond
+
 // CrawlResult contient le résultat de l'exploration d'une URL.
 type CrawlResult struct {
 	URL       string
@@ -129,8 +133,8 @@ func countWordsHTML(htmlContent string) int {
 
 // crawlURL explore une URL unique : vérifie robots.txt, récupère la page,
 // et compte les mots. Envoie le résultat sur le canal ch.
-// Un délai de 100 ms est ajouté après la vérification robots.txt pour limiter
-// la fréquence d'exploration et éviter de surcharger les serveurs.
+// Un délai de politesse configurable (politenessDelay) est appliqué après la
+// vérification robots.txt pour limiter la fréquence d'exploration.
 func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult) {
 	// Vérifier robots.txt avant d'explorer
 	if !checkRobotsAllowed(targetURL, client) {
@@ -141,8 +145,10 @@ func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult) {
 		return
 	}
 
-	// Délai de politesse : limite la fréquence des requêtes vers chaque serveur
-	time.Sleep(100 * time.Millisecond)
+	// Délai de politesse configurable : limite la fréquence des requêtes vers chaque serveur
+	if politenessDelay > 0 {
+		time.Sleep(politenessDelay)
+	}
 
 	content, err := fetchPage(targetURL, client)
 	if err != nil {

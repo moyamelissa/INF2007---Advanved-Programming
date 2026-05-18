@@ -398,6 +398,32 @@ func TestCheckRobotsReadBodyError(t *testing.T) {
 	}
 }
 
+// TestCheckRobotsInvalidURLParse vérifie que checkRobotsAllowed retourne false
+// quand url.Parse échoue sur un caractère réellement invalide (octet nul).
+func TestCheckRobotsInvalidURLParse(t *testing.T) {
+	client := &http.Client{Timeout: 2 * time.Second}
+	// L'octet nul force url.Parse à retourner une erreur
+	if checkRobotsAllowed("http://\x00invalid/page", client) {
+		t.Error("attendu false pour une URL avec octet nul")
+	}
+}
+
+// TestRunFunctionMixedResults vérifie que run gère simultanément des résultats
+// et des erreurs (couvre la boucle de résultats ET la section erreurs).
+func TestRunFunctionMixedResults(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/robots.txt" {
+			fmt.Fprint(w, "User-agent: *\nAllow: /\n")
+			return
+		}
+		fmt.Fprint(w, `<html><body><p>Hello world</p></body></html>`)
+	}))
+	defer server.Close()
+
+	// Une URL valide + une URL injoignable : résultats ET erreurs dans le même appel
+	run([]string{server.URL + "/page", "http://127.0.0.1:1/invalid"}, 2)
+}
+
 // TestMainFunction vérifie que main s'exécute sans panique.
 func TestMainFunction(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -437,6 +463,11 @@ func setupBenchServer(nPages int) *httptest.Server {
 
 // BenchmarkCrawlGoroutines compare les performances avec 1, 2, 4 et 8 goroutines.
 func BenchmarkCrawlGoroutines(b *testing.B) {
+	// Désactiver le délai de politesse pour mesurer la vraie performance de l'exploration
+	old := politenessDelay
+	politenessDelay = 0
+	defer func() { politenessDelay = old }()
+
 	server := setupBenchServer(8)
 	defer server.Close()
 
@@ -446,11 +477,42 @@ func BenchmarkCrawlGoroutines(b *testing.B) {
 		urls[i] = fmt.Sprintf("%s/page%d", server.URL, i)
 	}
 
-	goroutineCounts := []int{1, 2, 4, 8}
-
-	for _, g := range goroutineCounts {
+	for _, g := range []int{1, 2, 4, 8} {
 		b.Run(fmt.Sprintf("%d_goroutines", g), func(b *testing.B) {
 			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				CrawlURLs(urls, g)
+			}
+		})
+	}
+}
+
+// BenchmarkCrawlGoroutinesMultiServer compare les performances avec 1, 2, 4 et
+// 8 goroutines en utilisant un serveur distinct par URL, éliminant la contention
+// côté serveur pour mesurer le vrai gain de parallélisme.
+func BenchmarkCrawlGoroutinesMultiServer(b *testing.B) {
+	// Désactiver le délai de politesse pour mesurer la vraie performance de l'exploration
+	old := politenessDelay
+	politenessDelay = 0
+	defer func() { politenessDelay = old }()
+
+	const nURLs = 8
+	servers := make([]*httptest.Server, nURLs)
+	urls := make([]string, nURLs)
+	for i := range servers {
+		servers[i] = setupBenchServer(1)
+		urls[i] = fmt.Sprintf("%s/page%d", servers[i].URL, i)
+	}
+	defer func() {
+		for _, s := range servers {
+			s.Close()
+		}
+	}()
+
+	for _, g := range []int{1, 2, 4, 8} {
+		b.Run(fmt.Sprintf("%d_goroutines", g), func(b *testing.B) {
+			b.ReportAllocs()
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				CrawlURLs(urls, g)
 			}

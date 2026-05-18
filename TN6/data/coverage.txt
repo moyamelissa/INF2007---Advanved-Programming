@@ -1,0 +1,9 @@
+webcrawler/crawler.go:28:	newHTTPClient		100.0%
+webcrawler/crawler.go:38:	checkRobotsAllowed	100.0%
+webcrawler/crawler.go:72:	fetchPage		100.0%
+webcrawler/crawler.go:94:	countWordsHTML		100.0%
+webcrawler/crawler.go:138:	crawlURL		100.0%
+webcrawler/crawler.go:174:	CrawlURLs		100.0%
+webcrawler/crawler.go:226:	run			100.0%
+webcrawler/crawler.go:259:	main			100.0%
+total:				(statements)		100.0%

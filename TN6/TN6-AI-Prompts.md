@@ -33,7 +33,7 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 - « Est-ce qu'il faut tester le timeout HTTP séparément ou est-ce que c'est couvert par le test d'URL invalide ? »
 - « Comment vérifier qu'une URL bloquée par robots.txt retourne bien une erreur dans `CrawlURLs` ? »
 
-## Benchmarks et performance
+## Bancs d'essai et performance
 
-- « Comment mesurer l'impact du nombre de goroutines (1, 2, 4, 8) sur le temps de crawl avec un serveur de test local ? »
-- « Est-ce que le benchmark du parsing HTML est représentatif si la page de test fait ~1 900 mots ? Faut-il tester avec des pages plus grandes ? »
+- « Comment mesurer l'impact du nombre de goroutines (1, 2, 4, 8) sur le temps d'exploration avec un serveur de test local ? »
+- « Est-ce que le banc d'essai du parsing HTML est représentatif si la page de test fait ~1 900 mots ? Faut-il tester avec des pages plus grandes ? »

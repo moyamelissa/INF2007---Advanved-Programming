@@ -1,213 +1,112 @@
-# Mini-Projet — Rapport : Robot d'exploration Web concurrent en Go
+﻿# Robot d'exploration Web concurrent en Go
 
-**Cours** : INF2007 — Programmation avancée  
-**Travail** : TN6  
-**Étudiante** : Melissa Moya  
-**Semaine** : 15  
-**Plateforme** : Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
+**INF2007 – Programmation Avancée · TN6 · Melissa Moya**
 
 ---
 
-## 1. Description de l'implémentation
+## 1. Implémentation
 
-### Architecture générale
+Le programme accepte une liste d'URL, lance une goroutine par URL et collecte
+les résultats via un canal bufferisé (`chan CrawlResult`). Un sémaphore
+(`make(chan struct{}, maxGoroutines)`) limite le nombre de goroutines actives
+simultanément à 1, 2, 4 ou 8. Un mutex (`sync.Mutex`) protège l'agrégation
+des comptes dans la map de résultats et le total global, conformément aux
+exigences de l'énoncé qui demande explicitement les trois primitives.
 
-Le programme est structuré autour de la fonction `CrawlURLs(urls []string, maxGoroutines int)` qui orchestre l'exploration concurrente. J'ai combiné trois primitives de concurrence Go :
+Chaque goroutine appelle `crawlURL`, qui vérifie d'abord `robots.txt`, applique
+un délai de politesse de 100 ms, récupère la page avec `http.Client` (délai
+d'expiration de 10 secondes), puis compte les mots visibles. La goroutine
+principale itère sur le canal avec `for range` jusqu'à sa fermeture, qui est
+déclenchée par une goroutine dédiée après que `sync.WaitGroup` confirme la fin
+de toutes les explorations.
 
-```
-goroutine par URL ──► canal CrawlResult ──► goroutine principale (mutex + agrégation)
-       ▲
-   sémaphore (limite concurrence)
-```
+Le comptage de mots utilise le tokeniseur `golang.org/x/net/html`. Il parcourt
+les jetons HTML et ignore le contenu des balises `<script>`, `<style>` et
+`<noscript>` via un drapeau `skip`. Cette approche est plus robuste qu'une
+expression régulière car elle gère correctement les balises imbriquées, les
+entités HTML et le HTML malformé.
 
-#### Le sémaphore : pourquoi et comment
+## 2. Respect de robots.txt
 
-Pour limiter le nombre de requêtes HTTP simultanées, j'utilise un **canal buffered comme sémaphore** :
+La fonction `checkRobotsAllowed` récupère `robots.txt` à la racine de chaque
+domaine avant toute exploration. Elle utilise la bibliothèque
+`github.com/temoto/robotstxt` pour analyser les directives `User-agent: *` et
+appliquer les règles `Allow` et `Disallow`. Si `robots.txt` est absent (HTTP
+404), inaccessible (erreur réseau) ou illisible (corps tronqué), la fonction
+autorise l'exploration par défaut, conformément au comportement standard des
+robots d'exploration. Un délai de politesse de 100 ms est ajouté après chaque
+vérification pour limiter la fréquence des requêtes.
 
-```go
-semaphore := make(chan struct{}, maxGoroutines)
+## 3. Tests unitaires
 
-go func(targetURL string) {
-    defer wg.Done()
-    semaphore <- struct{}{}        // acquérir (bloque si plein)
-    defer func() { <-semaphore }() // libérer
-    crawlURL(targetURL, client, ch)
-}(u)
-```
+Les 27 tests utilisent `httptest.NewServer` pour simuler des serveurs HTTP
+locaux, sans aucun appel réseau réel. Cette approche garantit la reproductibilité
+et l'isolation des tests.
 
-Ce pattern est plus idiomatique en Go qu'un worker pool classique. Toutes les goroutines sont lancées immédiatement, mais seules `maxGoroutines` s'exécutent réellement en parallèle. Les autres bloquent sur l'écriture dans le sémaphore jusqu'à ce qu'une place se libère. L'avantage par rapport à un pool de workers est la simplicité : pas de file d'attente explicite à gérer.
+| Catégorie | Nombre | Exemples |
+|:---|:---:|:---|
+| Comptage HTML | 7 | Ignorer `<script>`, `<style>`, `<noscript>` |
+| Récupération de pages | 4 | Succès, URL invalide, timeout, HTTP 404 |
+| Vérification robots.txt | 6 | Allow/Disallow, absent, injoignable, corps tronqué |
+| Exploration complète | 3 | Intégration, URL bloquée, maxGoroutines=0 |
+| Fonctions run/main | 4 | Succès, erreurs, résultats mixtes, point d'entrée |
+| Cas limites | 3 | Octet nul, connexion interrompue, HTTP 500 |
 
-#### Le canal de résultats et le mutex
+La couverture de code atteint 100 % sur les 8 fonctions, y compris `main()`
+grâce à l'injection de la variable `mainURLs` dans `TestMainFunction`.
 
-Chaque goroutine envoie un `CrawlResult` (URL, nombre de mots, erreur) sur un canal buffered de taille `len(urls)` :
+## 4. Résultats des bancs d'essai
 
-```go
-ch := make(chan CrawlResult, len(urls))
-```
+Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
+physiques et 8 threads logiques, Windows/amd64), 8 URLs par configuration,
+6 exécutions analysées avec `benchstat`. Le délai de politesse est désactivé
+(`politenessDelay = 0`) pour isoler le coût réel de l'exploration.
 
-La goroutine principale lit les résultats et met à jour la map et le total avec un `sync.Mutex` :
+**Tableau 1 – Serveur unique partagé (contention visible)**
 
-```go
-for result := range ch {
-    mu.Lock()
-    if result.Err != nil {
-        errs = append(errs, result.Err)
-    } else {
-        results[result.URL] = result.WordCount
-        totalWords += result.WordCount
-    }
-    mu.Unlock()
-}
-```
+| Goroutines | 1 | 2 | 4 | 8 |
+|:---:|:---:|:---:|:---:|:---:|
+| Temps (ms) | 2.87 | 1.67 | 5.91 | 11.53 |
+| Accélération | 1.00× | 1.72× | 0.49× | 0.25× |
 
-Le mutex est nécessaire ici car `results` (une map) n'est pas thread-safe en Go. Sans mutex, des écritures concurrentes provoqueraient un `fatal error: concurrent map writes`. En pratique, puisque la goroutine principale est la seule à lire le canal, le mutex pourrait être omis — mais je l'ai conservé pour suivre les exigences de l'énoncé et démontrer son utilisation.
+**Tableau 2 – Serveurs distincts par URL (parallélisme réel)**
 
-#### Le WaitGroup pour fermer le canal
+| Goroutines | 1 | 2 | 4 | 8 |
+|:---:|:---:|:---:|:---:|:---:|
+| Temps (ms) | 3.02 | 1.52 | 0.92 | 0.86 |
+| Accélération | 1.00× | 1.98× | 3.28× | 3.52× |
 
-```go
-var wg sync.WaitGroup
-for _, u := range urls {
-    wg.Add(1)
-    go func(targetURL string) {
-        defer wg.Done()
-        // ...
-    }(u)
-}
-go func() {
-    wg.Wait()
-    close(ch)  // permet à `range ch` de terminer
-}()
-```
+Le tableau 1 révèle une régression à partir de 4 goroutines. Quand plusieurs
+goroutines accèdent simultanément au même serveur (8 URLs × 2 requêtes par URL
+= 16 requêtes concurrentes), le handler `httptest` devient le goulot
+d'étranglement. L'intervalle de confiance de ±87 % à 4 goroutines confirme un
+comportement bimodal : les premières itérations de `b.N` s'exécutent en ~1.9 ms,
+puis la contention s'installe et les suivantes dépassent 10 ms.
 
-Sans `wg.Wait()` avant `close(ch)`, le canal serait fermé prématurément, et certains résultats seraient perdus.
+Le tableau 2 reflète le cas réel où chaque URL provient d'un serveur distinct.
+Le gain atteint 3.52× à 8 goroutines, puis plafonne. Sur 4 cœurs physiques,
+au-delà de 8 goroutines, la loi d'Amdahl limite le gain : la récupération HTTP,
+le parsing HTML et l'agrégation finale comportent des parties séquentielles
+incompressibles.
 
-### Comptage des mots HTML
+## 5. Défis et optimisations
 
-La fonction `countWordsHTML` utilise le tokenizer `golang.org/x/net/html` plutôt qu'un simple `strings.Fields` sur le HTML brut. La raison : un comptage naïf compterait les noms de balises et attributs comme des mots. Le tokenizer parcourt les tokens et ne collecte que le texte visible :
+Le défi principal était de rendre les bancs d'essai représentatifs. Le délai de
+politesse de 100 ms, nécessaire en production, rendait les mesures inutilisables
+car `b.N` descendait à 1 ou 2 itérations et mesurait essentiellement
+`time.Sleep`. La solution a été d'extraire le délai dans une variable
+`politenessDelay` modifiable, identique au pattern `exitFunc` utilisé au TN5,
+ce qui permet de le désactiver dans les bancs d'essai tout en le conservant
+actif en production.
 
-```go
-case html.TextToken:
-    if !skip {
-        text := strings.TrimSpace(tokenizer.Token().Data)
-        if text != "" {
-            words := strings.Fields(text)
-            count += len(words)
-        }
-    }
-```
+Un second défi était l'interprétation du benchmark à serveur unique. La
+régression observée aurait pu être confondue avec un défaut d'implémentation.
+L'ajout de `BenchmarkCrawlGoroutinesMultiServer` avec 8 serveurs distincts a
+permis d'isoler la cause : la contention côté serveur, et non un problème dans
+le code du robot.
 
-Les balises `<script>`, `<style>` et `<noscript>` sont ignorées via un flag `skip` qui s'active sur le `StartTagToken` et se désactive sur le `EndTagToken` correspondant. Par exemple, pour `<script>var x = "hello world";</script>`, les 5 « mots » du JavaScript ne sont pas comptés.
-
-### Client HTTP
-
-```go
-func newHTTPClient() *http.Client {
-    return &http.Client{Timeout: 10 * time.Second}
-}
-```
-
-Le timeout de 10 secondes couvre l'intégralité de la requête (DNS, connexion TCP, TLS, envoi, réception). Si un serveur ne répond pas dans ce délai, l'erreur est capturée et renvoyée via le canal.
-
-## 2. Conformité robots.txt
-
-### Implémentation détaillée
-
-Avant chaque exploration, la fonction `checkRobotsAllowed` effectue les étapes suivantes :
-
-```go
-func checkRobotsAllowed(targetURL string, client *http.Client) bool {
-    parsed, _ := url.Parse(targetURL)
-    robotsURL := fmt.Sprintf("%s://%s/robots.txt", parsed.Scheme, parsed.Host)
-    resp, err := client.Get(robotsURL)
-    // ...
-    robots, _ := robotstxt.FromBytes(body)
-    group := robots.FindGroup("*")
-    return group.Test(parsed.Path)
-}
-```
-
-Décisions clés :
-- **User-agent `*`** : j'utilise le groupe générique car notre robot n'a pas d'identifiant spécifique enregistré.
-- **robots.txt inaccessible = autorisé** : si la requête échoue (timeout, 404, erreur réseau), on autorise l'exploration par défaut. C'est le comportement standard (RFC 9309) : l'absence de robots.txt signifie « tout est permis ».
-- **Vérification par URL** : `checkRobotsAllowed` est appelé dans chaque goroutine, avant `fetchPage`. Si le chemin est interdit (ex: `Disallow: /private`), la goroutine retourne immédiatement une erreur sans effectuer la requête sur la page.
-- **Bibliothèque `github.com/temoto/robotstxt`** : parse correctement les directives `Allow`, `Disallow`, et les wildcards. Évite de réimplémenter un parser de robots.txt.
-- **Délai de politesse (100 ms)** : un `time.Sleep(100 * time.Millisecond)` est inseré dans `crawlURL` après la vérification robots.txt et avant le fetch. Ce délai limite la fréquence des requêtes vers chaque serveur, conformes aux bonnes pratiques d’exploration éthique et à la directive `Crawl-delay` implicite.
-
-### Exemple concret testé
-
-Le test `TestCheckRobotsAllowed` crée un serveur avec ce robots.txt :
-```
-User-agent: *
-Disallow: /private/
-Allow: /public/
-```
-
-Et vérifie que :
-- `/public/page` → autorisé ✓
-- `/private/secret` → interdit ✓
-- `/` → autorisé ✓
-
-## 3. Cas de test
-
-J'ai écrit **25 tests** utilisant `httptest.NewServer` pour simuler des serveurs HTTP sans requêtes réseau réelles. Voici les plus significatifs :
-
-| Test | Ce qu'il vérifie concrètement |
-|------|-------------------------------|
-| `TestCountWordsHTMLIgnoreScript` | `<p>Texte visible</p><script>var x = "ignoré";</script><p>Autre texte</p>` → 4 mots, pas 8. Prouve que le parsing HTML fonctionne. |
-| `TestFetchPageTimeout` | Serveur qui dort 5s + client avec timeout 1s → erreur capturée. Vérifie que les serveurs lents ne bloquent pas le crawler indéfiniment. |
-| `TestCheckRobotsAllowed` | robots.txt avec `Disallow: /private/` → `/private/secret` bloqué, `/public/page` autorisé. Prouve la conformité robots.txt. |
-| `TestCheckRobotsReadBodyError` | Serveur TCP qui ferme la connexion après 7 octets (Content-Length: 1000) → `io.ReadAll` échoue, crawl autorisé par défaut. |
-| `TestCrawlURLsIntegration` | 2 pages crawlées en parallèle → `page1: 3 mots`, `page2: 2 mots`, `total: 5`. Test de bout en bout. |
-| `TestCrawlURLsRobotsBlocked` | URL interdite par `Disallow` → erreur, 0 mots comptés, map vide. Prouve que robots.txt est respecté avant le fetch. |
-| `TestMainFunction` | Injection de `mainURLs` avec un serveur local → `main()` couverte à 100% sans appel réseau externe. |
-
-## 4. Résultats des benchmarks
-
-> **Commande utilisée :** `go test -bench=. -benchmem -count=1 ./...`  
-> **Plateforme :** Windows/amd64, Intel Core i5-10300H @ 2.50 GHz, 8 threads
-
-### Performance selon le nombre de goroutines (8 URLs, serveur local)
-
-| Goroutines | ns/op     | B/op    | allocs/op | Speedup vs 1 goroutine |
-|:----------:|:---------:|:-------:|:---------:|:----------------------:|
-| 1          | 2 400 628 | 221 971 | 1 679     | 1.00×                  |
-| 2          | 1 472 996 | 222 324 | 1 680     | 1.63×                  |
-| 4          | 1 697 831 | 316 621 | 2 143     | 1.41×                  |
-| 8          | 2 160 625 | 360 811 | 2 370     | 1.11×                  |
-
-### Parsing HTML seul (1 900 mots)
-
-- `BenchmarkCountWordsHTML` : **188 349 ns/op**, 49 144 B/op, 204 allocs/op
-- Soit environ **99 ns par mot** pour le parsing HTML.
-
-### Interprétation détaillée
-
-Le **meilleur speedup (1.63×) est obtenu avec 2 goroutines**. Pourquoi la performance se dégrade au-delà ?
-
-Le serveur `httptest.Server` est **local** (loopback `127.0.0.1`). La latence réseau est de ~0.01 ms au lieu de 50-200 ms pour un serveur distant. Dans ces conditions :
-- Le goulot d'étranglement est le **listener unique** du serveur de test, qui sérialise les connexions entrantes.
-- Plus de goroutines = plus de contention sur ce listener + plus d'allocations mémoire (stacks des goroutines, buffers HTTP).
-
-**En conditions réelles** avec des serveurs distants (latence 100 ms), 8 goroutines traiteraient 8 URLs en ~100 ms au lieu de ~800 ms séquentiellement, soit un speedup théorique de **~8×**. La concurrence est donc critique pour un crawler réel, même si les benchmarks locaux ne le montrent pas.
-
-### Allocations mémoire
-
-On observe une corrélation entre goroutines et allocations :
-- 1 goroutine : 1 679 allocs (baseline)
-- 8 goroutines : 2 370 allocs (+41 %)
-
-Le surcoût provient des stacks des goroutines (~2 Ko chacune), des buffers du sémaphore, et des structs `CrawlResult` envoyées sur le canal.
-
-## 5. Défis rencontrés et optimisations
-
-1. **Comptage de mots dans du HTML** : un `strings.Fields(html)` brut comptait les balises comme des mots. L'utilisation du tokenizer `x/net/html` a résolu le problème, au prix de 204 allocations par page (pour les tokens et sous-chaînes).
-
-2. **Gestion des erreurs non-bloquante** : j'ai choisi de collecter les erreurs dans un slice plutôt que d'arrêter à la première erreur. Ainsi, si 1 URL sur 10 échoue, on obtient quand même les résultats des 9 autres. Le champ `Err` dans `CrawlResult` permet de distinguer succès et échec par URL.
-
-3. **Dimensionnement du canal** : `make(chan CrawlResult, len(urls))` garantit qu'aucune goroutine ne bloque en écriture, même si la goroutine principale est lente à consommer. Sans le buffer, une goroutine rapide devrait attendre que la goroutine principale lise son résultat avant de libérer le sémaphore, créant un goulot d'étranglement.
-
-4. **Sémaphore vs worker pool** : j'ai préféré le pattern sémaphore car il est plus simple (pas de file d'attente à gérer) et plus idiomatique en Go. Un worker pool serait justifié si les tâches avaient des durées très inégales, ce qui n'est pas le cas ici.
-
-## 6. Conclusion
-
-Le robot d'exploration démontre une utilisation combinée de quatre primitives de concurrence Go : goroutines, canaux, mutex et WaitGroup. Le sémaphore contrôle le parallélisme, le canal transmet les résultats de manière type-safe, le mutex protège la map partagée, et le WaitGroup assure la fermeture propre du canal. Le respect de robots.txt est intégré comme première étape de chaque goroutine, avant toute requête sur la page cible. Les 25 tests unitaires, tous basés sur des serveurs locaux (`httptest` et sockets TCP raw), garantissent une couverture de 100% sans dépendance réseau externe.
+### Bibliographie
+- Manuel INF2007, chapitres 1, 6 et 8.
+- Documentation Go : https://pkg.go.dev/net/http, https://pkg.go.dev/sync
+- Bibliothèque robotstxt : https://github.com/temoto/robotstxt
+- Bibliothèque HTML : https://pkg.go.dev/golang.org/x/net/html

@@ -1,11 +1,27 @@
-# Compiled binaries
+# Binaires compilés
 *.exe
+webcrawler.exe
 
-# Coverage artifacts
-cover/
-cover
-coverage
+# Artéfacts de tests Go
+cover.out
 *.out
 
-# Profiling artifacts
+# Profilage
 *.prof
+cpu.prof
+mem.prof
+
+# Rapports de couverture HTML (visualisation locale uniquement)
+data/coverage.html
+*.html
+
+# Artéfacts de commandes ratées
+data/annotate.txt
+
+# Fichiers d'environnement IDE
+.vscode/
+.idea/
+
+# Fichiers OS
+.DS_Store
+Thumbs.db
