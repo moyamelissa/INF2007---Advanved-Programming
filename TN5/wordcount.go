@@ -111,9 +111,6 @@ func CountWordsConcurrentPool(content string, numWorkers int) int {
 		segmentSize = len(content)
 	}
 	segments := splitIntoSegments(content, segmentSize)
-	if len(segments) == 0 {
-		return 0
-	}
 
 	jobs := make(chan string, len(segments))
 	results := make(chan int, len(segments))

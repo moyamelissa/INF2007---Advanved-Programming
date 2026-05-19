@@ -14,6 +14,7 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 | `countWordsInSegment(segment, ch)` | Goroutine qui envoie le nombre de mots sur un canal |
 | `CountWordsConcurrent(content, segmentSize)` | Orchestre le fan-out/fan-in et somme les résultats |
 | `CountWordsConcurrentN(content, n)` | Variante avec n goroutines explicites pour mesurer la linéarité |
+| `CountWordsConcurrentPool(content, n)` | Worker pool avec n goroutines persistantes |
 | `run(args)` | Logique principale testable, extraite de `main` |
 | `exitFunc` | Variable injectable pour tester la branche d'erreur de `main` |
 ## Structure du projet
@@ -22,12 +23,16 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 .
 ├── go.mod                          # Module Go (wordcount)
 ├── wordcount.go                    # Code principal + interface en ligne de commande
-├── wordcount_test.go               # 15 tests unitaires + 19 sous-benchmarks
+├── wordcount_test.go               # 16 tests unitaires + 25 sous-benchmarks
 ├── input.txt                       # Fichier texte de test
 ├── data/                           # Graphique et logs des benchmarks
-│   ├── worker-count-chart.png       # Graphique principal
+│   ├── worker-count-chart.png       # Graphique 1 – goroutine-par-segment vs linéaire idéal
+│   ├── worker-pool-chart.png        # Graphique 2 – worker pool vs goroutine-par-segment
 │   ├── bench-raw.txt                # Données brutes des benchmarks
+│   ├── workerpool-raw.txt           # Données brutes BenchmarkWorkerPool
 │   └── benchstat.txt                # Analyse statistique (benchstat)
+├── docs/                           # Documentation technique
+│   └── calculs.md                   # Calculs détaillés (speedup, Amdahl, allocations)
 ├── chart/                          # Générateur de graphique (module Go séparé)
 │   ├── go.mod                       # Module Go (chart)
 │   └── main.go                      # Générateur du graphique
@@ -59,7 +64,7 @@ go run . input.txt 5000
 go test -v -run="Test" ./...
 ```
 
-## Benchmarks
+## Bancs d'essai
 
 ```bash
 go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
@@ -84,18 +89,25 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestMainFunction` | `main()` sans panique pour un fichier valide |
 | `TestMainFunctionError` | `main()` appelle `exitFunc(1)` en cas d'erreur |
 | `TestCountWordsConcurrentN` | `CountWordsConcurrentN` avec 1, 2, 4, 8, 16 workers + cas limites |
-## Benchmarks disponibles
+| `TestCountWordsConcurrentPool` | `CountWordsConcurrentPool` avec 1, 2, 4, 8, 16 workers + cas limites |
 
-19 sous-benchmarks au total, soit 9 tailles de segment testées par `BenchmarkSegmentSize`, 4 comparaisons séquentiel contre concurrent par `BenchmarkSequentialVsConcurrent`, et 6 nombres de goroutines par `BenchmarkWorkerCount`.
+## Bancs d'essai disponibles
+
+25 sous-benchmarks au total, soit 9 tailles de segment par `BenchmarkSegmentSize`,
+4 comparaisons séquentiel contre concurrent par `BenchmarkSequentialVsConcurrent`,
+6 nombres de goroutines par `BenchmarkWorkerCount` et 6 par `BenchmarkWorkerPool`.
 
 | Résultat clé | Valeur |
 |--------------|--------|
-| Accélération optimale | 2.85× (segment 50 000 caract., ~14 goroutines) |
-| Point de dégradation | < 1 000 caract. (trop de goroutines, surcharge d'ordonnancement) |
+| Accélération optimale (taille segments) | 2.85× (segment 50 000 caract.) |
+| Point de dégradation | < 1 000 caract. (surcharge d'ordonnancement) |
 | Allocations au point optimal | 34 |
+| Worker pool vs goroutine-par-segment | 4–5× plus rapide |
+| Couverture de code | 100 % |
 
 ## Liens
 
 - [Rapport TN5](TN5-report.md)
+- [Calculs détaillés](docs/calculs.md)
 - [Prompts IA](TN5-AI-Prompts.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN5)
