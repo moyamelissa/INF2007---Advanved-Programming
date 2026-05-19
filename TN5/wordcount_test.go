@@ -90,7 +90,9 @@ func TestSplitIntoSegmentsNegativeSize(t *testing.T) {
 func TestRunValidFile(t *testing.T) {
 	dir := t.TempDir()
 	f := filepath.Join(dir, "test.txt")
-	os.WriteFile(f, []byte("Hello world from Go"), 0644)
+	if err := os.WriteFile(f, []byte("Hello world from Go"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	total, err := run([]string{"cmd", f})
 	if err != nil {
@@ -105,7 +107,9 @@ func TestRunValidFile(t *testing.T) {
 func TestRunWithSegmentSize(t *testing.T) {
 	dir := t.TempDir()
 	f := filepath.Join(dir, "test.txt")
-	os.WriteFile(f, []byte("Hello world from Go"), 0644)
+	if err := os.WriteFile(f, []byte("Hello world from Go"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	total, err := run([]string{"cmd", f, "5"})
 	if err != nil {
@@ -153,7 +157,9 @@ func TestMainFunction(t *testing.T) {
 
 	dir := t.TempDir()
 	f := filepath.Join(dir, "test.txt")
-	os.WriteFile(f, []byte("Hello world"), 0644)
+	if err := os.WriteFile(f, []byte("Hello world"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	exitFunc = func(code int) {}
 	os.Args = []string{"cmd", f}

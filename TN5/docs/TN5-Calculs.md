@@ -80,7 +80,7 @@ de 700 000 chars quand `numWorkers = 1`.
 Taille contenu           : ~700 000 chars
 Taille segment           :     500 chars
 Nombre de goroutines     : 700 000 / 500 = ~1 400 goroutines
-Coût création goroutine  : ~3 µs (estimation courante pour le runtime Go)
+Coût création goroutine  : ~3 µs (approximation empirique pour le runtime Go)
 Coût total création      : 1 400 × 3 µs = 4 200 µs = 4.2 ms
 
 Temps mesuré (500 chars) : 8.87 ms

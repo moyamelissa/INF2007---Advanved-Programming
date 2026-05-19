@@ -3,7 +3,7 @@
 ![Tests](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn5-coverage.yml/badge.svg)
 [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn5)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
 
-Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des canaux (modèle fan-out / fan-in). Il met en pratique la concurrence du Chapitre 8 en Go.
+Ce projet implémente un comptage de mots en parallèle à l'aide de goroutines et de canaux (modèle fan-out / fan-in), conformément aux concepts de concurrence du chapitre 8 en Go.
 
 ## Fonctions implémentées
 
@@ -107,7 +107,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 
 | Résultat clé | Valeur |
 |--------------|--------|
-| Accélération optimale (taille segments) | 2.85× (segment 50 000 caract.) |
+| Accélération optimale (taille segments) | 2.85× (segment 50 000 caractères) |
 | Point de dégradation | < 1 000 caract. (surcharge d'ordonnancement) |
 | Allocations au point optimal | 34 |
 | Worker pool vs goroutine-par-segment | 4–5× plus rapide |
