@@ -32,13 +32,13 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 │   ├── workerpool-raw.txt           # Données brutes BenchmarkWorkerPool
 │   └── benchstat.txt                # Analyse statistique (benchstat)
 ├── docs/                           # Documentation technique
-│   └── calculs.md                   # Calculs détaillés (speedup, Amdahl, allocations)
+│   ├── TN5-Calculs.md               # Calculs détaillés (speedup, Amdahl, allocations)
+│   ├── TN5-AI-Prompts.md            # Prompts IA utilisés
+│   └── TN5-Homework-Instructions.md # Énoncé du travail
 ├── chart/                          # Générateur de graphique (module Go séparé)
 │   ├── go.mod                       # Module Go (chart)
 │   └── main.go                      # Générateur du graphique
 ├── TN5-report.md                   # Rapport d'analyse
-├── TN5-AI-Prompts.md               # Prompts IA utilisés
-├── TN5-Homework-Instructions.md    # Énoncé du travail
 └── README.md                       # Ce fichier
 ```
 
@@ -108,6 +108,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 ## Liens
 
 - [Rapport TN5](TN5-report.md)
-- [Calculs détaillés](docs/calculs.md)
-- [Prompts IA](TN5-AI-Prompts.md)
+- [Calculs détaillés](docs/TN5-Calculs.md)
+- [Prompts IA](docs/TN5-AI-Prompts.md)
+- [Énoncé du travail](docs/TN5-Homework-Instructions.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN5)
