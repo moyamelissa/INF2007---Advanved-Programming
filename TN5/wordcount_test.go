@@ -282,7 +282,56 @@ func TestCountWordsConcurrentN(t *testing.T) {
 	}
 }
 
-// BenchmarkWorkerCount mesure la performance en fonction du nombre de goroutines.
+// BenchmarkWorkerPool mesure la performance du worker pool réel en fonction
+// du nombre de workers, pour comparer avec BenchmarkWorkerCount.
+func BenchmarkWorkerPool(b *testing.B) {
+	workers := []struct {
+		name  string
+		count int
+	}{
+		{"1worker", 1},
+		{"2workers", 2},
+		{"4workers", 4},
+		{"8workers", 8},
+		{"16workers", 16},
+		{"32workers", 32},
+	}
+	for _, w := range workers {
+		b.Run(w.name, func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				CountWordsConcurrentPool(benchContent, w.count)
+			}
+		})
+	}
+}
+
+// TestCountWordsConcurrentPool vérifie que le worker pool retourne le bon
+// résultat pour différents nombres de workers et les cas limites.
+func TestCountWordsConcurrentPool(t *testing.T) {
+	content := "La programmation concurrente en Go repose sur les goroutines et les canaux pour une exécution efficace"
+	expected := len(strings.Fields(content))
+
+	for _, n := range []int{1, 2, 4, 8, 16} {
+		result := CountWordsConcurrentPool(content, n)
+		if result != expected {
+			t.Errorf("pool workers=%d : attendu %d mots, obtenu %d", n, expected, result)
+		}
+	}
+
+	// Contenu vide → 0
+	if CountWordsConcurrentPool("", 4) != 0 {
+		t.Error("pool : attendu 0 pour contenu vide")
+	}
+	// Zéro workers → 0
+	if CountWordsConcurrentPool("hello world", 0) != 0 {
+		t.Error("pool : attendu 0 pour 0 workers")
+	}
+	// Plus de workers que de segments → doit fonctionner
+	if CountWordsConcurrentPool("hi there", 100) != 2 {
+		t.Error("pool : attendu 2 mots pour 'hi there' avec 100 workers")
+	}
+}
 // Répond directement à la question de l'énoncé : "Est-ce que la performance
 // croît linéairement avec le nombre de goroutines ?"
 func BenchmarkWorkerCount(b *testing.B) {

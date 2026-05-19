@@ -64,9 +64,9 @@ segment), donc le travail par goroutine est trop court pour amortir le coût de
 création et d'orchestration. Ensuite, le canal partagé crée un point de contention
 à la collecte des résultats.
 
-La pression mémoire amplifie cette surcharge : les allocations passent de 1/op en
+La pression mémoire amplifie cette surcharge puisque les allocations passent de 1/op en
 séquentiel à 71 pour 32 workers et jusqu'à 2 700 pour des segments de 500
-caractères, car chaque goroutine alloue sa pile et son entrée sur le canal. Enfin,
+caractères, chaque goroutine allouant sa pile et son entrée sur le canal. Enfin,
 la loi d'Amdahl s'applique puisque la lecture du fichier, le découpage et la
 sommation finale restent séquentiels. Appliquée au speedup maximum observé (1.67×),
 elle indique qu'environ 40 % du travail est parallélisable et 60 % intrinsèquement

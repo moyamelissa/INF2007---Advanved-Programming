@@ -95,6 +95,52 @@ func CountWordsConcurrentN(content string, numWorkers int) int {
 	return CountWordsConcurrent(content, segmentSize)
 }
 
+// CountWordsConcurrentPool utilise un vrai worker pool : numWorkers goroutines
+// persistantes traitent les segments via un canal de jobs, ce qui évite de
+// recréer une goroutine par segment. Les workers lisent sur le canal jobs
+// jusqu'à sa fermeture, ce qui garantit que tous les segments sont traités
+// sans bloquer et sans condition de course.
+func CountWordsConcurrentPool(content string, numWorkers int) int {
+	if len(content) == 0 || numWorkers <= 0 {
+		return 0
+	}
+
+	// Taille de segment optimale d'après les benchmarks (50 000 chars)
+	segmentSize := 50_000
+	if segmentSize > len(content) {
+		segmentSize = len(content)
+	}
+	segments := splitIntoSegments(content, segmentSize)
+	if len(segments) == 0 {
+		return 0
+	}
+
+	jobs := make(chan string, len(segments))
+	results := make(chan int, len(segments))
+
+	// Lancer exactement numWorkers goroutines persistantes (le pool)
+	for w := 0; w < numWorkers; w++ {
+		go func() {
+			for seg := range jobs {
+				results <- countWords(seg)
+			}
+		}()
+	}
+
+	// Distribuer tous les segments dans le canal de jobs
+	for _, seg := range segments {
+		jobs <- seg
+	}
+	close(jobs) // Signale aux workers qu'il n'y a plus de travail
+
+	// Récupérer exactement len(segments) résultats
+	total := 0
+	for range segments {
+		total += <-results
+	}
+	return total
+}
+
 // run contient la logique principale du programme, extraite de main pour
 // permettre les tests unitaires. Elle retourne le nombre total de mots et une erreur.
 func run(args []string) (int, error) {
