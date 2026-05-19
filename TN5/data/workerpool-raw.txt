@@ -1,0 +1,42 @@
+goos: windows
+goarch: amd64
+pkg: wordcount
+cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+BenchmarkWorkerPool/1worker-8         	     430	   2994628 ns/op	 1664074 B/op	      23 allocs/op
+BenchmarkWorkerPool/1worker-8         	     370	   2858151 ns/op	 1664068 B/op	      23 allocs/op
+BenchmarkWorkerPool/1worker-8         	     404	   2887007 ns/op	 1664071 B/op	      23 allocs/op
+BenchmarkWorkerPool/1worker-8         	     438	   2556332 ns/op	 1664072 B/op	      23 allocs/op
+BenchmarkWorkerPool/1worker-8         	     411	   2869774 ns/op	 1664076 B/op	      23 allocs/op
+BenchmarkWorkerPool/1worker-8         	     458	   2830340 ns/op	 1664073 B/op	      23 allocs/op
+BenchmarkWorkerPool/2workers-8        	     626	   2113997 ns/op	 1664124 B/op	      24 allocs/op
+BenchmarkWorkerPool/2workers-8        	     573	   2191442 ns/op	 1664133 B/op	      24 allocs/op
+BenchmarkWorkerPool/2workers-8        	     466	   2189482 ns/op	 1664124 B/op	      24 allocs/op
+BenchmarkWorkerPool/2workers-8        	     594	   2042864 ns/op	 1664105 B/op	      24 allocs/op
+BenchmarkWorkerPool/2workers-8        	     630	   1974594 ns/op	 1664119 B/op	      24 allocs/op
+BenchmarkWorkerPool/2workers-8        	     597	   1907919 ns/op	 1664099 B/op	      24 allocs/op
+BenchmarkWorkerPool/4workers-8        	     681	   1825863 ns/op	 1664208 B/op	      26 allocs/op
+BenchmarkWorkerPool/4workers-8        	     724	   1701006 ns/op	 1664176 B/op	      26 allocs/op
+BenchmarkWorkerPool/4workers-8        	     714	   1670327 ns/op	 1664165 B/op	      26 allocs/op
+BenchmarkWorkerPool/4workers-8        	     729	   1762746 ns/op	 1664161 B/op	      26 allocs/op
+BenchmarkWorkerPool/4workers-8        	     706	   1707406 ns/op	 1664166 B/op	      26 allocs/op
+BenchmarkWorkerPool/4workers-8        	     717	   1701955 ns/op	 1664164 B/op	      26 allocs/op
+BenchmarkWorkerPool/8workers-8        	     760	   1515890 ns/op	 1664252 B/op	      30 allocs/op
+BenchmarkWorkerPool/8workers-8        	     769	   1515518 ns/op	 1664240 B/op	      30 allocs/op
+BenchmarkWorkerPool/8workers-8        	     804	   1573922 ns/op	 1664234 B/op	      30 allocs/op
+BenchmarkWorkerPool/8workers-8        	     873	   1605759 ns/op	 1664229 B/op	      30 allocs/op
+BenchmarkWorkerPool/8workers-8        	     702	   1701227 ns/op	 1664233 B/op	      30 allocs/op
+BenchmarkWorkerPool/8workers-8        	     681	   1868600 ns/op	 1664225 B/op	      30 allocs/op
+BenchmarkWorkerPool/16workers-8       	     711	   1603060 ns/op	 1664441 B/op	      38 allocs/op
+BenchmarkWorkerPool/16workers-8       	     813	   1448408 ns/op	 1664425 B/op	      38 allocs/op
+BenchmarkWorkerPool/16workers-8       	     784	   1467372 ns/op	 1664453 B/op	      38 allocs/op
+BenchmarkWorkerPool/16workers-8       	     831	   1493584 ns/op	 1664449 B/op	      38 allocs/op
+BenchmarkWorkerPool/16workers-8       	     787	   1459215 ns/op	 1664440 B/op	      38 allocs/op
+BenchmarkWorkerPool/16workers-8       	     799	   1458265 ns/op	 1664440 B/op	      38 allocs/op
+BenchmarkWorkerPool/32workers-8       	     828	   1673450 ns/op	 1664951 B/op	      55 allocs/op
+BenchmarkWorkerPool/32workers-8       	     756	   1518854 ns/op	 1664929 B/op	      55 allocs/op
+BenchmarkWorkerPool/32workers-8       	     817	   1565849 ns/op	 1664954 B/op	      55 allocs/op
+BenchmarkWorkerPool/32workers-8       	     764	   1506885 ns/op	 1664958 B/op	      55 allocs/op
+BenchmarkWorkerPool/32workers-8       	     777	   1530965 ns/op	 1664918 B/op	      55 allocs/op
+BenchmarkWorkerPool/32workers-8       	     802	   1535997 ns/op	 1664911 B/op	      54 allocs/op
+PASS
+ok  	wordcount	51.099s

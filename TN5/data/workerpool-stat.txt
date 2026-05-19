@@ -1,0 +1,33 @@
+goos: windows
+goarch: amd64
+pkg: wordcount
+cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
+                       │ data\workerpool-raw.txt │
+                       │         sec/op          │
+WorkerPool/1worker-8                2.864m ± 11%
+WorkerPool/2workers-8               2.078m ±  8%
+WorkerPool/4workers-8               1.705m ±  7%
+WorkerPool/8workers-8               1.590m ± 18%
+WorkerPool/16workers-8              1.463m ± 10%
+WorkerPool/32workers-8              1.533m ±  9%
+geomean                             1.819m
+
+                       │ data\workerpool-raw.txt │
+                       │          B/op           │
+WorkerPool/1worker-8                1.587Mi ± 0%
+WorkerPool/2workers-8               1.587Mi ± 0%
+WorkerPool/4workers-8               1.587Mi ± 0%
+WorkerPool/8workers-8               1.587Mi ± 0%
+WorkerPool/16workers-8              1.587Mi ± 0%
+WorkerPool/32workers-8              1.588Mi ± 0%
+geomean                             1.587Mi
+
+                       │ data\workerpool-raw.txt │
+                       │        allocs/op        │
+WorkerPool/1worker-8                  23.00 ± 0%
+WorkerPool/2workers-8                 24.00 ± 0%
+WorkerPool/4workers-8                 26.00 ± 0%
+WorkerPool/8workers-8                 30.00 ± 0%
+WorkerPool/16workers-8                38.00 ± 0%
+WorkerPool/32workers-8                55.00 ± 2%
+geomean                               31.07

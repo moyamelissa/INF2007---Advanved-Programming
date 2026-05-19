@@ -178,10 +178,9 @@ func run(args []string) (int, error) {
 var exitFunc = os.Exit
 
 func main() {
-	total, err := run(os.Args)
+	_, err := run(os.Args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Erreur : %v\n", err)
 		exitFunc(1)
 	}
-	_ = total
 }

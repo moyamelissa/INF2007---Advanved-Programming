@@ -20,6 +20,9 @@ import (
 var workerLabels = []string{"1", "2", "4", "8", "16", "32"}
 var workerActualMS = []float64{10.39, 9.021, 8.473, 6.926, 6.307, 6.208}
 
+// BenchmarkWorkerPool
+var poolActualMS = []float64{2.86, 2.08, 1.71, 1.59, 1.46, 1.53}
+
 // Palette mauve/violet (cohérente avec TN4)
 var (
 	colorActual   = color.RGBA{R: 106, G: 62, B: 160, A: 255}  // violet foncé (courbe principale)
@@ -199,4 +202,130 @@ func makeWorkerCountChart() {
 
 func main() {
 	makeWorkerCountChart()
+	makeWorkerPoolChart()
+}
+
+// makeWorkerPoolChart trace la comparaison Worker Pool vs goroutine-par-segment.
+func makeWorkerPoolChart() {
+	n := len(workerLabels)
+	xs := buildXS(n)
+
+	p := plot.New()
+	p.BackgroundColor = colorWhiteBg
+	p.X.Label.Text = "Nombre de workers"
+	p.X.Label.TextStyle.Font.Size = vg.Points(10)
+	p.Y.Label.Text = "Temps d'exécution (ms)"
+	p.Y.Label.TextStyle.Font.Size = vg.Points(10)
+
+	p.Y.Min = 0
+	p.Y.Max = 12
+	p.X.Min = -0.4
+	p.X.Max = float64(n-1) + 0.6
+
+	p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+		{Value: 0, Label: "0"}, {Value: 2, Label: "2"},
+		{Value: 4, Label: "4"}, {Value: 6, Label: "6"},
+		{Value: 8, Label: "8"}, {Value: 10, Label: "10"},
+		{Value: 12, Label: "12"},
+	})
+	p.X.Tick.Marker = plot.ConstantTicks(func() []plot.Tick {
+		ticks := make([]plot.Tick, n)
+		for i, lbl := range workerLabels {
+			ticks[i] = plot.Tick{Value: float64(i), Label: lbl}
+		}
+		return ticks
+	}())
+
+	// Zone translucide entre les deux courbes
+	poly, err := plotter.NewPolygon(fillBetween(xs, workerActualMS, poolActualMS))
+	if err != nil {
+		log.Fatal(err)
+	}
+	poly.Color = colorFill
+	poly.LineStyle.Width = 0
+	p.Add(poly)
+
+	// ── Courbe goroutine-par-segment (pointillé) ──
+	perSegLine, err := plotter.NewLine(xyPoints(xs, workerActualMS))
+	if err != nil {
+		log.Fatal(err)
+	}
+	perSegLine.Color = colorIdeal
+	perSegLine.Width = vg.Points(2)
+	perSegLine.Dashes = []vg.Length{vg.Points(6), vg.Points(3)}
+
+	perSegScatter, err := plotter.NewScatter(xyPoints(xs, workerActualMS))
+	if err != nil {
+		log.Fatal(err)
+	}
+	perSegScatter.GlyphStyle = draw.GlyphStyle{
+		Color:  colorIdeal,
+		Radius: vg.Points(3.5),
+		Shape:  draw.SquareGlyph{},
+	}
+
+	// ── Courbe worker pool (pleine) ──
+	poolLine, err := plotter.NewLine(xyPoints(xs, poolActualMS))
+	if err != nil {
+		log.Fatal(err)
+	}
+	poolLine.Color = colorActual
+	poolLine.Width = vg.Points(2.5)
+
+	poolScatter, err := plotter.NewScatter(xyPoints(xs, poolActualMS))
+	if err != nil {
+		log.Fatal(err)
+	}
+	poolScatter.GlyphStyle = draw.GlyphStyle{
+		Color:  color.White,
+		Radius: vg.Points(4),
+		Shape:  draw.CircleGlyph{},
+	}
+	poolScatterFill, err := plotter.NewScatter(xyPoints(xs, poolActualMS))
+	if err != nil {
+		log.Fatal(err)
+	}
+	poolScatterFill.GlyphStyle = draw.GlyphStyle{
+		Color:  colorActual,
+		Radius: vg.Points(3),
+		Shape:  draw.CircleGlyph{},
+	}
+
+	p.Add(perSegLine, perSegScatter,
+		poolLine, poolScatter, poolScatterFill)
+
+	p.Legend.Add("Worker pool", poolLine, poolScatterFill)
+	p.Legend.Add("Goroutine-par-segment", perSegLine, perSegScatter)
+	p.Legend.Top = true
+	p.Legend.Left = true
+	p.Legend.Padding = vg.Points(4)
+
+	// Labels valeur finale
+	poolEndLabel, err := plotter.NewLabels(plotter.XYLabels{
+		XYs:    plotter.XYs{{X: float64(n-1) + 0.12, Y: poolActualMS[n-1] + 0.45}},
+		Labels: []string{fmt.Sprintf("%.2f ms", poolActualMS[n-1])},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	poolEndLabel.TextStyle[0].Color = colorActual
+	poolEndLabel.TextStyle[0].Font.Size = vg.Points(8.5)
+	p.Add(poolEndLabel)
+
+	perSegEndLabel, err := plotter.NewLabels(plotter.XYLabels{
+		XYs:    plotter.XYs{{X: float64(n-1) + 0.12, Y: workerActualMS[n-1] + 0.45}},
+		Labels: []string{fmt.Sprintf("%.2f ms", workerActualMS[n-1])},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	perSegEndLabel.TextStyle[0].Color = colorIdeal
+	perSegEndLabel.TextStyle[0].Font.Size = vg.Points(8.5)
+	p.Add(perSegEndLabel)
+
+	out := "../data/worker-pool-chart.png"
+	if err := p.Save(28*vg.Centimeter, 15*vg.Centimeter, out); err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Graphique sauvegardé : %s", out)
 }
