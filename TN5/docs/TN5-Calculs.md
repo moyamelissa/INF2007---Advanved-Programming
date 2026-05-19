@@ -118,7 +118,7 @@ S                         ≈ 0.477 ≈ 48 %
 
 48 % du travail est séquentiel, 52 % est parallélisable.
 
-Le worker pool parallélise davantage (52 % contre 40 %) car il supprime la
+Le worker pool parallélise davantage (52 % contre 40 %), car il supprime la
 recréation de goroutines à chaque appel, réduisant la part séquentielle de
 l'orchestration.
 
