@@ -6,38 +6,64 @@
 
 ## 1. Architecture concurrente
 
-Le programme divise le contenu du fichier en segments de taille paramétrable
-via `splitIntoSegments`, qui décale chaque coupure vers le prochain espace pour
-ne jamais couper un mot. Une goroutine est lancée par segment avec
-`go countWordsInSegment`, et chaque goroutine envoie son résultat partiel sur
-un canal partagé (`chan int`).
+Le point de départ est une contrainte de l'énoncé : un segment découpé à
+exactement N caractères risque de couper un mot en deux, faussant le compte.
+Pour éviter ce problème, `splitIntoSegments` avance la coupure caractère par
+caractère jusqu'au prochain espace blanc, garantissant que chaque segment
+contient des mots complets. Cette décision architecturale est préalable à toute
+concurrence, car elle assure que chaque goroutine peut compter ses mots de façon
+totalement indépendante sans coordination.
 
-La correction de l'exécution concurrente repose sur trois mécanismes. D'abord,
-aucune variable n'est partagée entre les goroutines. Chaque goroutine calcule
-son total local dans une variable de pile, puis l'envoie sur le canal, ce qui
-élimine toute condition de course sans mutex. Ensuite, le canal est en mémoire
-tampon avec une capacité égale au nombre de segments, donc tous les envois
-aboutissent sans blocage. Enfin, la boucle `for range segments` dans la goroutine
-principale consomme exactement N résultats avant de retourner, ce qui garantit
-que toutes les goroutines ont terminé avant la sommation finale. L'addition
-étant commutative, l'ordre d'arrivée n'affecte pas le résultat.
+Une fois les segments établis, une goroutine est lancée par segment avec
+`go countWordsInSegment`. Chaque goroutine calcule un total local dans une
+variable de pile, puis envoie ce résultat sur un canal partagé (`chan int`).
+La goroutine principale collecte ensuite tous les résultats et les somme.
 
-## 2. Résultats des benchmarks
+Trois propriétés du canal et du programme garantissent l'exactitude du résultat
+sans recourir à un mutex. Premièrement, aucune variable n'est partagée entre
+les goroutines : chaque goroutine opère sur son propre segment et n'écrit que
+sur le canal, ce qui élimine toute condition de course. Deuxièmement, le canal
+est en mémoire tampon avec une capacité égale au nombre de segments, de sorte
+que chaque envoi aboutit immédiatement sans bloquer la goroutine expéditrice,
+quelle que soit la vitesse de la goroutine principale. Troisièmement, la boucle
+`for range segments` consomme exactement N résultats avant de retourner, ce qui
+constitue une synchronisation implicite : la goroutine principale ne peut pas
+terminer avant que toutes les goroutines aient envoyé leur résultat. L'addition
+étant commutative, l'ordre d'arrivée des résultats n'affecte pas le total final.
 
-Mesures sur un Intel i5-10300H à 2,50 GHz (4 cœurs physiques et 8 threads
-logiques, Windows/amd64), contenu de 100 000 mots (~700 000 caractères),
-6 exécutions analysées avec `benchstat`.
+## 2. Démarche de mesure et résultats
 
-**Tableau 1 – Temps selon la taille des segments**
+Pour mesurer la performance, deux questions guident l'exploration. Comment la
+performance évolue-t-elle en fonction de la taille des segments ? Et le gain
+croît-il linéairement avec le nombre de goroutines ?
+
+Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
+physiques et 8 threads logiques, Windows/amd64) avec un contenu de test de
+100 000 mots (~700 000 caractères). Chaque configuration a été exécutée 6 fois
+avec `go test -bench=. -count=6` et analysée avec `benchstat` pour obtenir la
+médiane et l'intervalle de confiance à 95 %. Le contenu de test est pré-généré
+comme variable de paquet, hors de la boucle `b.N`, ce qui exclut l'initialisation
+du temps mesuré conformément aux recommandations du chapitre 6.
+
+**Tableau 1 – Temps selon la taille des segments (CountWordsConcurrent)**
 
 | Segment | 500 | 1 000 | 5 000 | 10 000 | 50 000 | 100 000 | Tout |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Temps (ms) | 8.87 | 2.84 | 4.84 | 4.85 | **1.78** | 1.97 | 4.09 |
 
-Le séquentiel prend 5.08 ms. L'optimum concurrent est à 50 000 caractères
-(1.78 ms, soit 2.85× plus rapide). Avec des segments de 500 caractères
-(~1 200 goroutines), la surcharge d'ordonnancement dépasse le bénéfice du
-parallélisme.
+Le résultat révèle un comportement en U. Avec des segments trop petits (500
+caractères, ~1 200 goroutines), le coût de création et d'ordonnancement des
+goroutines dépasse le bénéfice du parallélisme et la performance devient pire
+que le séquentiel (5.08 ms). À 50 000 caractères, on obtient l'optimum à 1.78 ms,
+soit un gain de 2.85× sur le séquentiel. Au-delà, les segments deviennent si
+grands que le parallélisme disparaît et on retrouve un comportement quasi-séquentiel.
+
+## 3. Analyse de la linéarité et worker pool
+
+Pour répondre à la question de la linéarité, `CountWordsConcurrentN` contrôle
+directement le nombre de goroutines en calculant une taille de segment
+proportionnelle. Cela permet d'isoler l'effet du nombre de goroutines
+indépendamment de la taille des segments.
 
 **Tableau 2 – Temps selon le nombre de goroutines (CountWordsConcurrentN)**
 
@@ -46,19 +72,27 @@ parallélisme.
 | Temps (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Accélération | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
 
-## 3. Analyse de la linéarité et worker pool
+La progression est clairement sous-linéaire. Sur 4 cœurs physiques, l'accélération
+plafonne à 1.67× au lieu des 4× théoriques. L'explication tient à la nature du
+travail : `strings.Fields` effectue un seul balayage linéaire très rapide, si
+bien que le temps de calcul par goroutine est trop court pour amortir les coûts
+fixes de création, d'ordonnancement et de synchronisation via le canal. En
+appliquant la loi d'Amdahl au speedup maximum observé (1.67×), on déduit que
+seulement 40 % du travail est parallélisable et 60 % est séquentiel de façon
+inhérente (lecture du fichier, découpage, sommation finale).
 
-La performance ne croît pas linéairement. Sur 4 cœurs physiques, l'accélération
-atteint 1.67× au lieu des 4× théoriques et plafonne dès 16 workers. D'abord,
-`strings.Fields` est trop rapide par goroutine pour amortir le coût de création
-et d'orchestration. Ensuite, le canal partagé crée un point de contention.
-Enfin, la loi d'Amdahl s'applique car la lecture, le découpage et la sommation
-finale restent séquentiels. Appliquée au speedup maximum (1.67×), elle indique
-que 40 % du travail est parallélisable et 60 % est intrinsèquement séquentiel.
+Face à ce constat, une deuxième approche a été explorée. Plutôt que de créer
+une nouvelle goroutine par segment à chaque appel, `CountWordsConcurrentPool`
+maintient un pool fixe de `numWorkers` goroutines persistantes qui lisent les
+segments depuis un canal de jobs (`for seg := range jobs`). La fermeture du
+canal avec `close(jobs)` signale proprement la fin du travail, et chaque worker
+envoie son résultat sur un canal distinct. Cette architecture élimine la
+recréation répétée des goroutines et fixe la taille des segments à 50 000
+caractères, l'optimum identifié au Tableau 1.
 
-Pour améliorer la linéarité, `CountWordsConcurrentPool` remplace la création
-d'une goroutine par segment par un pool de `numWorkers` goroutines persistantes
-qui traitent les segments via un canal de jobs.
+**Graphique 1 – Worker pool vs goroutine-par-segment selon le nombre de workers**
+
+![Graphique 1](data/worker-pool-chart.png)
 
 **Tableau 3 – Worker pool vs goroutine-par-segment**
 
@@ -68,13 +102,18 @@ qui traitent les segments via un canal de jobs.
 | Par-segment (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Gain pool | 3.6× | 4.3× | 5.0× | 4.4× | 4.3× | 4.1× |
 
-Le pool est 4 à 5× plus rapide car il fixe la taille des segments à 50 000
-caractères, évitant la surcharge de l'approche naïve. Le plateau dès 16 workers
-persiste car la bande passante mémoire reste le vrai goulot d'étranglement.
-En appliquant Amdahl au pool (speedup max 1.96×), 52 % du travail devient
-parallélisable contre 40 % pour l'approche naïve.
+Le pool est 4 à 5× plus rapide que l'approche par segment à nombre de workers
+égal. La différence vient du fait que `CountWordsConcurrentN` avec 1 worker
+produit un seul segment de 700 000 caractères, comportement quasi-séquentiel,
+tandis que le pool fixe toujours la taille à 50 000 caractères, soit ~14
+segments distribués au worker unique. Le pool améliore également la fraction
+parallélisable : en appliquant Amdahl au speedup max du pool (1.96× de 1 à 16
+workers), on obtient 52 % de travail parallélisable contre 40 % pour l'approche
+naïve. Le plateau dès 16 workers persiste néanmoins, car la bande passante
+mémoire et la contention sur le canal de résultats constituent un plafond
+indépendant de la stratégie de création des goroutines.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
 - Documentation Go : https://pkg.go.dev/sync, https://pkg.go.dev/testing
-- Calculs détaillés : docs/TN5-Calculs.md
+- Calculs détaillés : docs/TN5-Calculs.md 
