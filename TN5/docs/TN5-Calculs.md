@@ -72,59 +72,7 @@ de 700 000 chars quand `numWorkers = 1`.
 
 ---
 
-## 3. Application de la loi d'Amdahl
-
-### Formule
-
-```
-Speedup(N) = 1 / (S + (1 - S) / N)
-
-où  S = fraction séquentielle du programme
-    N = nombre de goroutines
-```
-
-Pour trouver S, on résout l'équation à partir du speedup maximum observé.
-
-### Fraction séquentielle pour CountWordsConcurrentN
-
-Speedup maximum observé : passage de 10.39 ms (1 worker) à 6.21 ms (32 workers).
-
-```
-Speedup = 10.39 / 6.21 = 1.67×
-
-1.67 = 1 / (S + (1 - S) / 32)
-1.67 × (S + (1 - S) / 32) = 1
-1.67S + 1.67(1 - S) / 32 = 1
-1.67S + 0.0522 - 0.0522S  = 1
-1.618S                     = 0.948
-S                         ≈ 0.586 ≈ 60 %
-```
-
-60 % du travail est séquentiel, seulement 40 % est parallélisable.
-
-### Fraction séquentielle pour CountWordsConcurrentPool
-
-Speedup maximum observé : passage de 2.864 ms (1 worker) à 1.463 ms (16 workers).
-
-```
-Speedup = 2.864 / 1.463 = 1.96×
-
-1.96 = 1 / (S + (1 - S) / 16)
-1.96 × (S + (1 - S) / 16) = 1
-1.96S + 0.1225 - 0.1225S  = 1
-1.8375S                    = 0.8775
-S                         ≈ 0.477 ≈ 48 %
-```
-
-48 % du travail est séquentiel, 52 % est parallélisable.
-
-Le worker pool parallélise davantage (52 % contre 40 %), car il supprime la
-recréation de goroutines à chaque appel, réduisant la part séquentielle de
-l'orchestration.
-
----
-
-## 4. Calcul du point de dégradation
+## 3. Calcul du point de dégradation
 
 ### Pourquoi 500 chars est pire que le séquentiel
 
@@ -167,7 +115,7 @@ Rapport signal/bruit  : 3.6 / 3 ≈ 1.2×  → pas rentable
 
 ---
 
-## 5. Évolution des allocations mémoire
+## 4. Évolution des allocations mémoire
 
 ### CountWordsConcurrentN
 

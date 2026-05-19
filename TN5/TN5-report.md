@@ -67,10 +67,9 @@ proportionnelle.
 La progression est clairement sous-linéaire. Sur 4 cœurs physiques, l'accélération
 plafonne à 1.67× au lieu des 4× théoriques : `strings.Fields` effectue un seul balayage linéaire très rapide, si
 bien que le temps de calcul par goroutine est trop court pour amortir les coûts
-fixes de création, d'ordonnancement et de synchronisation via le canal. En
-appliquant la loi d'Amdahl à l'accélération maximale observée (1.67×), on déduit que
-seulement 40 % du travail est parallélisable et 60 % reste séquentiel de façon
-inhérente.
+fixes de création, d'ordonnancement et de synchronisation via le canal. La lecture du fichier,
+le découpage et la synchronisation constituent une part séquentielle incompressible qui
+plafonne l'accélération quelle que soit le nombre de goroutines.
 
 Face à ce constat, `CountWordsConcurrentPool` adopte une approche différente. Plutôt que de créer
 une nouvelle goroutine par segment à chaque appel, cette fonction
@@ -93,10 +92,8 @@ Le pool est 4 à 5× plus rapide que l'approche par segment à nombre de workers
 égal. La différence vient du fait que `CountWordsConcurrentN` avec 1 worker
 produit un seul segment de 700 000 caractères, ce qui crée un comportement quasi-séquentiel,
 tandis que le pool fixe toujours la taille à 50 000 caractères, soit environ
-14 segments distribués au worker unique. Le pool améliore également la fraction
-parallélisable. En appliquant Amdahl à l'accélération maximale du pool (1.96× de 1 à
-16 workers), on obtient 52 % de travail parallélisable contre 40 % pour
-l'approche naïve. Le plateau dès 16 workers persiste, la bande passante mémoire constituant un plafond indépendant de la stratégie choisie.
+14 segments distribués au worker unique. Le pool atteint 1.96× d'accélération de 1 à 16 workers, contre 1.67× pour l'approche naïve,
+car la réutilisation des goroutines réduit la part séquentielle d'orchestration. Le plateau dès 16 workers persiste, la bande passante mémoire constituant un plafond indépendant de la stratégie choisie.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.

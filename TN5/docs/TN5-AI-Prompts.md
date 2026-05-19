@@ -23,7 +23,7 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 ## Benchmarks et performance
 
 - « Pourquoi un segment de 10 caractères (environ 100 000 goroutines) est-il plus lent que le séquentiel ? »
-- « Comment expliquer que l'accélération plafonne à 1.67× au lieu des 4× théoriques sur 4 cœurs ? La loi d'Amdahl s'applique-t-elle ici ? »
+
 - « La performance devrait-elle croître linéairement avec le nombre de goroutines ? »
 
 ## Tests

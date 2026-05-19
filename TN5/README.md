@@ -32,7 +32,7 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 │   ├── workerpool-raw.txt           # Données brutes BenchmarkWorkerPool
 │   └── benchstat.txt                # Analyse statistique (benchstat)
 ├── docs/                           # Documentation technique
-│   ├── TN5-Calculs.md               # Calculs détaillés (speedup, Amdahl, allocations)
+│   ├── TN5-Calculs.md               # Calculs détaillés (accélération, point de dégradation, allocations)
 │   ├── TN5-AI-Prompts.md            # Prompts IA utilisés
 │   └── TN5-Homework-Instructions.md # Énoncé du travail
 ├── chart/                          # Générateur de graphique (module Go séparé)
