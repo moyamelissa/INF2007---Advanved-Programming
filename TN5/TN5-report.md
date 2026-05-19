@@ -28,10 +28,6 @@ Mesures sur un Intel i5-10300H à 2,50 GHz (4 cœurs physiques et 8 threads
 logiques, Windows/amd64), contenu de 100 000 mots (~700 000 caractères),
 6 exécutions analysées avec `benchstat`.
 
-**Graphique 1 – Passage à l'échelle réel vs linéaire idéal (CountWordsConcurrentN)**
-
-![Graphique 1](data/worker-count-chart.png)
-
 **Tableau 1 – Temps selon la taille des segments**
 
 | Segment | 500 | 1 000 | 5 000 | 10 000 | 50 000 | 100 000 | Tout |
@@ -53,21 +49,16 @@ parallélisme.
 ## 3. Analyse de la linéarité et worker pool
 
 La performance ne croît pas linéairement. Sur 4 cœurs physiques, l'accélération
-atteint 1.67× au lieu des 4× théoriques et plafonne dès 16 workers. Trois
-facteurs expliquent cet écart. D'abord, `strings.Fields` est trop rapide par
-goroutine pour amortir le coût de création et d'orchestration. Ensuite, le canal
-partagé crée un point de contention. Enfin, la loi d'Amdahl s'applique car la
-lecture, le découpage et la sommation finale restent séquentiels. Appliquée au
-speedup maximum (1.67×), elle indique que 40 % du travail est parallélisable et
-60 % est intrinsèquement séquentiel.
+atteint 1.67× au lieu des 4× théoriques et plafonne dès 16 workers. D'abord,
+`strings.Fields` est trop rapide par goroutine pour amortir le coût de création
+et d'orchestration. Ensuite, le canal partagé crée un point de contention.
+Enfin, la loi d'Amdahl s'applique car la lecture, le découpage et la sommation
+finale restent séquentiels. Appliquée au speedup maximum (1.67×), elle indique
+que 40 % du travail est parallélisable et 60 % est intrinsèquement séquentiel.
 
 Pour améliorer la linéarité, `CountWordsConcurrentPool` remplace la création
 d'une goroutine par segment par un pool de `numWorkers` goroutines persistantes
 qui traitent les segments via un canal de jobs.
-
-**Graphique 2 – Worker pool vs goroutine-par-segment**
-
-![Graphique 2](data/worker-pool-chart.png)
 
 **Tableau 3 – Worker pool vs goroutine-par-segment**
 
@@ -78,9 +69,8 @@ qui traitent les segments via un canal de jobs.
 | Gain pool | 3.6× | 4.3× | 5.0× | 4.4× | 4.3× | 4.1× |
 
 Le pool est 4 à 5× plus rapide car il fixe la taille des segments à 50 000
-caractères (optimum du Tableau 1), évitant la surcharge de l'approche naïve.
-Le plateau dès 16 workers persiste car la bande passante mémoire reste le vrai
-goulot d'étranglement, indépendamment de la stratégie de création des goroutines.
+caractères, évitant la surcharge de l'approche naïve. Le plateau dès 16 workers
+persiste car la bande passante mémoire reste le vrai goulot d'étranglement.
 En appliquant Amdahl au pool (speedup max 1.96×), 52 % du travail devient
 parallélisable contre 40 % pour l'approche naïve.
 
