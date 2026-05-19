@@ -73,22 +73,11 @@ elle indique qu'environ 40 % du travail est parallélisable et 60 % intrinsèque
 séquentiel. Pour cette charge de travail, le segment optimal reste 50 000 caractères, qui
 équilibre parallélisme et surcharge.
 
-## 4. Worker pool vs goroutine-par-segment
+Pour tenter d'améliorer la linéarité, `CountWordsConcurrentPool` a été implémenté :
+un pool fixe de `numWorkers` goroutines persistantes piochent dans un canal de jobs,
+éliminant la recréation de goroutines à chaque appel.
 
-`CountWordsConcurrentPool` remplace la création d'une goroutine par segment par
-un pool fixe de `numWorkers` goroutines persistantes qui piochent dans un canal
-de jobs. Cela élimine la surcharge de création à chaque appel et réduit la
-contention sur le planificateur Go.
-
-**Graphique 2 – Worker Pool vs goroutine-par-segment selon le nombre de workers**
-
-![Graphique 2 – Worker Pool vs goroutine-par-segment](data/worker-pool-chart.png)
-
-La zone violette mesure l'écart de performance entre les deux approches. Le worker
-pool (courbe pleine, basse) est systématiquement plus rapide que l'approche
-goroutine-par-segment (pointillé, haute) sur toute la plage de workers testée.
-
-**Tableau 3 – Comparaison Worker Pool vs goroutine-par-segment (`CountWordsConcurrentN`)**
+**Tableau 3 – Worker pool vs goroutine-par-segment**
 
 | Workers | 1 | 2 | 4 | 8 | 16 | 32 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -96,13 +85,11 @@ goroutine-par-segment (pointillé, haute) sur toute la plage de workers testée.
 | Par-segment (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Gain Pool | 3.6× | 4.3× | 5.0× | 4.4× | 4.3× | 4.1× |
 
-Le pool est systématiquement **4 à 5× plus rapide** que l'approche goroutine-par-segment.
-L'explication principale est la taille des segments : le pool utilise des segments de
-50 000 caractères (optimum mesuré au Tableau 1), tandis que `CountWordsConcurrentN`
-découpe le contenu en `numWorkers` segments de taille variable qui peuvent être
-beaucoup plus petits et générer une surcharge d'ordonnancement importante.
-Le pool atteint également un plateau rapide dès 16 workers, confirmant la limite imposée
-par les 4 cœurs physiques de la machine de test.
+![Graphique 2 – Worker Pool vs goroutine-par-segment](data/worker-pool-chart.png)
+
+Le pool est **4 à 5× plus rapide** grâce aux segments de 50 000 caractères (optimum du
+Tableau 1), mais le plateau persiste dès 16 workers : la limite reste la bande passante
+mémoire, non le planificateur.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
