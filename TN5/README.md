@@ -42,6 +42,14 @@ Ce projet compte les mots d'un fichier texte en utilisant des goroutines et des 
 └── README.md                       # Ce fichier
 ```
 
+## Formatage du code
+
+Le code source a été formaté avec `gofmt` avant la remise :
+
+```bash
+gofmt -w wordcount.go wordcount_test.go
+```
+
 ## Prérequis
 
 - Go 1.26.1
