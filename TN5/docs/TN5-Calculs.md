@@ -195,8 +195,8 @@ workers, ce qui confirme que chaque goroutine est recréée à chaque appel.
 | 16      | 38        | +15                           |
 | 32      | 55        | +32                           |
 
-Le pool alloue davantage au départ (23 contre 4) car il crée les canaux
+Le pool alloue davantage au départ (23 contre 4), car il crée les canaux
 `jobs` et `results` ainsi que les ~14 entrées de segments dès le lancement.
 En revanche, la croissance avec le nombre de workers est beaucoup plus faible
-(+32 pour passer de 1 à 32 workers, contre +67 pour `CountWordsConcurrentN`)
-car le nombre de segments reste fixe.
+(+32 pour passer de 1 à 32 workers, contre +67 pour `CountWordsConcurrentN`),
+puisque le nombre de segments reste fixe.
