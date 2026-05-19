@@ -6,7 +6,7 @@
 
 ## 1. Architecture concurrente
 
-Le point de départ est une contrainte de l'énoncé : un segment découpé à
+Le point de départ est une contrainte de l'énoncé, car un segment découpé à
 exactement N caractères risque de couper un mot en deux, faussant le compte.
 Pour éviter ce problème, `splitIntoSegments` avance la coupure caractère par
 caractère jusqu'au prochain espace blanc, garantissant que chaque segment
@@ -21,7 +21,7 @@ La goroutine principale collecte ensuite tous les résultats et les somme.
 
 Trois propriétés du canal et du programme garantissent l'exactitude du résultat
 sans recourir à un mutex. Premièrement, aucune variable n'est partagée entre
-les goroutines : chaque goroutine opère sur son propre segment et n'écrit que
+les goroutines, puisque chaque goroutine opère sur son propre segment et n'écrit que
 sur le canal, ce qui élimine toute condition de course. Deuxièmement, le canal
 est en mémoire tampon avec une capacité égale au nombre de segments, de sorte
 que chaque envoi aboutit immédiatement sans bloquer la goroutine expéditrice,
