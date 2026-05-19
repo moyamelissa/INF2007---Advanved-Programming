@@ -24,8 +24,9 @@ est en mémoire tampon avec une capacité égale au nombre de segments, de sorte
 que chaque envoi aboutit immédiatement sans bloquer la goroutine expéditrice,
 quelle que soit la vitesse de la goroutine principale. Troisièmement, la boucle
 `for range segments` consomme exactement N résultats avant de retourner, ce qui
-constitue une synchronisation implicite. L'addition
+constitue un mécanisme de synchronisation implicite entre les goroutines. L'addition
 étant commutative, l'ordre d'arrivée des résultats n'affecte pas le total final.
+Ce comportement correspond au modèle de Go basé sur la communication entre goroutines via des canaux pour assurer une exécution concurrente correcte.
 
 ## 2. Démarche de mesure et résultats
 
@@ -68,8 +69,7 @@ La progression est clairement sous-linéaire. Sur 4 cœurs physiques, l'accélé
 plafonne à 1.67× au lieu des 4× théoriques : `strings.Fields` effectue un seul balayage linéaire très rapide, si
 bien que le temps de calcul par goroutine est trop court pour amortir les coûts
 fixes de création, d'ordonnancement et de synchronisation via le canal. La lecture du fichier,
-le découpage et la synchronisation constituent une part séquentielle incompressible qui
-plafonne l'accélération quelle que soit le nombre de goroutines.
+le découpage et la synchronisation constituent une part séquentielle incompressible limitant l'accélération.
 
 Face à ce constat, `CountWordsConcurrentPool` adopte une approche différente. Plutôt que de créer
 une nouvelle goroutine par segment à chaque appel, cette fonction
@@ -94,6 +94,8 @@ produit un seul segment de 700 000 caractères, ce qui crée un comportement qua
 tandis que le pool fixe toujours la taille à 50 000 caractères, soit environ
 14 segments distribués au worker unique. Le pool atteint 1.96× d'accélération de 1 à 16 workers, contre 1.67× pour l'approche naïve,
 car la réutilisation des goroutines réduit la part séquentielle d'orchestration. Le plateau dès 16 workers persiste, la bande passante mémoire constituant un plafond indépendant de la stratégie choisie.
+
+En définitive, le modèle de concurrence de Go, basé sur des goroutines légères et des canaux, permet d’atteindre une accélération réelle sur du matériel multicœur, à condition d’adapter la granularité des tâches et de réutiliser les goroutines afin de minimiser les coûts fixes d’orchestration.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
