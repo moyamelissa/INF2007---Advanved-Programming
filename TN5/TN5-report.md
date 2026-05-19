@@ -33,10 +33,6 @@ terminer avant que toutes les goroutines aient envoyé leur résultat. L'additio
 
 ## 2. Démarche de mesure et résultats
 
-Pour mesurer la performance, deux questions guident l'exploration. Comment la
-performance évolue-t-elle en fonction de la taille des segments, et le gain
-croît-il linéairement avec le nombre de goroutines ?
-
 Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
 physiques et 8 threads logiques, Windows/amd64) avec un contenu de test de
 100 000 mots (~700 000 caractères). Chaque configuration a été exécutée 6 fois
@@ -88,16 +84,9 @@ une nouvelle goroutine par segment à chaque appel, `CountWordsConcurrentPool`
 maintient un pool fixe de `numWorkers` goroutines persistantes qui lisent les
 segments depuis un canal de jobs via `for seg := range jobs`. La fermeture du
 canal avec `close(jobs)` signale proprement la fin du travail à tous les workers
-simultanément, sans coordination explicite supplémentaire. L'utilisation de deux
-canaux séparés — un pour distribuer les segments aux workers et un pour collecter
-les comptes — reflète le principe selon lequel les canaux servent à la fois à la
-communication et à la synchronisation entre goroutines. Cette architecture élimine
+simultanément, sans coordination explicite supplémentaire. Cette architecture élimine
 la recréation répétée des goroutines et fixe la taille des segments à 50 000
 caractères, soit l'optimum identifié au Tableau 1.
-
-**Graphique 1 – Worker pool vs goroutine-par-segment selon le nombre de workers**
-
-![Graphique 1](data/worker-pool-chart.png)
 
 **Tableau 3 – Worker pool vs goroutine-par-segment**
 
@@ -106,6 +95,10 @@ caractères, soit l'optimum identifié au Tableau 1.
 | Pool (ms) | 2.86 | 2.08 | 1.71 | 1.59 | **1.46** | 1.53 |
 | Par-segment (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Gain pool | 3.6× | 4.3× | 5.0× | 4.4× | 4.3× | 4.1× |
+
+**Graphique 1 – Worker pool vs goroutine-par-segment selon le nombre de workers**
+
+![Graphique 1](data/worker-pool-chart.png)
 
 Le pool est 4 à 5× plus rapide que l'approche par segment à nombre de workers
 égal. La différence vient du fait que `CountWordsConcurrentN` avec 1 worker
