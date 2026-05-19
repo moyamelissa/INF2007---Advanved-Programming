@@ -17,7 +17,7 @@ func countWords(text string) int {
 // en s'assurant de ne pas couper au milieu d'un mot. Chaque coupure est décalée
 // vers l'espace le plus proche à droite de la position segmentSize.
 func splitIntoSegments(content string, segmentSize int) []string {
-	if len(content) == 0 {
+	if content == "" {
 		return nil
 	}
 	if segmentSize <= 0 {
@@ -85,7 +85,7 @@ func CountWordsConcurrent(content string, segmentSize int) int {
 // CountWordsConcurrent, le nombre de goroutines est contrôlé directement, ce
 // qui permet de mesurer la linéarité du gain de performance.
 func CountWordsConcurrentN(content string, numWorkers int) int {
-	if len(content) == 0 || numWorkers <= 0 {
+	if content == "" || numWorkers <= 0 {
 		return 0
 	}
 	segmentSize := len(content) / numWorkers
@@ -101,7 +101,7 @@ func CountWordsConcurrentN(content string, numWorkers int) int {
 // jusqu'à sa fermeture, ce qui garantit que tous les segments sont traités
 // sans bloquer et sans condition de course.
 func CountWordsConcurrentPool(content string, numWorkers int) int {
-	if len(content) == 0 || numWorkers <= 0 {
+	if content == "" || numWorkers <= 0 {
 		return 0
 	}
 
