@@ -73,9 +73,9 @@ elle indique qu'environ 40 % du travail est parallélisable et 60 % intrinsèque
 séquentiel. Pour cette charge de travail, le segment optimal reste 50 000 caractères, qui
 équilibre parallélisme et surcharge.
 
-Pour tenter d'améliorer la linéarité, `CountWordsConcurrentPool` a été implémenté :
-un pool fixe de `numWorkers` goroutines persistantes piochent dans un canal de jobs,
-éliminant la recréation de goroutines à chaque appel.
+Pour tenter d'améliorer la linéarité, `CountWordsConcurrentPool` remplace la création
+d'une goroutine par segment par un pool fixe de `numWorkers` goroutines persistantes
+qui piochent dans un canal de jobs, éliminant ainsi la recréation à chaque appel.
 
 **Tableau 3 – Worker pool vs goroutine-par-segment**
 
@@ -85,11 +85,10 @@ un pool fixe de `numWorkers` goroutines persistantes piochent dans un canal de j
 | Par-segment (ms) | 10.39 | 9.02 | 8.47 | 6.93 | 6.31 | 6.21 |
 | Gain Pool | 3.6× | 4.3× | 5.0× | 4.4× | 4.3× | 4.1× |
 
-![Graphique 2 – Worker Pool vs goroutine-par-segment](data/worker-pool-chart.png)
-
-Le pool est **4 à 5× plus rapide** grâce aux segments de 50 000 caractères (optimum du
-Tableau 1), mais le plateau persiste dès 16 workers : la limite reste la bande passante
-mémoire, non le planificateur.
+Le pool est **4 à 5× plus rapide** car il fixe la taille des segments à 50 000 caractères
+(optimum du Tableau 1), évitant la surcharge d'ordonnancement de l'approche naïve.
+Cependant, le plateau dès 16 workers persiste : le vrai goulot d'étranglement est la
+bande passante mémoire, indépendamment de la stratégie de création des goroutines.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
