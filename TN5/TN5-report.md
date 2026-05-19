@@ -101,4 +101,6 @@ l'approche naïve. Le plateau dès 16 workers persiste, la bande passante mémoi
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
 - Documentation Go : https://pkg.go.dev/sync, https://pkg.go.dev/testing
-- Calculs détaillés : docs/TN5-Calculs.md
+- Calculs détaillés : [docs/TN5-Calculs.md](docs/TN5-Calculs.md)
+- Prompts IA utilisés : [docs/TN5-AI-Prompts.md](docs/TN5-AI-Prompts.md)
+- Données brutes des benchmarks : [data/bench-raw.txt](data/bench-raw.txt), [data/workerpool-raw.txt](data/workerpool-raw.txt), [data/benchstat.txt](data/benchstat.txt)
