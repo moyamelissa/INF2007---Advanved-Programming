@@ -113,6 +113,18 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | Worker pool vs goroutine-par-segment | 4–5× plus rapide |
 | Couverture de code | 100 % |
 
+### Graphique 1 – Linéarité du gain (`CountWordsConcurrentN`)
+
+![Linéarité goroutines](data/worker-count-chart.png)
+
+La courbe réelle s'éloigne rapidement de l'idéal linéaire et plafonne à ~6 ms dès 16 goroutines.
+
+### Graphique 2 – Worker pool vs goroutine-par-segment
+
+![Worker pool vs goroutine-par-segment](data/worker-pool-chart.png)
+
+Le pool est 4–5× plus rapide grâce à la réutilisation des goroutines et à une taille de segment fixe (50 000 caractères).
+
 ## Liens
 
 - [Rapport TN5](TN5-report.md)
