@@ -6,7 +6,7 @@
 
 ## 1. Architecture concurrente
 
-Le point de départ est une contrainte de l'énoncé, car un segment découpé à
+Le point de départ est une contrainte de l'énoncé. Un segment découpé à
 exactement N caractères risque de couper un mot en deux, faussant le compte.
 Pour éviter ce problème, `splitIntoSegments` avance la coupure caractère par
 caractère jusqu'au prochain espace blanc, garantissant que chaque segment
@@ -21,20 +21,20 @@ La goroutine principale collecte ensuite tous les résultats et les somme.
 
 Trois propriétés du canal et du programme garantissent l'exactitude du résultat
 sans recourir à un mutex. Premièrement, aucune variable n'est partagée entre
-les goroutines, puisque chaque goroutine opère sur son propre segment et n'écrit que
+les goroutines. Chaque goroutine opère sur son propre segment et n'écrit que
 sur le canal, ce qui élimine toute condition de course. Deuxièmement, le canal
 est en mémoire tampon avec une capacité égale au nombre de segments, de sorte
 que chaque envoi aboutit immédiatement sans bloquer la goroutine expéditrice,
 quelle que soit la vitesse de la goroutine principale. Troisièmement, la boucle
 `for range segments` consomme exactement N résultats avant de retourner, ce qui
-constitue une synchronisation implicite : la goroutine principale ne peut pas
+constitue une synchronisation implicite. La goroutine principale ne peut pas
 terminer avant que toutes les goroutines aient envoyé leur résultat. L'addition
 étant commutative, l'ordre d'arrivée des résultats n'affecte pas le total final.
 
 ## 2. Démarche de mesure et résultats
 
 Pour mesurer la performance, deux questions guident l'exploration. Comment la
-performance évolue-t-elle en fonction de la taille des segments ? Et le gain
+performance évolue-t-elle en fonction de la taille des segments, et le gain
 croît-il linéairement avec le nombre de goroutines ?
 
 Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
@@ -52,11 +52,12 @@ du temps mesuré conformément aux recommandations du chapitre 6.
 | Temps (ms) | 8.87 | 2.84 | 4.84 | 4.85 | **1.78** | 1.97 | 4.09 |
 
 Le résultat révèle un comportement en U. Avec des segments trop petits (500
-caractères, ~1 200 goroutines), le coût de création et d'ordonnancement des
-goroutines dépasse le bénéfice du parallélisme et la performance devient pire
-que le séquentiel (5.08 ms). À 50 000 caractères, on obtient l'optimum à 1.78 ms,
-soit un gain de 2.85× sur le séquentiel. Au-delà, les segments deviennent si
-grands que le parallélisme disparaît et on retrouve un comportement quasi-séquentiel.
+caractères, soit environ 1 200 goroutines), le coût de création et
+d'ordonnancement des goroutines dépasse le bénéfice du parallélisme et la
+performance devient pire que le séquentiel (5.08 ms). À 50 000 caractères on
+atteint l'optimum à 1.78 ms, soit un gain de 2.85× sur le séquentiel.
+Au-delà, les segments deviennent si grands que le parallélisme disparaît et on
+retrouve un comportement quasi-séquentiel.
 
 ## 3. Analyse de la linéarité et worker pool
 
@@ -74,21 +75,25 @@ indépendamment de la taille des segments.
 
 La progression est clairement sous-linéaire. Sur 4 cœurs physiques, l'accélération
 plafonne à 1.67× au lieu des 4× théoriques. L'explication tient à la nature du
-travail : `strings.Fields` effectue un seul balayage linéaire très rapide, si
+travail. `strings.Fields` effectue un seul balayage linéaire très rapide, si
 bien que le temps de calcul par goroutine est trop court pour amortir les coûts
 fixes de création, d'ordonnancement et de synchronisation via le canal. En
 appliquant la loi d'Amdahl au speedup maximum observé (1.67×), on déduit que
-seulement 40 % du travail est parallélisable et 60 % est séquentiel de façon
-inhérente (lecture du fichier, découpage, sommation finale).
+seulement 40 % du travail est parallélisable et 60 % reste séquentiel de façon
+inhérente, ce qui inclut la lecture du fichier, le découpage et la sommation
+finale.
 
 Face à ce constat, une deuxième approche a été explorée. Plutôt que de créer
 une nouvelle goroutine par segment à chaque appel, `CountWordsConcurrentPool`
 maintient un pool fixe de `numWorkers` goroutines persistantes qui lisent les
-segments depuis un canal de jobs (`for seg := range jobs`). La fermeture du
-canal avec `close(jobs)` signale proprement la fin du travail, et chaque worker
-envoie son résultat sur un canal distinct. Cette architecture élimine la
-recréation répétée des goroutines et fixe la taille des segments à 50 000
-caractères, l'optimum identifié au Tableau 1.
+segments depuis un canal de jobs via `for seg := range jobs`. La fermeture du
+canal avec `close(jobs)` signale proprement la fin du travail à tous les workers
+simultanément, sans coordination explicite supplémentaire. L'utilisation de deux
+canaux séparés — un pour distribuer les segments aux workers et un pour collecter
+les comptes — reflète le principe selon lequel les canaux servent à la fois à la
+communication et à la synchronisation entre goroutines. Cette architecture élimine
+la recréation répétée des goroutines et fixe la taille des segments à 50 000
+caractères, soit l'optimum identifié au Tableau 1.
 
 **Graphique 1 – Worker pool vs goroutine-par-segment selon le nombre de workers**
 
@@ -105,15 +110,15 @@ caractères, l'optimum identifié au Tableau 1.
 Le pool est 4 à 5× plus rapide que l'approche par segment à nombre de workers
 égal. La différence vient du fait que `CountWordsConcurrentN` avec 1 worker
 produit un seul segment de 700 000 caractères, comportement quasi-séquentiel,
-tandis que le pool fixe toujours la taille à 50 000 caractères, soit ~14
-segments distribués au worker unique. Le pool améliore également la fraction
-parallélisable : en appliquant Amdahl au speedup max du pool (1.96× de 1 à 16
-workers), on obtient 52 % de travail parallélisable contre 40 % pour l'approche
-naïve. Le plateau dès 16 workers persiste néanmoins, car la bande passante
-mémoire et la contention sur le canal de résultats constituent un plafond
-indépendant de la stratégie de création des goroutines.
+tandis que le pool fixe toujours la taille à 50 000 caractères, soit environ
+14 segments distribués au worker unique. Le pool améliore également la fraction
+parallélisable. En appliquant Amdahl au speedup maximal du pool (1.96× de 1 à
+16 workers), on obtient 52 % de travail parallélisable contre 40 % pour
+l'approche naïve. Le plateau dès 16 workers persiste néanmoins, car la bande
+passante mémoire et la contention sur le canal de résultats constituent un
+plafond indépendant de la stratégie de création des goroutines.
 
 ### Bibliographie
 - Manuel INF2007, chapitre 8.
 - Documentation Go : https://pkg.go.dev/sync, https://pkg.go.dev/testing
-- Calculs détaillés : docs/TN5-Calculs.md 
+- Calculs détaillés : docs/TN5-Calculs.md
