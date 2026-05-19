@@ -108,7 +108,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | Résultat clé | Valeur |
 |--------------|--------|
 | Accélération optimale (taille segments) | 2.85× (segment 50 000 caractères) |
-| Point de dégradation | < 1 000 caract. (surcharge d'ordonnancement) |
+| Point de dégradation | < 1 000 caractères (surcharge d'ordonnancement) |
 | Allocations au point optimal | 34 |
 | Worker pool vs goroutine-par-segment | 4–5× plus rapide |
 | Couverture de code | 100 % |
