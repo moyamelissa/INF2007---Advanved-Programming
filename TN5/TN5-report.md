@@ -16,8 +16,9 @@ Les mesures ont été effectuées sur un Intel i5-10300H à 2,50 GHz (4 cœurs
 physiques et 8 threads logiques, Windows/amd64) avec un fichier de test d'environ
 700 000 caractères (100 000 mots). Chaque configuration a été lancée 6 fois avec
 `go test -bench=. -count=6` puis analysée avec `benchstat` pour obtenir la médiane
-et l'intervalle de confiance à 95 %. `b.ResetTimer()` exclut l'initialisation et
-`b.ReportAllocs()` rapporte les allocations mémoire.
+et l'intervalle de confiance à 95 %. Le contenu de test (`benchContent`) est généré
+une seule fois comme variable de paquet, hors de la boucle de mesure, ce qui exclut
+l'initialisation du temps mesuré. `b.ReportAllocs()` rapporte les allocations mémoire.
 
 **Graphique 1 – Passage à l'échelle réel vs linéaire idéal selon le nombre de goroutines**
 
