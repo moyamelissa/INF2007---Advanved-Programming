@@ -37,11 +37,11 @@ Chaque palier compare `BenchmarkWorkerPool` (pool) à `BenchmarkWorkerCount`
 | 16      | 6.307            | 1.463           | 6.307 / 1.463   | 4.31×        |
 | 32      | 6.208            | 1.533           | 6.208 / 1.533   | 4.05×        |
 
-Fourchette : 3.63× à 4.97×, d'ou l'affirmation "4 a 5× plus rapide" dans le rapport.
+Fourchette : 3.63× à 4.97×, d'où l'affirmation "4 à 5× plus rapide" dans le rapport.
 
 ---
 
-## 2. Pourquoi le worker pool est plus rapide a nombre de workers égal
+## 2. Pourquoi le worker pool est plus rapide à nombre de workers égal
 
 La différence vient de la taille des segments utilisés par chaque implémentation.
 
@@ -83,11 +83,11 @@ où  S = fraction séquentielle du programme
     N = nombre de goroutines
 ```
 
-Pour trouver S, on résout l'équation a partir du speedup maximum observé.
+Pour trouver S, on résout l'équation à partir du speedup maximum observé.
 
 ### Fraction séquentielle pour CountWordsConcurrentN
 
-Speedup maximum observé : passage de 10.39 ms (1 worker) a 6.21 ms (32 workers).
+Speedup maximum observé : passage de 10.39 ms (1 worker) à 6.21 ms (32 workers).
 
 ```
 Speedup = 10.39 / 6.21 = 1.67×
@@ -104,7 +104,7 @@ S                         ≈ 0.586 ≈ 60 %
 
 ### Fraction séquentielle pour CountWordsConcurrentPool
 
-Speedup maximum observé : passage de 2.864 ms (1 worker) a 1.463 ms (16 workers).
+Speedup maximum observé : passage de 2.864 ms (1 worker) à 1.463 ms (16 workers).
 
 ```
 Speedup = 2.864 / 1.463 = 1.96×
@@ -119,7 +119,7 @@ S                         ≈ 0.477 ≈ 48 %
 48 % du travail est séquentiel, 52 % est parallélisable.
 
 Le worker pool parallélise davantage (52 % contre 40 %) car il supprime la
-recréation de goroutines a chaque appel, réduisant la part séquentielle de
+recréation de goroutines à chaque appel, réduisant la part séquentielle de
 l'orchestration.
 
 ---
@@ -171,7 +171,7 @@ Rapport signal/bruit  : 3.6 / 3 ≈ 1.2×  → pas rentable
 
 ### CountWordsConcurrentN
 
-| Workers | allocs/op | Delta par rapport a 1 worker |
+| Workers | allocs/op | Delta par rapport à 1 worker |
 |:-------:|:---------:|:-----------------------------:|
 | 1       | 4         | —                             |
 | 2       | 7         | +3                            |
@@ -182,11 +182,11 @@ Rapport signal/bruit  : 3.6 / 3 ≈ 1.2×  → pas rentable
 
 Chaque goroutine supplémentaire alloue environ 2 objets (pile initiale + entrée
 dans le canal de résultats). La croissance est quasi-linéaire avec le nombre de
-workers, ce qui confirme que chaque goroutine est recréée a chaque appel.
+workers, ce qui confirme que chaque goroutine est recréée à chaque appel.
 
 ### CountWordsConcurrentPool
 
-| Workers | allocs/op | Delta par rapport a 1 worker |
+| Workers | allocs/op | Delta par rapport à 1 worker |
 |:-------:|:---------:|:-----------------------------:|
 | 1       | 23        | —                             |
 | 2       | 24        | +1                            |
@@ -196,7 +196,7 @@ workers, ce qui confirme que chaque goroutine est recréée a chaque appel.
 | 32      | 55        | +32                           |
 
 Le pool alloue davantage au départ (23 contre 4) car il crée les canaux
-`jobs` et `results` ainsi que les ~14 entrées de segments des le lancement.
+`jobs` et `results` ainsi que les ~14 entrées de segments dès le lancement.
 En revanche, la croissance avec le nombre de workers est beaucoup plus faible
-(+32 pour passer de 1 a 32 workers, contre +67 pour `CountWordsConcurrentN`)
+(+32 pour passer de 1 à 32 workers, contre +67 pour `CountWordsConcurrentN`)
 car le nombre de segments reste fixe.

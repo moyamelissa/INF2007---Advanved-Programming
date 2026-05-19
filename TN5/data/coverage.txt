@@ -1,0 +1,9 @@
+﻿wordcount/wordcount.go:12:	countWords			100.0%
+wordcount/wordcount.go:19:	splitIntoSegments		100.0%
+wordcount/wordcount.go:54:	countWordsInSegment		100.0%
+wordcount/wordcount.go:61:	CountWordsConcurrent		100.0%
+wordcount/wordcount.go:87:	CountWordsConcurrentN		100.0%
+wordcount/wordcount.go:103:	CountWordsConcurrentPool	100.0%
+wordcount/wordcount.go:143:	run				100.0%
+wordcount/wordcount.go:177:	main				100.0%
+total:				(statements)			100.0%

@@ -31,6 +31,15 @@ Exemples des prompts utilisés avec l'assistant IA (GitHub Copilot) lors de la r
 - « Mon test `TestCountWordsConsistency` couvre 7 tailles de segment. Est-ce suffisant pour garantir que le split ne perd aucun mot ? »
 - « Faut-il tester un fichier contenant uniquement des espaces et des retours à la ligne ? »
 
+## Worker pool
+
+- « Quelle est la différence architecturale entre lancer une goroutine par segment
+  et un worker pool avec N goroutines persistantes ? »
+- « Pourquoi `for seg := range jobs` garantit-il que tous les segments sont traités
+  sans condition de course quand on ferme le canal `jobs` ? »
+- « Comment expliquer que le worker pool est 4 à 5× plus rapide que
+  `CountWordsConcurrentN` à nombre de workers égal ? »
+
 ## Rapport
 
 - « Comment expliquer le plateau d'accélération de façon concise pour un rapport d'une page ? »
