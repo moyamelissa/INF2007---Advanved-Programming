@@ -66,7 +66,7 @@ proportionnelle.
 | Accélération | 1.00× | 1.15× | 1.23× | 1.50× | 1.65× | 1.67× |
 
 La progression est clairement sous-linéaire. Sur 4 cœurs physiques, l'accélération
-plafonne à 1.67× au lieu des 4× théoriques : `strings.Fields` effectue un seul balayage linéaire très rapide, si
+plafonne à 1.67× au lieu des 4× théoriques. En effet, `strings.Fields` effectue un seul balayage linéaire très rapide, si
 bien que le temps de calcul par goroutine est trop court pour amortir les coûts
 fixes de création, d'ordonnancement et de synchronisation via le canal. La lecture du fichier,
 le découpage et la synchronisation constituent une part séquentielle incompressible limitant l'accélération.
@@ -76,7 +76,11 @@ une nouvelle goroutine par segment à chaque appel, cette fonction
 maintient un pool fixe de `numWorkers` goroutines persistantes qui lisent les
 segments depuis un canal de jobs via `for seg := range jobs`. La fermeture du
 canal avec `close(jobs)` signale proprement la fin du travail à tous les workers
-simultanément, sans coordination explicite supplémentaire. Cette architecture élimine
+simultanément, sans coordination explicite supplémentaire. L'utilisation de deux canaux séparés, soit un canal `jobs` pour
+distribuer les segments aux workers et un canal `results` pour collecter
+les comptes partiels, reflète le principe fondamental selon lequel les
+canaux servent à la fois à la communication et à la synchronisation
+entre goroutines sans partage de mémoire. Cette architecture élimine
 la recréation répétée des goroutines et fixe la taille des segments à 50 000
 caractères, soit l'optimum identifié au Tableau 1.
 

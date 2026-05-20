@@ -3,7 +3,7 @@
 ![Tests](https://github.com/moyamelissa/Advanced-Programming/actions/workflows/tn5-coverage.yml/badge.svg)
 [![codecov](https://codecov.io/gh/moyamelissa/Advanced-Programming/branch/main/graph/badge.svg?flag=tn5)](https://codecov.io/gh/moyamelissa/Advanced-Programming)
 
-Ce projet implémente un comptage de mots en parallèle à l'aide de goroutines et de canaux (modèle fan-out / fan-in), conformément aux concepts de concurrence du chapitre 8 en Go.
+Ce projet implémente un comptage de mots en parallèle à l'aide de goroutines et de canaux (modèle fan-out / fan-in).
 
 ## Fonctions implémentées
 
