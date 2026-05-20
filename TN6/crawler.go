@@ -31,41 +31,69 @@ func newHTTPClient() *http.Client {
 	}
 }
 
-// checkRobotsAllowed vérifie si le chemin d'une URL est autorisé par robots.txt.
-// Retourne true si l'exploration est permise, false sinon.
-// En cas d'erreur de récupération de robots.txt, on autorise l'exploration par défaut
-// (comportement standard des robots d'exploration).
-func checkRobotsAllowed(targetURL string, client *http.Client) bool {
-	parsed, err := url.Parse(targetURL)
-	if err != nil {
-		return false
-	}
-
-	robotsURL := fmt.Sprintf("%s://%s/robots.txt", parsed.Scheme, parsed.Host)
-
+// fetchRobots récupère et analyse robots.txt pour un hôte donné.
+// Retourne nil si robots.txt est inaccessible, introuvable ou invalide,
+// ce qui signifie que l'exploration est autorisée par défaut.
+func fetchRobots(scheme, host string, client *http.Client) *robotstxt.RobotsData {
+	robotsURL := fmt.Sprintf("%s://%s/robots.txt", scheme, host)
 	resp, err := client.Get(robotsURL)
 	if err != nil {
-		// Si robots.txt n'est pas accessible, on autorise par défaut
-		return true
+		return nil
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		// Si robots.txt n'existe pas (404, etc.), tout est autorisé
-		return true
+		return nil
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return true
+		return nil
 	}
 
-	// robotstxt.FromBytes ne retourne jamais d'erreur pour un contenu textuel valide
-	robots, _ := robotstxt.FromBytes(body)
+	robots, err := robotstxt.FromBytes(body)
+	if err != nil {
+		return nil
+	}
+	return robots
+}
 
-	// Vérifier les règles pour User-agent "*" (robot générique)
-	group := robots.FindGroup("*")
-	return group.Test(parsed.Path)
+// checkRobotsAllowed vérifie si le chemin d'une URL est autorisé par robots.txt.
+// Retourne true si l'exploration est permise, false sinon.
+// Si cache et cacheMu sont fournis (non nil), robots.txt est mis en cache par hôte
+// pour éviter les requêtes répétées. En cas d'erreur, on autorise par défaut.
+func checkRobotsAllowed(targetURL string, client *http.Client, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) bool {
+	parsed, err := url.Parse(targetURL)
+	if err != nil {
+		return false
+	}
+	host := parsed.Host
+
+	var robots *robotstxt.RobotsData
+	if cache != nil && cacheMu != nil {
+		cacheMu.RLock()
+		r, found := cache[host]
+		cacheMu.RUnlock()
+
+		if !found {
+			r = fetchRobots(parsed.Scheme, host, client)
+			cacheMu.Lock()
+			if _, alreadyCached := cache[host]; !alreadyCached {
+				cache[host] = r
+			} else {
+				r = cache[host]
+			}
+			cacheMu.Unlock()
+		}
+		robots = r
+	} else {
+		robots = fetchRobots(parsed.Scheme, host, client)
+	}
+
+	if robots == nil {
+		return true
+	}
+	return robots.FindGroup("*").Test(parsed.Path)
 }
 
 // fetchPage récupère le contenu HTML d'une URL.
@@ -135,9 +163,9 @@ func countWordsHTML(htmlContent string) int {
 // et compte les mots. Envoie le résultat sur le canal ch.
 // Un délai de politesse configurable (politenessDelay) est appliqué après la
 // vérification robots.txt pour limiter la fréquence d'exploration.
-func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult) {
+func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) {
 	// Vérifier robots.txt avant d'explorer
-	if !checkRobotsAllowed(targetURL, client) {
+	if !checkRobotsAllowed(targetURL, client, cache, cacheMu) {
 		ch <- CrawlResult{
 			URL: targetURL,
 			Err: fmt.Errorf("exploration interdite par robots.txt pour %s", targetURL),
@@ -179,8 +207,11 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 	client := newHTTPClient()
 	results := make(map[string]int)
 	var totalWords int
-	var mu sync.Mutex
 	var errs []error
+
+	// Cache robots.txt par hôte pour éviter les requêtes répétées
+	robotsCache := make(map[string]*robotstxt.RobotsData)
+	var cacheMu sync.RWMutex
 
 	ch := make(chan CrawlResult, len(urls))
 	// Sémaphore pour limiter le nombre de goroutines concurrentes
@@ -196,7 +227,7 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
-			crawlURL(targetURL, client, ch)
+			crawlURL(targetURL, client, ch, robotsCache, &cacheMu)
 		}(u)
 	}
 
@@ -206,16 +237,14 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 		close(ch)
 	}()
 
-	// Collecter les résultats depuis le canal et agréger avec le mutex
+	// Collecter les résultats depuis le canal (goroutine unique : pas de mutex nécessaire)
 	for result := range ch {
-		mu.Lock()
 		if result.Err != nil {
 			errs = append(errs, result.Err)
 		} else {
 			results[result.URL] = result.WordCount
 			totalWords += result.WordCount
 		}
-		mu.Unlock()
 	}
 
 	return results, totalWords, errs

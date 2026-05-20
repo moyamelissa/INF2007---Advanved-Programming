@@ -146,17 +146,17 @@ func TestCheckRobotsAllowed(t *testing.T) {
 	client := &http.Client{Timeout: 5 * time.Second}
 
 	// /public/ devrait être autorisé
-	if !checkRobotsAllowed(server.URL+"/public/page", client) {
+	if !checkRobotsAllowed(server.URL+"/public/page", client, nil, nil) {
 		t.Error("/public/page devrait être autorisé")
 	}
 
 	// /private/ devrait être interdit
-	if checkRobotsAllowed(server.URL+"/private/secret", client) {
+	if checkRobotsAllowed(server.URL+"/private/secret", client, nil, nil) {
 		t.Error("/private/secret devrait être interdit par robots.txt")
 	}
 
 	// / (racine) devrait être autorisé
-	if !checkRobotsAllowed(server.URL+"/", client) {
+	if !checkRobotsAllowed(server.URL+"/", client, nil, nil) {
 		t.Error("/ devrait être autorisé")
 	}
 }
@@ -173,7 +173,7 @@ func TestCheckRobotsNoFile(t *testing.T) {
 	defer server.Close()
 
 	client := &http.Client{Timeout: 5 * time.Second}
-	if !checkRobotsAllowed(server.URL+"/anything", client) {
+	if !checkRobotsAllowed(server.URL+"/anything", client, nil, nil) {
 		t.Error("devrait être autorisé quand robots.txt n'existe pas")
 	}
 }
@@ -244,7 +244,7 @@ func TestCrawlURLsRobotsBlocked(t *testing.T) {
 // pour une URL qui ne peut pas être parsée par url.Parse.
 func TestCheckRobotsInvalidURL(t *testing.T) {
 	client := &http.Client{Timeout: 2 * time.Second}
-	if checkRobotsAllowed("://invalid", client) {
+	if checkRobotsAllowed("://invalid", client, nil, nil) {
 		t.Error("attendu false pour une URL invalide")
 	}
 }
@@ -253,7 +253,7 @@ func TestCheckRobotsInvalidURL(t *testing.T) {
 // de robots.txt est injoignable (comportement standard des crawlers).
 func TestCheckRobotsUnreachable(t *testing.T) {
 	client := &http.Client{Timeout: 1 * time.Second}
-	if !checkRobotsAllowed("http://127.0.0.1:1/page", client) {
+	if !checkRobotsAllowed("http://127.0.0.1:1/page", client, nil, nil) {
 		t.Error("attendu true quand robots.txt est injoignable")
 	}
 }
@@ -275,7 +275,7 @@ func TestCheckRobotsInvalidBody(t *testing.T) {
 	defer server.Close()
 
 	client := &http.Client{Timeout: 5 * time.Second}
-	if !checkRobotsAllowed(server.URL+"/page", client) {
+	if !checkRobotsAllowed(server.URL+"/page", client, nil, nil) {
 		t.Error("attendu true pour robots.txt valide")
 	}
 }
@@ -338,7 +338,7 @@ func TestCrawlURLFetchError(t *testing.T) {
 
 	ch := make(chan CrawlResult, 1)
 	client := &http.Client{Timeout: 5 * time.Second}
-	crawlURL(server.URL+"/page", client, ch)
+	crawlURL(server.URL+"/page", client, ch, nil, nil)
 
 	result := <-ch
 	if result.Err == nil {
@@ -393,7 +393,7 @@ func TestCheckRobotsReadBodyError(t *testing.T) {
 	}()
 	serverURL := "http://" + ln.Addr().String()
 	client := &http.Client{Timeout: 2 * time.Second}
-	if !checkRobotsAllowed(serverURL+"/page", client) {
+	if !checkRobotsAllowed(serverURL+"/page", client, nil, nil) {
 		t.Error("attendu true quand la lecture de robots.txt échoue")
 	}
 }
