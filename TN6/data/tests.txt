@@ -1,4 +1,4 @@
-=== RUN   TestCountWordsHTMLSimple
+﻿=== RUN   TestCountWordsHTMLSimple
 --- PASS: TestCountWordsHTMLSimple (0.00s)
 === RUN   TestCountWordsHTMLMultipleTags
 --- PASS: TestCountWordsHTMLMultipleTags (0.00s)
@@ -15,7 +15,7 @@
 === RUN   TestFetchPageInvalidURL
 --- PASS: TestFetchPageInvalidURL (0.11s)
 === RUN   TestFetchPageTimeout
---- PASS: TestFetchPageTimeout (5.01s)
+--- PASS: TestFetchPageTimeout (5.00s)
 === RUN   TestFetchPage404
 --- PASS: TestFetchPage404 (0.00s)
 === RUN   TestCheckRobotsAllowed
@@ -45,10 +45,10 @@
 URLs à explorer : 1
 Goroutines max  : 2
 
-  http://127.0.0.1:52766/page                                  : 2 mots
+  http://127.0.0.1:55887/page                                  : 2 mots
 
 Total global    : 2 mots
-Temps d'exécution : 103.5435ms
+Temps d'exécution : 113.9708ms
 --- PASS: TestRunFunction (0.11s)
 === RUN   TestRunFunctionWithErrors
 === Robot d'exploration Web concurrent ===
@@ -60,7 +60,7 @@ Erreurs (1) :
   - échec de la requête pour http://127.0.0.1:1/page : Get "http://127.0.0.1:1/page": dial tcp 127.0.0.1:1: connectex: No connection could be made because the target machine actively refused it.
 
 Total global    : 0 mots
-Temps d'exécution : 102.6999ms
+Temps d'exécution : 101.7095ms
 --- PASS: TestRunFunctionWithErrors (0.10s)
 === RUN   TestCheckRobotsReadBodyError
 --- PASS: TestCheckRobotsReadBodyError (0.00s)
@@ -71,23 +71,23 @@ Temps d'exécution : 102.6999ms
 URLs à explorer : 2
 Goroutines max  : 2
 
-  http://127.0.0.1:52772/page                                  : 2 mots
+  http://127.0.0.1:55893/page                                  : 2 mots
 
 Erreurs (1) :
   - échec de la requête pour http://127.0.0.1:1/invalid : Get "http://127.0.0.1:1/invalid": dial tcp 127.0.0.1:1: connectex: No connection could be made because the target machine actively refused it.
 
 Total global    : 2 mots
-Temps d'exécution : 105.8186ms
---- PASS: TestRunFunctionMixedResults (0.11s)
+Temps d'exécution : 101.3553ms
+--- PASS: TestRunFunctionMixedResults (0.10s)
 === RUN   TestMainFunction
 === Robot d'exploration Web concurrent ===
 URLs à explorer : 1
 Goroutines max  : 8
 
-  http://127.0.0.1:52776/                                      : 2 mots
+  http://127.0.0.1:55897/                                      : 2 mots
 
 Total global    : 2 mots
-Temps d'exécution : 105.2433ms
---- PASS: TestMainFunction (0.11s)
+Temps d'exécution : 103.9672ms
+--- PASS: TestMainFunction (0.10s)
 PASS
-ok  	webcrawler	7.613s
+ok  	webcrawler	7.616s

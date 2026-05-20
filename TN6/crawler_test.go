@@ -403,7 +403,7 @@ func TestCheckRobotsReadBodyError(t *testing.T) {
 func TestCheckRobotsInvalidURLParse(t *testing.T) {
 	client := &http.Client{Timeout: 2 * time.Second}
 	// L'octet nul force url.Parse à retourner une erreur
-	if checkRobotsAllowed("http://\x00invalid/page", client) {
+	if checkRobotsAllowed("http://\x00invalid/page", client, nil, nil) {
 		t.Error("attendu false pour une URL avec octet nul")
 	}
 }
