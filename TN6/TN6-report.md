@@ -26,12 +26,29 @@ dédiée ferme le canal après que `sync.WaitGroup` confirme la fin de toutes le
 explorations, ce qui permet à la goroutine principale d'itérer proprement avec
 `for range` sans savoir à l'avance combien de résultats attendre.
 
-Le **mutex** (`sync.Mutex`) protège la mise à jour de la carte de résultats et
-du total global. Sans mutex, deux goroutines pourraient lire puis écrire
-simultanément dans la carte, provoquant une condition de course. Un canal seul
-aurait suffi pour collecter les résultats, mais le mutex est requis explicitement
-par l'énoncé et permet d'agréger directement dans la goroutine principale sans
-goroutine intermédiaire.
+L'**agrégation des résultats** repose sur le motif consommateur unique (*single
+consumer*), identique à l'exemple `countBytes` du chapitre 8 du manuel : les
+goroutines productrices envoient leurs résultats sur le canal `ch`, et une seule
+boucle `for range ch` — dans la goroutine principale — lit ces résultats et écrit
+dans la carte `results` et dans `totalWords`. L'absence de mutex sur ces structures
+n'est pas un oubli : c'est une conséquence directe de l'architecture. Le canal
+constitue la frontière de synchronisation entre les producteurs et le consommateur
+unique ; une fois un résultat reçu depuis le canal, une seule goroutine y accède,
+rendant tout verrou structurellement superflu.
+
+L'énoncé préconisait un mutex pour l'agrégation — approche correcte, mais qui
+impose un point de contention : chaque goroutine productrice doit acquérir le
+verrou avant d'écrire, ce qui sérialise les mises à jour. Avec le consommateur
+unique, les goroutines déposent leurs résultats sur le canal sans se bloquer
+mutuellement ; la sérialisation est naturellement assurée par l'ordre de réception.
+Cette décision est délibérée : elle élimine toute condition de course sans
+ajouter de primitive de synchronisation supplémentaire.
+
+Un `sync.RWMutex` est néanmoins utilisé dans le code, mais pour une raison
+distincte : protéger le cache `robotsCache`, qui est lu et écrit simultanément
+par plusieurs goroutines productrices. Ce cas ne peut pas être traité par le
+motif consommateur unique sans introduire une goroutine gardienne dédiée pour
+le cache — d'où l'utilisation justifiée d'un vrai verrou.
 
 Le comptage de mots utilise le tokeniseur `golang.org/x/net/html`. Il parcourt
 les jetons HTML et ignore le contenu des balises `<script>`, `<style>` et
