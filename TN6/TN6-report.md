@@ -133,7 +133,7 @@ point à partir duquel les comportements divergent selon la source de contention
 
 **Figure 1 – Temps d'exécution selon le nombre de goroutines**
 
-![Figure 1 – Temps d'exécution selon le nombre de goroutines](../data/benchmark-chart.png)
+![Figure 1 – Temps d'exécution selon le nombre de goroutines](data/benchmark-chart.png)
 
 ### 3.2 Analyse
 

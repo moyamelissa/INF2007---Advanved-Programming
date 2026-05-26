@@ -398,6 +398,26 @@ func TestCheckRobotsReadBodyError(t *testing.T) {
 	}
 }
 
+// TestFetchRobotsParseError vérifie que fetchRobots retourne nil quand
+// robots.txt contient une directive invalide qui déclenche une erreur dans
+// robotstxt.FromBytes (ex. Disallow avant User-agent).
+func TestFetchRobotsParseError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		// Disallow avant User-agent → parseAll() retourne une erreur
+		fmt.Fprint(w, "Disallow: /private/\n")
+	}))
+	defer server.Close()
+
+	host := strings.TrimPrefix(server.URL, "http://")
+	client := &http.Client{Timeout: 5 * time.Second}
+	result := fetchRobots("http", host, client)
+	if result != nil {
+		t.Error("attendu nil quand robotstxt.FromBytes retourne une erreur")
+	}
+}
+
 // TestCheckRobotsInvalidURLParse vérifie que checkRobotsAllowed retourne false
 // quand url.Parse échoue sur un caractère réellement invalide (octet nul).
 func TestCheckRobotsInvalidURLParse(t *testing.T) {
