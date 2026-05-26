@@ -8,7 +8,7 @@
 
 ### 1.1 Architecture générale
 
-Le programme repose sur neuf fonctions à responsabilité unique (tableau 1), qui
+Le programme repose sur neuf fonctions à responsabilité unique (figure 1), qui
 propagent les erreurs explicitement plutôt que de paniquer. Cette conception
 garantit qu'une URL défaillante n'interrompt pas l'exploration des autres, qu'il
 s'agisse d'un timeout HTTP, d'un code de statut non-200, d'une lecture interrompue
@@ -17,19 +17,9 @@ une goroutine par URL, bornée par un sémaphore. La logique principale est extr
 dans `run()` pour permettre les tests unitaires sans modifier le comportement en
 production.
 
-**Tableau 1 – Fonctions implémentées dans crawler.go**
+**Figure 1 – Flux d'exécution du crawler**
 
-| Fonction | Description |
-|:---|:---|
-| `newHTTPClient()` | Crée un client HTTP avec délai d'expiration de 10 s |
-| `fetchRobots()` | Récupère et analyse `robots.txt` pour un hôte donné ; retourne `nil` si inaccessible |
-| `checkRobotsAllowed()` | Vérifie si `robots.txt` autorise l'exploration d'une URL ; gère le cache via `RWMutex` |
-| `fetchPage()` | Récupère le contenu HTML d'une URL via HTTP GET |
-| `countWordsHTML()` | Comptabilise les mots visibles (ignore `<script>`, `<style>`, `<noscript>`) |
-| `crawlURL()` | Vérifie `robots.txt`, applique le délai de politesse, récupère la page et envoie le résultat sur le canal |
-| `CrawlURLs()` | Orchestre l'exploration concurrente avec sémaphore et consommateur unique |
-| `run()` | Logique principale extraite de `main()` pour permettre les tests unitaires |
-| `main()` | Point d'entrée ; appelle `run()` avec la liste d'URLs par défaut |
+![Figure 1 – Flux d'exécution du crawler](asset/tn6-workflow-crawler.jpg)
 
 ### 1.2 Gestion de la concurrence
 
@@ -128,12 +118,12 @@ mesure isolément le tokeniseur HTML sur une page de ~1 900 mots.
 | Multi-serveurs, 4 goroutines | 0,92 | ± 1 % | 3,28× |
 | Multi-serveurs, 8 goroutines | 0,86 | ± 22 % | 3,52× |
 
-La figure 1 illustre visuellement le croisement des deux courbes à 2 goroutines,
+La figure 2 illustre visuellement le croisement des deux courbes à 2 goroutines,
 point à partir duquel les comportements divergent selon la source de contention.
 
-**Figure 1 – Temps d'exécution selon le nombre de goroutines**
+**Figure 2 – Temps d'exécution selon le nombre de goroutines**
 
-![Figure 1 – Temps d'exécution selon le nombre de goroutines](data/benchmark-chart.png)
+![Figure 2 – Temps d'exécution selon le nombre de goroutines](data/benchmark-chart.png)
 
 ### 3.2 Analyse
 

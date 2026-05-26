@@ -3,7 +3,9 @@
 webcrawler.exe
 
 # Artéfacts de tests Go
+cover
 cover.out
+coverage
 *.out
 
 # Profilage
