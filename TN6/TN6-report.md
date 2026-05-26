@@ -35,9 +35,33 @@ lisent et écrivent simultanément. Le patron de double vérification, consistan
 détecter un défaut de cache puis acquérir un verrou exclusif avant d'écrire,
 garantit l'exactitude sans bloquer les lectures concurrentes.
 
+```go
+cacheMu.RLock()
+r, found := cache[host]
+cacheMu.RUnlock()
+
+if !found {
+    r = fetchRobots(parsed.Scheme, host, client)
+    cacheMu.Lock()
+    if _, alreadyCached := cache[host]; !alreadyCached {
+        cache[host] = r
+    } else {
+        r = cache[host]
+    }
+    cacheMu.Unlock()
+}
+```
+
 Le parallélisme est borné par un sémaphore implémenté comme un canal bufferisé de
 capacité `maxGoroutines`. Chaque goroutine acquiert un jeton au démarrage et le
 libère via `defer`, évitant de saturer les ressources réseau ou le planificateur Go.
+
+```go
+semaphore := make(chan struct{}, maxGoroutines)
+// ...
+semaphore <- struct{}{}         // acquiert le jeton (bloque si maxGoroutines actives)
+defer func() { <-semaphore }() // libère toujours, même en cas de panique
+```
 
 ### 1.3 Respect de robots.txt
 
@@ -133,6 +157,13 @@ le traitement séquentiel des connexions dans `httptest.NewServer`, qui transfor
 surcroît de goroutines en surcoût de coordination. Ce comportement est un artefact
 du banc d'essai, non un défaut du crawler, mais il illustre un phénomène réel
 lorsque plusieurs URLs partagent le même hôte.
+
+Les données brutes révèlent la cause : trois des six exécutions à 4 goroutines ont
+achévé en ~1,78 ms, mais les trois suivantes ont décroché à 4,4 ms, 8,6 ms et
+9,1 ms — une interférence de l'ordonnanceur Windows lors de l'exécution consécutive
+des benchmarks. La médiane benchstat (5,91 ms) est donc peu représentative pour
+cette configuration. En contexte réseau réel, chaque hôte disposant de sa propre
+latence indépendante, ce décrochage ne se produirait pas.
 
 Avec 8 serveurs distincts, le gain atteint 3,52×. La progression de 3,02 ms à
 0,86 ms illustre le rendement décroissant attendu, où la portion séquentielle

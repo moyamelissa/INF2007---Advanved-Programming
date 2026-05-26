@@ -258,15 +258,15 @@ func TestCheckRobotsUnreachable(t *testing.T) {
 	}
 }
 
-// TestCheckRobotsInvalidBody vérifie qu'on autorise l'exploration si robots.txt
-// contient un contenu invalide qui ne peut pas être parsé.
+// TestCheckRobotsInvalidBody vérifie que checkRobotsAllowed autorise l'exploration
+// quand robots.txt est valide et contient Allow: / pour tous les agents.
+// Les cas d'erreur (lecture échouée, parse error) sont couverts par
+// TestCheckRobotsReadBodyError et TestFetchRobotsParseError respectivement.
 func TestCheckRobotsInvalidBody(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/robots.txt" {
-			// Contenu binaire invalide pour robotstxt.FromBytes
 			w.Header().Set("Content-Type", "text/plain")
 			w.WriteHeader(http.StatusOK)
-			// robotstxt accepte presque tout, mais on peut tester que ça ne panique pas
 			fmt.Fprint(w, "User-agent: *\nAllow: /\n")
 			return
 		}
@@ -276,7 +276,7 @@ func TestCheckRobotsInvalidBody(t *testing.T) {
 
 	client := &http.Client{Timeout: 5 * time.Second}
 	if !checkRobotsAllowed(server.URL+"/page", client, nil, nil) {
-		t.Error("attendu true pour robots.txt valide")
+		t.Error("attendu true pour robots.txt valide avec Allow: /")
 	}
 }
 
@@ -296,8 +296,9 @@ func TestFetchPageReadError(t *testing.T) {
 
 	client := &http.Client{Timeout: 5 * time.Second}
 	_, err := fetchPage(server.URL, client)
-	// Peut retourner une erreur ou lire partiellement selon l'implémentation
-	_ = err
+	if err == nil {
+		t.Error("attendu une erreur quand la connexion est fermée avant Content-Length octets")
+	}
 }
 
 // TestCrawlURLsZeroGoroutines vérifie que CrawlURLs gère maxGoroutines <= 0
