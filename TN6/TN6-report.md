@@ -204,14 +204,7 @@ les tests sans appel réseau réel.
 
 ## 5. Conclusion
 
-Ce projet démontre comment la robustesse, la concurrence structurée et la mesure
-rigoureuse se combinent pour produire un crawler fiable et performant. Le patron
-producteur-consommateur unique élimine toute course aux données, le sémaphore
-bufferisé contrôle le degré de parallélisme et les 28 tests unitaires atteignent une
-couverture de 100 %. Les benchmarks confirment une accélération de 3,52× en scénario
-multi-hôtes et un parsing HTML de 173 µs pour 48 Ko alloués. La conformité à
-`robots.txt` avec cache par hôte et délai de politesse configurable complète une
-implémentation correcte, performante et éthiquement responsable.
+Ce projet démontre comment la robustesse et la concurrence structurée se combinent pour produire un crawler performant. Le patron producteur-consommateur unique élimine les courses aux données, le sémaphore contrôle le parallélisme. Les benchmarks confirment une accélération de 3,52× en scénario multi-hôtes et un parsing HTML de 173 µs pour 48 Ko. La conformité à robots.txt avec cache par hôte et délai configurable complète une implémentation correcte et responsable.
 
 ### Bibliographie
 
