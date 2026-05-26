@@ -31,6 +31,8 @@ La concurrence est gérée par des goroutines, un canal de résultats et un sém
 ├── crawler_test.go       # 28 tests unitaires + 3 bancs d'essai
 ├── README.md             # Ce fichier
 ├── TN6-report.md         # Rapport (copie racine)
+├── asset/                        # Ressources visuelles du rapport
+│   └── tn6-workflow-crawler.jpg  # Diagramme de flux (figure 1)
 ├── chart/                        # Générateur de graphique de benchmarks
 │   ├── go.mod                    # Module Go du sous-projet chart
 │   └── main.go                   # Génère data/benchmark-chart.png
