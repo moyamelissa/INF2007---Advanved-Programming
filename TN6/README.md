@@ -29,9 +29,11 @@ La concurrence est gérée par des goroutines, un canal de résultats et un sém
 ├── go.sum                # Dépendances vérifiées
 ├── crawler.go            # Code principal
 ├── crawler_test.go       # 27 tests unitaires + 3 bancs d'essai
-├── TN6-report.md         # Rapport d'analyse
-├── TN6-AI-Prompts.md     # Prompts IA utilisés
-└── README.md             # Ce fichier
+├── README.md             # Ce fichier
+└── docs/
+    ├── TN6-report.md             # Rapport d'analyse
+    ├── TN6-AI-Prompts.md         # Prompts IA utilisés
+    └── TN6-Homework-Instructions.md
 ```
 
 ## Prérequis
@@ -57,6 +59,17 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 ```
 
 ## Tests disponibles
+
+| Catégorie | Nombre | Tests |
+|:---|:---:|:---|
+| Comptage HTML | 7 | `Simple`, `MultipleTags`, `IgnoreScript`, `IgnoreStyle`, `Empty`, `OnlyTags`, `Noscript` |
+| Récupération de pages | 5 | `Success`, `InvalidURL`, `Timeout`, `404`, `ReadError` |
+| Vérification robots.txt | 7 | `Allowed`, `NoFile`, `InvalidURL`, `Unreachable`, `InvalidBody`, `ReadBodyError`, `InvalidURLParse` |
+| Exploration complète | 3 | `Integration`, `RobotsBlocked`, `ZeroGoroutines` |
+| crawlURL | 1 | `FetchError` |
+| Fonctions run/main | 4 | `RunFunction`, `RunFunctionWithErrors`, `RunFunctionMixedResults`, `MainFunction` |
+
+### Détail des tests
 
 | Test | Ce qu'il vérifie |
 |------|-----------------|
@@ -107,6 +120,6 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 
 ## Liens
 
-- [Rapport TN6](TN6-report.md)
-- [Prompts IA](TN6-AI-Prompts.md)
+- [Rapport TN6](docs/TN6-report.md)
+- [Prompts IA](docs/TN6-AI-Prompts.md)
 - [Dépôt GitHub](https://github.com/moyamelissa/Advanced-Programming/tree/main/TN6)
