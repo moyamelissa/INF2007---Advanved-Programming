@@ -28,8 +28,18 @@ La concurrence est gérée par des goroutines, un canal de résultats et un sém
 ├── go.mod                # Module Go
 ├── go.sum                # Dépendances vérifiées
 ├── crawler.go            # Code principal
-├── crawler_test.go       # 27 tests unitaires + 3 bancs d'essai
+├── crawler_test.go       # 28 tests unitaires + 3 bancs d'essai
 ├── README.md             # Ce fichier
+├── TN6-report.md         # Rapport (copie racine)
+├── chart/
+│   ├── go.mod
+│   └── main.go           # Génère data/benchmark-chart.png
+├── data/
+│   ├── benchmark-chart.png   # Graphique des benchmarks
+│   ├── bench-raw.txt
+│   ├── benchstat.txt
+│   ├── coverage.txt
+│   └── tests.txt
 └── docs/
     ├── TN6-report.md             # Rapport d'analyse
     ├── TN6-AI-Prompts.md         # Prompts IA utilisés
@@ -64,7 +74,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 |:---|:---:|:---|
 | Comptage HTML | 7 | `Simple`, `MultipleTags`, `IgnoreScript`, `IgnoreStyle`, `Empty`, `OnlyTags`, `Noscript` |
 | Récupération de pages | 5 | `Success`, `InvalidURL`, `Timeout`, `404`, `ReadError` |
-| Vérification robots.txt | 7 | `Allowed`, `NoFile`, `InvalidURL`, `Unreachable`, `InvalidBody`, `ReadBodyError`, `InvalidURLParse` |
+| Vérification robots.txt | 8 | `Allowed`, `NoFile`, `InvalidURL`, `Unreachable`, `InvalidBody`, `ReadBodyError`, `InvalidURLParse`, `FetchRobotsParseError` |
 | Exploration complète | 3 | `Integration`, `RobotsBlocked`, `ZeroGoroutines` |
 | crawlURL | 1 | `FetchError` |
 | Fonctions run/main | 4 | `RunFunction`, `RunFunctionWithErrors`, `RunFunctionMixedResults`, `MainFunction` |
@@ -92,6 +102,7 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | `TestCheckRobotsInvalidBody` | Corps valide de robots.txt parsé sans erreur |
 | `TestCheckRobotsReadBodyError` | Autorise si la lecture du corps robots.txt échoue |
 | `TestCheckRobotsInvalidURLParse` | Retourne false pour URL avec octet nul |
+| `TestFetchRobotsParseError` | Retourne nil quand `robotstxt.FromBytes` échoue (`Disallow` avant `User-agent`) |
 | `TestCrawlURLsIntegration` | Exploration complète de 2 pages locales |
 | `TestCrawlURLsRobotsBlocked` | URL bloquée par robots.txt retourne une erreur |
 | `TestCrawlURLsZeroGoroutines` | maxGoroutines ≤ 0 traité comme 1 |
