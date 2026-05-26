@@ -8,28 +8,19 @@
 
 ### 1.1 Architecture générale
 
-Le programme repose sur neuf fonctions à responsabilité unique (tableau 1), qui
+Le programme repose sur neuf fonctions à responsabilité unique, qui
 propagent les erreurs explicitement plutôt que de paniquer. Cette conception
 garantit qu'une URL défaillante n'interrompt pas l'exploration des autres, qu'il
 s'agisse d'un timeout HTTP, d'un code de statut non-200, d'une lecture interrompue
 ou d'une URL malformée. `CrawlURLs` orchestre l'exploration concurrente en lançant
 une goroutine par URL, bornée par un sémaphore. La logique principale est extraite
 dans `run()` pour permettre les tests unitaires sans modifier le comportement en
-production.
+production. La figure 1 illustre le flux d'exécution complet pour une URL, des deux
+points de décision jusqu'à l'agrégation des résultats par le consommateur unique.
 
-**Tableau 1 – Fonctions implémentées dans crawler.go**
+**Figure 1 – Flux d'exécution de crawlURL()**
 
-| Fonction | Description |
-|:---|:---|
-| `newHTTPClient()` | Crée un client HTTP avec délai d'expiration de 10 s |
-| `fetchRobots()` | Récupère et analyse `robots.txt` pour un hôte donné ; retourne `nil` si inaccessible |
-| `checkRobotsAllowed()` | Vérifie si `robots.txt` autorise l'exploration d'une URL ; gère le cache via `RWMutex` |
-| `fetchPage()` | Récupère le contenu HTML d'une URL via HTTP GET |
-| `countWordsHTML()` | Comptabilise les mots visibles (ignore `<script>`, `<style>`, `<noscript>`) |
-| `crawlURL()` | Vérifie `robots.txt`, applique le délai de politesse, récupère la page et envoie le résultat sur le canal |
-| `CrawlURLs()` | Orchestre l'exploration concurrente avec sémaphore et consommateur unique |
-| `run()` | Logique principale extraite de `main()` pour permettre les tests unitaires |
-| `main()` | Point d'entrée ; appelle `run()` avec la liste d'URLs par défaut |
+![Figure 1 – Flux d'exécution de crawlURL()](../asset/tn6-workflow-crawler.jpg)
 
 ### 1.2 Gestion de la concurrence
 
@@ -73,12 +64,11 @@ le tokeniseur.
 Le fichier `crawler_test.go` contient 28 tests unitaires et 3 bancs d'essai,
 atteignant une couverture de code de 100 %. Tous les tests s'appuient sur
 `httptest.NewServer` pour éliminer toute dépendance au réseau réel et garantir des
-résultats reproductibles. Deux exceptions ont nécessité des techniques spécifiques :
-`net.Listen` a été utilisé directement pour simuler une connexion TCP fermée après
-7 octets, seul moyen de couvrir le chemin d'erreur de `io.ReadAll` dans `fetchRobots` ;
-un serveur retournant un `robots.txt` avec `Disallow` avant `User-agent` a permis
-de déclencher l'erreur de `robotstxt.FromBytes`, couvrant le dernier chemin d'erreur
-de `fetchRobots`.
+résultats reproductibles. Une exception a nécessité l'utilisation directe de
+`net.Listen` pour simuler des comportements impossibles à reproduire avec un serveur
+HTTP standard, notamment un serveur qui déclare un corps de 1 000 octets, mais ferme
+la connexion après 7 octets, seul moyen de couvrir le chemin d'erreur de `io.ReadAll`
+dans `fetchRobots`.
 
 Les tests couvrent non seulement les chemins nominaux, mais aussi les cas limites
 les plus difficiles à provoquer. Le timeout de 10 secondes est vérifié par un
@@ -105,7 +95,7 @@ est appelé dans `BenchmarkCrawlGoroutinesMultiServer` et `BenchmarkCountWordsHT
 pour exclure le temps d'initialisation des serveurs de test. Le délai de politesse
 est désactivé (`politenessDelay = 0`) pour isoler l'effet du parallélisme. Les
 benchmarks ont été exécutés avec
-`go test -bench=Benchmark -benchmem -run=^$ -count=1` sur un Intel i5-10300H à
+`go test -bench=Benchmark -benchmem -run=^$ -count=6` sur un Intel i5-10300H à
 2,50 GHz (Windows/amd64).
 
 Deux scénarios distincts séparent deux sources de contention indépendantes.
@@ -115,7 +105,7 @@ serveur unique, introduisant une contention côté serveur.
 distincts pour mesurer le gain de parallélisme réel. `BenchmarkCountWordsHTML`
 mesure isolément le tokeniseur HTML sur une page de ~1 900 mots.
 
-**Tableau 2 – Résultats des benchmarks de crawl (benchstat, count=1)**
+**Tableau 2 – Résultats des benchmarks de crawl (benchstat, count=6)**
 
 | Configuration | Temps (ms) | Variance | Accélération vs 1G |
 |:---|:---:|:---:|:---:|
@@ -128,12 +118,12 @@ mesure isolément le tokeniseur HTML sur une page de ~1 900 mots.
 | Multi-serveurs, 4 goroutines | 0,92 | ± 1 % | 3,28× |
 | Multi-serveurs, 8 goroutines | 0,86 | ± 22 % | 3,52× |
 
-La figure 1 illustre visuellement le croisement des deux courbes à 2 goroutines,
+La figure 2 illustre visuellement le croisement des deux courbes à 2 goroutines,
 point à partir duquel les comportements divergent selon la source de contention.
 
-**Figure 1 – Temps d'exécution selon le nombre de goroutines**
+**Figure 2 – Temps d'exécution selon le nombre de goroutines**
 
-![Figure 1 – Temps d'exécution selon le nombre de goroutines](../data/benchmark-chart.png)
+![Figure 2 – Temps d'exécution selon le nombre de goroutines](../data/benchmark-chart.png)
 
 ### 3.2 Analyse
 
@@ -173,13 +163,13 @@ masqué l'effet du parallélisme dans les bancs d'essai. L'exposition de
 `politenessDelay` comme variable de paquet permet de le désactiver en test sans
 modifier le comportement en production.
 
-Atteindre 100 % de couverture a exigé de simuler trois comportements impossibles
-avec `httptest.NewServer` standard : une connexion TCP fermée avant la fin du
-transfert (via `net.Listen` directement) pour couvrir le chemin d'erreur de
-`io.ReadAll` ; un `robots.txt` contenant `Disallow` avant `User-agent` pour déclencher
-l'erreur de `robotstxt.FromBytes` ; et un octet nul dans l'URL pour forcer
-`url.Parse` à retourner une erreur. La testabilité de `main()` a été assurée via la
-variable de paquet `mainURLs`, substituable dans les tests sans appel réseau réel.
+Atteindre 100 % de couverture a exigé de simuler des comportements impossibles
+avec `httptest.NewServer`, notamment une connexion TCP fermée avant la fin du
+transfert, qui a nécessité l'utilisation directe de `net.Listen` pour contrôler
+précisément le comportement réseau simulé, et un octet nul dans l'URL, qui force
+`url.Parse` à retourner une erreur sans aucune infrastructure réseau. La testabilité
+de `main()` a été assurée via la variable de paquet `mainURLs`, substituable dans
+les tests sans appel réseau réel.
 
 ## 5. Conclusion
 
