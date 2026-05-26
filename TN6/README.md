@@ -31,19 +31,19 @@ La concurrence est gérée par des goroutines, un canal de résultats et un sém
 ├── crawler_test.go       # 28 tests unitaires + 3 bancs d'essai
 ├── README.md             # Ce fichier
 ├── TN6-report.md         # Rapport (copie racine)
-├── chart/
-│   ├── go.mod
-│   └── main.go           # Génère data/benchmark-chart.png
-├── data/
-│   ├── benchmark-chart.png   # Graphique des benchmarks
-│   ├── bench-raw.txt
-│   ├── benchstat.txt
-│   ├── coverage.txt
-│   └── tests.txt
-└── docs/
+├── chart/                        # Générateur de graphique de benchmarks
+│   ├── go.mod                    # Module Go du sous-projet chart
+│   └── main.go                   # Génère data/benchmark-chart.png
+├── data/                         # Résultats de tests et benchmarks
+│   ├── benchmark-chart.png       # Graphique des benchmarks
+│   ├── bench-raw.txt             # Données brutes des benchmarks
+│   ├── benchstat.txt             # Statistiques benchstat
+│   ├── coverage.txt              # Rapport de couverture de code
+│   └── tests.txt                 # Résultats des tests unitaires
+└── docs/                         # Documentation du projet
     ├── TN6-report.md             # Rapport d'analyse
     ├── TN6-AI-Prompts.md         # Prompts IA utilisés
-    └── TN6-Homework-Instructions.md
+    └── TN6-Homework-Instructions.md  # Énoncé du travail
 ```
 
 ## Prérequis
