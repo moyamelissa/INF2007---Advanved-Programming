@@ -18,8 +18,8 @@ import (
 var goroutines = []float64{0, 1, 2, 3} // positions X (1, 2, 4, 8 goroutines)
 var labels = []string{"1", "2", "4", "8"}
 
-var singleMS = []float64{2.87, 1.67, 5.91, 11.53}
-var multiMS = []float64{3.02, 1.52, 0.92, 0.86}
+var singleMS = []float64{1.91, 1.18, 3.09, 10.80}
+var multiMS = []float64{3.14, 1.72, 0.95, 0.71}
 
 // Palette mauve cohérente avec TN4
 var (

@@ -1,42 +1,41 @@
-goos: windows
-goarch: amd64
+﻿goarch: amd64
 pkg: webcrawler
 cpu: Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz
                                           │ data\bench-raw.txt │
-                                          │       sec/op       │
-CrawlGoroutines/1_goroutines-8                    2.872m ±  9%
-CrawlGoroutines/2_goroutines-8                    1.670m ±  9%
-CrawlGoroutines/4_goroutines-8                    5.906m ± 87%
-CrawlGoroutines/8_goroutines-8                    11.53m ± 13%
-CrawlGoroutinesMultiServer/1_goroutines-8         3.018m ±  8%
-CrawlGoroutinesMultiServer/2_goroutines-8         1.523m ±  5%
-CrawlGoroutinesMultiServer/4_goroutines-8         921.3µ ±  1%
-CrawlGoroutinesMultiServer/8_goroutines-8         856.8µ ± 22%
-CountWordsHTML-8                                  173.2µ ±  8%
-geomean                                           1.807m
+                                          │         sec/op          │
+CrawlGoroutines/1_goroutines-8                        1.905m ±   2%
+CrawlGoroutines/2_goroutines-8                        1.176m ±   7%
+CrawlGoroutines/4_goroutines-8                        3.094m ± 196%
+CrawlGoroutines/8_goroutines-8                        10.80m ±   6%
+CrawlGoroutinesMultiServer/1_goroutines-8             3.135m ±   7%
+CrawlGoroutinesMultiServer/2_goroutines-8             1.719m ±   5%
+CrawlGoroutinesMultiServer/4_goroutines-8             949.5µ ±   2%
+CrawlGoroutinesMultiServer/8_goroutines-8             705.6µ ±   2%
+CountWordsHTML-8                                      345.7µ ±  35%
+geomean                                               1.656m
 
                                           │ data\bench-raw.txt │
-                                          │        B/op        │
-CrawlGoroutines/1_goroutines-8                   216.6Ki ±  0%
-CrawlGoroutines/2_goroutines-8                   216.9Ki ±  0%
-CrawlGoroutines/4_goroutines-8                   304.8Ki ± 15%
-CrawlGoroutines/8_goroutines-8                   262.0Ki ±  8%
-CrawlGoroutinesMultiServer/1_goroutines-8        215.1Ki ±  0%
-CrawlGoroutinesMultiServer/2_goroutines-8        215.1Ki ±  0%
-CrawlGoroutinesMultiServer/4_goroutines-8        215.1Ki ±  0%
-CrawlGoroutinesMultiServer/8_goroutines-8        215.0Ki ±  0%
-CountWordsHTML-8                                 47.99Ki ±  0%
-geomean                                          193.8Ki
+                                          │          B/op           │
+CrawlGoroutines/1_goroutines-8                        153.7Ki ±  0%
+CrawlGoroutines/2_goroutines-8                        163.0Ki ±  0%
+CrawlGoroutines/4_goroutines-8                        258.0Ki ± 12%
+CrawlGoroutines/8_goroutines-8                        223.5Ki ±  2%
+CrawlGoroutinesMultiServer/1_goroutines-8             215.6Ki ±  0%
+CrawlGoroutinesMultiServer/2_goroutines-8             215.5Ki ±  0%
+CrawlGoroutinesMultiServer/4_goroutines-8             215.4Ki ±  0%
+CrawlGoroutinesMultiServer/8_goroutines-8             215.4Ki ±  0%
+CountWordsHTML-8                                      47.99Ki ±  0%
+geomean                                               174.4Ki
 
                                           │ data\bench-raw.txt │
-                                          │     allocs/op      │
-CrawlGoroutines/1_goroutines-8                     1.678k ± 0%
-CrawlGoroutines/2_goroutines-8                     1.679k ± 0%
-CrawlGoroutines/4_goroutines-8                     2.155k ± 2%
-CrawlGoroutines/8_goroutines-8                     2.171k ± 1%
-CrawlGoroutinesMultiServer/1_goroutines-8          1.673k ± 0%
-CrawlGoroutinesMultiServer/2_goroutines-8          1.673k ± 0%
-CrawlGoroutinesMultiServer/4_goroutines-8          1.672k ± 0%
-CrawlGoroutinesMultiServer/8_goroutines-8          1.663k ± 0%
-CountWordsHTML-8                                    204.0 ± 0%
-geomean                                            1.402k
+                                          │        allocs/op        │
+CrawlGoroutines/1_goroutines-8                          1.028k ± 0%
+CrawlGoroutines/2_goroutines-8                          1.122k ± 0%
+CrawlGoroutines/4_goroutines-8                          1.704k ± 3%
+CrawlGoroutines/8_goroutines-8                          1.825k ± 2%
+CrawlGoroutinesMultiServer/1_goroutines-8               1.675k ± 0%
+CrawlGoroutinesMultiServer/2_goroutines-8               1.675k ± 0%
+CrawlGoroutinesMultiServer/4_goroutines-8               1.672k ± 0%
+CrawlGoroutinesMultiServer/8_goroutines-8               1.664k ± 0%
+CountWordsHTML-8                                         204.0 ± 0%
+geomean                                                 1.214k

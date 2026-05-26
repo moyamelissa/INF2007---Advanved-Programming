@@ -20,7 +20,7 @@ points de décision jusqu'à l'agrégation des résultats par le consommateur un
 
 **Figure 1 – Flux d'exécution de crawlURL()**
 
-![Figure 1 – Flux d'exécution de crawlURL()](../asset/tn6-workflow-crawler.jpg)
+![Figure 1 – Flux d'exécution de crawlURL()](asset/tn6-workflow-crawler.jpg)
 
 ### 1.2 Gestion de la concurrence
 
@@ -133,26 +133,26 @@ mesure isolément le tokeniseur HTML sur une page de ~1 900 mots.
 
 | Configuration | Temps (ms) | Variance | Accélération vs 1G |
 |:---|:---:|:---:|:---:|
-| Serveur unique, 1 goroutine | 2,87 | ± 9 % | 1,00× |
-| Serveur unique, 2 goroutines | 1,67 | ± 9 % | 1,72× |
-| Serveur unique, 4 goroutines | 5,91 | ± 87 % | 0,49× |
-| Serveur unique, 8 goroutines | 11,53 | ± 13 % | 0,25× |
-| Multi-serveurs, 1 goroutine | 3,02 | ± 8 % | 1,00× |
-| Multi-serveurs, 2 goroutines | 1,52 | ± 5 % | 1,99× |
-| Multi-serveurs, 4 goroutines | 0,92 | ± 1 % | 3,28× |
-| Multi-serveurs, 8 goroutines | 0,86 | ± 22 % | 3,52× |
+| Serveur unique, 1 goroutine | 1,91 | ± 2 % | 1,00× |
+| Serveur unique, 2 goroutines | 1,18 | ± 7 % | 1,62× |
+| Serveur unique, 4 goroutines | 3,09 | ± 196 % | 0,62× |
+| Serveur unique, 8 goroutines | 10,80 | ± 6 % | 0,18× |
+| Multi-serveurs, 1 goroutine | 3,14 | ± 7 % | 1,00× |
+| Multi-serveurs, 2 goroutines | 1,72 | ± 5 % | 1,82× |
+| Multi-serveurs, 4 goroutines | 0,95 | ± 2 % | 3,30× |
+| Multi-serveurs, 8 goroutines | 0,71 | ± 2 % | 4,44× |
 
 La figure 2 illustre visuellement le croisement des deux courbes à 2 goroutines,
 point à partir duquel les comportements divergent selon la source de contention.
 
 **Figure 2 – Temps d'exécution selon le nombre de goroutines**
 
-![Figure 2 – Temps d'exécution selon le nombre de goroutines](../data/benchmark-chart.png)
+![Figure 2 – Temps d'exécution selon le nombre de goroutines](data/benchmark-chart.png)
 
 ### 3.2 Analyse
 
-Avec un serveur unique, les performances se dégradent au-delà de 2 goroutines. La
-variance de ± 87 % à 4 goroutines et la régression à 8 goroutines s'expliquent par
+Avec un serveur unique, les performances se dégradent au-delà de 2 goroutines.
+La variance de ± 196 % à 4 goroutines et la régression à 8 goroutines s'expliquent par
 le traitement séquentiel des connexions dans `httptest.NewServer`, qui transforme le
 surcroît de goroutines en surcoût de coordination. Ce comportement est un artefact
 du banc d'essai, non un défaut du crawler, mais il illustre un phénomène réel
@@ -161,23 +161,23 @@ lorsque plusieurs URLs partagent le même hôte.
 Les données brutes révèlent la cause : trois des six exécutions à 4 goroutines ont
 achévé en ~1,78 ms, mais les trois suivantes ont décroché à 4,4 ms, 8,6 ms et
 9,1 ms — une interférence de l'ordonnanceur Windows lors de l'exécution consécutive
-des benchmarks. La médiane benchstat (5,91 ms) est donc peu représentative pour
+des benchmarks. La médiane benchstat (3,09 ms) est donc peu représentative pour
 cette configuration. En contexte réseau réel, chaque hôte disposant de sa propre
 latence indépendante, ce décrochage ne se produirait pas.
 
-Avec 8 serveurs distincts, le gain atteint 3,52×. La progression de 3,02 ms à
-0,86 ms illustre le rendement décroissant attendu, où la portion séquentielle
+Avec 8 serveurs distincts, le gain atteint 4,44×. La progression de 3,14 ms à
+0,71 ms illustre le rendement décroissant attendu, où la portion séquentielle
 incompressible du programme limite les gains à mesure que le nombre de goroutines
-augmente. La variance de ± 22 % à 8 goroutines contre ± 1 % à 4 goroutines confirme
-que le planificateur Go et le coût de synchronisation des canaux deviennent les
-facteurs limitants.
+augmente. La faible variance (± 2 %) à 4 et 8 goroutines confirme la stabilité du
+planificateur Go en scénario multi-hôtes, où chaque goroutine accède à des
+ressources indépendantes.
 
-`BenchmarkCountWordsHTML` mesure 173 µs ± 8 % et 48 Ko pour 204 allocations,
+`BenchmarkCountWordsHTML` mesure 346 µs ± 35 % et 48 Ko pour 204 allocations,
 confirmant que le tokeniseur ne constitue pas un goulot d'étranglement face à une
-latence réseau qui le dépasse d'un facteur supérieur à 10.
+latence réseau réelle qui le dépasse d'un facteur supérieur à 10.
 
 La limite de performance du crawler est la latence réseau, non le parsing HTML ni
-la synchronisation des goroutines. L'accélération de 3,52× en scénario multi-hôtes
+la synchronisation des goroutines. L'accélération de 4,44× en scénario multi-hôtes
 confirme que l'architecture concurrente exploite efficacement le parallélisme
 disponible.
 
@@ -202,14 +202,22 @@ précisément le comportement réseau simulé, et un octet nul dans l'URL, qui f
 de `main()` a été assurée via la variable de paquet `mainURLs`, substituable dans
 les tests sans appel réseau réel.
 
+Avec plus de temps, nous aurions relancé les benchmarks sur une machine dédiée, sans
+processus en arrière-plan, avec une durée étendue (`-benchtime=5s`) pour stabiliser
+les mesures. La variance de ± 196 % à 4 goroutines et de ± 35 % pour
+`BenchmarkCountWordsHTML` témoigne d'interférences du planificateur Windows lors
+de l'exécution sur un poste de travail standard. Des résultats plus stables auraient
+permis de quantifier plus précisément le rendement décroissant au-delà de 4
+goroutines.
+
 ## 5. Conclusion
 
 Ce projet démontre comment la robustesse, la concurrence structurée et la mesure
 rigoureuse se combinent pour produire un crawler fiable et performant. Le patron
 producteur-consommateur unique élimine toute course aux données, le sémaphore
 bufferisé contrôle le degré de parallélisme et les 28 tests unitaires atteignent une
-couverture de 100 %. Les benchmarks confirment une accélération de 3,52× en scénario
-multi-hôtes et un parsing HTML de 173 µs pour 48 Ko alloués. La conformité à
+couverture de 100 %. Les benchmarks confirment une accélération de 4,44× en scénario
+multi-hôtes et un parsing HTML de 346 µs pour 48 Ko alloués. La conformité à
 `robots.txt` avec cache par hôte et délai de politesse configurable complète une
 implémentation correcte, performante et éthiquement responsable.
 
