@@ -14,7 +14,7 @@ import (
 	"gonum.org/v1/plot/vg/draw"
 )
 
-// Données benchstat (medians, count=1, politenessDelay=0, mai 2026)
+// Données benchstat (medians, count=6, politenessDelay=0, mai 2026)
 var goroutines = []float64{0, 1, 2, 3} // positions X (1, 2, 4, 8 goroutines)
 var labels = []string{"1", "2", "4", "8"}
 

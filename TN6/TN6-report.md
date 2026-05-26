@@ -95,7 +95,7 @@ est appelé dans `BenchmarkCrawlGoroutinesMultiServer` et `BenchmarkCountWordsHT
 pour exclure le temps d'initialisation des serveurs de test. Le délai de politesse
 est désactivé (`politenessDelay = 0`) pour isoler l'effet du parallélisme. Les
 benchmarks ont été exécutés avec
-`go test -bench=Benchmark -benchmem -run=^$ -count=1` sur un Intel i5-10300H à
+`go test -bench=Benchmark -benchmem -run=^$ -count=6` sur un Intel i5-10300H à
 2,50 GHz (Windows/amd64).
 
 Deux scénarios distincts séparent deux sources de contention indépendantes.
@@ -105,7 +105,7 @@ serveur unique, introduisant une contention côté serveur.
 distincts pour mesurer le gain de parallélisme réel. `BenchmarkCountWordsHTML`
 mesure isolément le tokeniseur HTML sur une page de ~1 900 mots.
 
-**Tableau 2 – Résultats des benchmarks de crawl (benchstat, count=1)**
+**Tableau 2 – Résultats des benchmarks de crawl (benchstat, count=6)**
 
 | Configuration | Temps (ms) | Variance | Accélération vs 1G |
 |:---|:---:|:---:|:---:|
