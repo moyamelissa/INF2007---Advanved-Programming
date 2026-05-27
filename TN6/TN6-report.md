@@ -24,22 +24,29 @@ points de décision jusqu'à l'agrégation des résultats par le consommateur un
 
 ### 1.2 Gestion de la concurrence
 
-`CrawlURLs` applique un patron producteur-consommateur : les goroutines de crawl
-publient des `CrawlResult` dans un canal bufferisé, puis un consommateur unique
-agrège `results`, `totalWords` et `errs`. Comme une seule goroutine écrit ces
-structures, cette partie est intrinsèquement thread-safe et ne nécessite pas de
-mutex.
+`CrawlURLs` combine le patron producteur-consommateur via canal et la
+synchronisation par mutex, conformément à la consigne du cours. Les goroutines
+publient leur `CrawlResult` dans un canal bufferisé (`resultsCh`). Après
+`wg.Wait()` et `close(resultsCh)`, un consommateur unique lit chaque résultat et
+verrouille un `sync.Mutex` pour mettre à jour `totalWords`, `results` et `errs`,
+respectant ainsi la synchronisation par mutex requise au Chapitre 8.
 
 ```go
-ch := make(chan CrawlResult, len(urls))
+resultsCh := make(chan CrawlResult, len(urls))
 
-for result := range ch {
+// Goroutines productrices :
+resultsCh <- crawlURL(targetURL, client, robotsCache, &cacheMu)
+
+// Consommateur unique (après wg.Wait + close) :
+for result := range resultsCh {
+    mu.Lock()
     if result.Err != nil {
         errs = append(errs, result.Err)
     } else {
         results[result.URL] = result.WordCount
         totalWords += result.WordCount
     }
+    mu.Unlock()
 }
 ```
 
