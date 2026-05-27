@@ -127,8 +127,8 @@ go test -bench="Benchmark" -benchmem -run="^$" -count=1 ./...
 | Mesure | Valeur |
 |--------|--------|
 | Couverture de code | 100 % |
-| Accélération optimale (multi-serveurs) | 3.52× (8 goroutines) |
-| Temps d'analyse HTML (~1 900 mots) | ~173 µs |
+| Accélération optimale (multi-serveurs) | 4.44× (8 goroutines) |
+| Temps d'analyse HTML (~1 900 mots) | ~346 µs |
 | Délai de politesse | 100 ms par URL |
 
 ## Liens
