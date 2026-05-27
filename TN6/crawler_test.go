@@ -338,11 +338,9 @@ func TestCrawlURLFetchError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	ch := make(chan CrawlResult, 1)
 	client := &http.Client{Timeout: 5 * time.Second}
-	crawlURL(server.URL+"/page", client, ch, nil, nil)
+	result := crawlURL(server.URL+"/page", client, nil, nil)
 
-	result := <-ch
 	if result.Err == nil {
 		t.Fatal("attendu une erreur pour HTTP 500")
 	}

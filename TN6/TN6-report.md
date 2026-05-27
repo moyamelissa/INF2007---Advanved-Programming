@@ -24,16 +24,20 @@ points de décision jusqu'à l'agrégation des résultats par le consommateur un
 
 ### 1.2 Gestion de la concurrence
 
-Plutôt qu'un mutex sur la map des résultats, l'implémentation retenue utilise le
-patron producteur-consommateur unique, où les goroutines déposent leurs résultats
-dans un canal bufferisé (`chan CrawlResult`) et une goroutine consommatrice unique
-les lit avec `for result := range ch`. Puisqu'une seule goroutine écrit dans la
-map et le compteur total, toute course aux données est structurellement impossible.
+Pour garantir l'atomicité de l'agrégation du compteur global (`totalWords`), un
+`sync.Mutex` est utilisé. Chaque goroutine, après avoir compté les mots d'une page
+via `crawlURL`, verrouille ce mutex pour mettre à jour `totalWords`, la map
+`results` et la slice `errs`. Cette approche assure la sécurité mémoire
+(thread-safety) conformément aux concepts de synchronisation vus au Chapitre 8 du
+manuel INF2007. Le mutex garantit qu'aucune écriture concurrente ne corrompt la
+somme globale, ce qui serait possible si plusieurs goroutines incrémentaient
+`totalWords` simultanément sans synchronisation.
 
-Un `sync.RWMutex` protège le cache `robots.txt` par hôte, où plusieurs goroutines
-lisent et écrivent simultanément. Le patron de double vérification, consistant à effectuer une lecture partagée,
-détecter un défaut de cache puis acquérir un verrou exclusif avant d'écrire,
-garantit l'exactitude sans bloquer les lectures concurrentes.
+Un `sync.RWMutex` distinct protège le cache `robots.txt` par hôte, où plusieurs
+goroutines lisent et écrivent simultanément. Le patron de double vérification,
+consistant à effectuer une lecture partagée, détecter un défaut de cache puis
+acquérir un verrou exclusif avant d'écrire, garantit l'exactitude sans bloquer les
+lectures concurrentes.
 
 ```go
 cacheMu.RLock()
@@ -54,7 +58,12 @@ if !found {
 
 Le parallélisme est borné par un sémaphore implémenté comme un canal bufferisé de
 capacité `maxGoroutines`. Chaque goroutine acquiert un jeton au démarrage et le
-libère via `defer`, évitant de saturer les ressources réseau ou le planificateur Go.
+libère via `defer`. Cette limitation est cruciale pour deux raisons : d'une part,
+elle préserve les ressources locales (descripteurs de fichiers, mémoire, threads du
+système d'exploitation) qui sont en nombre fini ; d'autre part, elle respecte les
+limites de connexions simultanées acceptées par les serveurs distants. Un crawler
+sans borne équivaudrait à un déni de service involontaire (DoS), risquant le
+blocage de l'adresse IP de l'explorateur.
 
 ```go
 semaphore := make(chan struct{}, maxGoroutines)
@@ -77,11 +86,16 @@ est désactivé dans les bancs d'essai pour isoler l'effet réel du parallélism
 ### 1.4 Comptage des mots
 
 `countWordsHTML()` lit le flux de jetons HTML séquentiellement avec
-`golang.org/x/net/html`, ce qui garantit un comportement correct face à du HTML
-malformé, contrairement à une expression régulière. Les balises `<script>`,
-`<style>` et `<noscript>` sont ignorées via un drapeau booléen activé à l'ouverture
-et réinitialisé à la fermeture. Les entités HTML sont décodées automatiquement par
-le tokeniseur.
+`golang.org/x/net/html` plutôt qu'avec une expression régulière. Ce choix est
+justifié par la fragilité des regex face au HTML réel : des balises non fermées,
+des attributs imbriques ou des entités spéciales comme `&amp;` peuvent facilement
+tromper un pattern régulier. Le tokeniseur, lui, traite le flux de manière
+séquentielle événement par événement, ce qui permet d'extraire uniquement le texte
+visible tout en ignorant de manière fiable les balises `<script>` et `<style>` qui
+fausseraient le décompte (code JavaScript ou règles CSS comptés comme des mots).
+Les entités HTML sont décodées automatiquement. Les balises `<noscript>` sont
+également ignorées via un drapeau booléen activé à l'ouverture et réinitialisé à
+la fermeture.
 
 ## 2. Tests unitaires
 
@@ -213,13 +227,14 @@ goroutines.
 ## 5. Conclusion
 
 Ce projet démontre comment la robustesse, la concurrence structurée et la mesure
-rigoureuse se combinent pour produire un crawler fiable et performant. Le patron
-producteur-consommateur unique élimine toute course aux données, le sémaphore
-bufferisé contrôle le degré de parallélisme et les 28 tests unitaires atteignent une
-couverture de 100 %. Les benchmarks confirment une accélération de 4,44× en scénario
-multi-hôtes et un parsing HTML de 346 µs pour 48 Ko alloués. La conformité à
-`robots.txt` avec cache par hôte et délai de politesse configurable complète une
-implémentation correcte, performante et éthiquement responsable.
+rigoureuse se combinent pour produire un crawler fiable et performant. Un
+`sync.Mutex` protège l'agrégation du compteur global `totalWords` contre les
+accès concurrents, le sémaphore bufferisé contrôle le degré de parallélisme et les
+28 tests unitaires atteignent une couverture de 100 %. Les benchmarks confirment
+une accélération de 4,44× en scénario multi-hôtes et un parsing HTML de 346 µs
+pour 48 Ko alloués. La conformité à `robots.txt` avec cache par hôte et délai de
+politesse configurable complète une implémentation correcte, performante et
+éthiquement responsable.
 
 ### Bibliographie
 

@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // countWords compte le nombre de mots dans une chaîne de caractères.
@@ -50,34 +51,36 @@ func splitIntoSegments(content string, segmentSize int) []string {
 }
 
 // countWordsInSegment est la fonction exécutée par chaque goroutine.
-// Elle compte les mots dans le segment donné et envoie le résultat sur le canal.
-func countWordsInSegment(segment string, ch chan<- int) {
-	ch <- countWords(segment)
+// Elle compte les mots dans le segment donné, puis additionne le résultat
+// à *total en tenant le mutex, avant de signaler la fin via wg.
+func countWordsInSegment(segment string, total *int, mu *sync.Mutex, wg *sync.WaitGroup) {
+	defer wg.Done()
+	count := countWords(segment)
+	mu.Lock()
+	*total += count
+	mu.Unlock()
 }
 
 // CountWordsConcurrent divise le contenu en segments et lance une goroutine par
-// segment pour compter les mots en parallèle. Les résultats sont récupérés via
-// un canal bufferisé et sommés dans la goroutine principale.
+// segment pour compter les mots en parallèle. L'agrégation sur totalWords est
+// protégée par un sync.Mutex conformément à la consigne.
 func CountWordsConcurrent(content string, segmentSize int) int {
 	segments := splitIntoSegments(content, segmentSize)
 	if len(segments) == 0 {
 		return 0
 	}
 
-	ch := make(chan int, len(segments))
+	var mu sync.Mutex
+	var totalWords int
+	var wg sync.WaitGroup
 
-	// Lancer une goroutine par segment
 	for _, seg := range segments {
-		go countWordsInSegment(seg, ch)
+		wg.Add(1)
+		go countWordsInSegment(seg, &totalWords, &mu, &wg)
 	}
 
-	// Récupérer les résultats depuis le canal
-	total := 0
-	for range segments {
-		total += <-ch
-	}
-
-	return total
+	wg.Wait()
+	return totalWords
 }
 
 // CountWordsConcurrentN divise le contenu en numWorkers segments de taille

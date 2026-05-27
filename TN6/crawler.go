@@ -160,17 +160,17 @@ func countWordsHTML(htmlContent string) int {
 }
 
 // crawlURL explore une URL unique : vérifie robots.txt, récupère la page,
-// et compte les mots. Envoie le résultat sur le canal ch.
+// et compte les mots. Retourne le résultat pour que l'appelant l'agrège
+// sous mutex.
 // Un délai de politesse configurable (politenessDelay) est appliqué après la
 // vérification robots.txt pour limiter la fréquence d'exploration.
-func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) {
+func crawlURL(targetURL string, client *http.Client, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) CrawlResult {
 	// Vérifier robots.txt avant d'explorer
 	if !checkRobotsAllowed(targetURL, client, cache, cacheMu) {
-		ch <- CrawlResult{
+		return CrawlResult{
 			URL: targetURL,
 			Err: fmt.Errorf("exploration interdite par robots.txt pour %s", targetURL),
 		}
-		return
 	}
 
 	// Délai de politesse configurable : limite la fréquence des requêtes vers chaque serveur
@@ -180,12 +180,11 @@ func crawlURL(targetURL string, client *http.Client, ch chan<- CrawlResult, cach
 
 	content, err := fetchPage(targetURL, client)
 	if err != nil {
-		ch <- CrawlResult{URL: targetURL, Err: err}
-		return
+		return CrawlResult{URL: targetURL, Err: err}
 	}
 
 	wordCount := countWordsHTML(content)
-	ch <- CrawlResult{URL: targetURL, WordCount: wordCount}
+	return CrawlResult{URL: targetURL, WordCount: wordCount}
 }
 
 // CrawlURLs explore une liste d'URL de manière concurrente en limitant le nombre
@@ -205,6 +204,11 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 	}
 
 	client := newHTTPClient()
+
+	// mu protège l'accès concurrent à results, totalWords et errs.
+	// Chaque goroutine verrouille mu après avoir compté les mots pour
+	// mettre à jour le compteur global conformément au Chapitre 8.
+	var mu sync.Mutex
 	results := make(map[string]int)
 	var totalWords int
 	var errs []error
@@ -213,7 +217,6 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 	robotsCache := make(map[string]*robotstxt.RobotsData)
 	var cacheMu sync.RWMutex
 
-	ch := make(chan CrawlResult, len(urls))
 	// Sémaphore pour limiter le nombre de goroutines concurrentes
 	semaphore := make(chan struct{}, maxGoroutines)
 
@@ -227,26 +230,21 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
-			crawlURL(targetURL, client, ch, robotsCache, &cacheMu)
+			result := crawlURL(targetURL, client, robotsCache, &cacheMu)
+
+			// Verrouiller le mutex pour mettre à jour les données partagées
+			mu.Lock()
+			if result.Err != nil {
+				errs = append(errs, result.Err)
+			} else {
+				results[result.URL] = result.WordCount
+				totalWords += result.WordCount
+			}
+			mu.Unlock()
 		}(u)
 	}
 
-	// Fermer le canal quand toutes les goroutines ont terminé
-	go func() {
-		wg.Wait()
-		close(ch)
-	}()
-
-	// Collecter les résultats depuis le canal (goroutine unique : pas de mutex nécessaire)
-	for result := range ch {
-		if result.Err != nil {
-			errs = append(errs, result.Err)
-		} else {
-			results[result.URL] = result.WordCount
-			totalWords += result.WordCount
-		}
-	}
-
+	wg.Wait()
 	return results, totalWords, errs
 }
 
