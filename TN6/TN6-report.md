@@ -24,14 +24,27 @@ points de décision jusqu'à l'agrégation des résultats par le consommateur un
 
 ### 1.2 Gestion de la concurrence
 
-Pour garantir l'atomicité de l'agrégation du compteur global (`totalWords`), un
-`sync.Mutex` est utilisé. Chaque goroutine, après avoir compté les mots d'une page
-via `crawlURL`, verrouille ce mutex pour mettre à jour `totalWords`, la map
-`results` et la slice `errs`. Cette approche assure la sécurité mémoire
-(thread-safety) conformément aux concepts de synchronisation vus au Chapitre 8 du
-manuel INF2007. Le mutex garantit qu'aucune écriture concurrente ne corrompt la
-somme globale, ce qui serait possible si plusieurs goroutines incrémentaient
-`totalWords` simultanément sans synchronisation.
+`CrawlURLs` combine le patron producteur-consommateur via canal et la
+synchronisation par mutex, conformément à la consigne. Les goroutines productrices
+envoient leur `CrawlResult` dans un canal bufferisé (`resultsCh`) sans se bloquer
+mutuellement. Après `wg.Wait()` et `close(resultsCh)`, un consommateur unique lit
+chaque résultat et verrouille un `sync.Mutex` pour mettre à jour `totalWords`,
+`results` et `errs` de façon sécurisée (thread-safe), conformément aux concepts
+de synchronisation du Chapitre 8 du manuel INF2007.
+
+```go
+resultsCh := make(chan CrawlResult, len(urls))
+
+// Goroutine productrice :
+resultsCh <- crawlURL(targetURL, client, robotsCache, &cacheMu)
+
+// Consommateur unique (après wg.Wait + close) :
+for result := range resultsCh {
+    mu.Lock()
+    // mise à jour de results, totalWords, errs
+    mu.Unlock()
+}
+```
 
 Un `sync.RWMutex` distinct protège le cache `robots.txt` par hôte, où plusieurs
 goroutines lisent et écrivent simultanément. Le patron de double vérification,

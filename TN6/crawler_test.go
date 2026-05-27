@@ -258,9 +258,9 @@ func TestCheckRobotsUnreachable(t *testing.T) {
 	}
 }
 
-// TestCheckRobotsInvalidBody vérifie qu'un robots.txt valide (User-agent: * / Allow: /)
+// TestCheckRobotsValidBody vérifie qu'un robots.txt valide (User-agent: * / Allow: /)
 // est correctement parsé et que checkRobotsAllowed retourne true sans panique.
-func TestCheckRobotsInvalidBody(t *testing.T) {
+func TestCheckRobotsValidBody(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/robots.txt" {
 			w.Header().Set("Content-Type", "text/plain")

@@ -215,6 +215,10 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 
 	client := newHTTPClient()
 
+	// resultsCh transporte les CrawlResult des goroutines productrices vers
+	// le consommateur unique — patron producteur-consommateur via channel.
+	resultsCh := make(chan CrawlResult, len(urls))
+
 	// mu protège l'accès concurrent à results, totalWords et errs.
 	// Chaque goroutine verrouille mu après avoir compté les mots pour
 	// mettre à jour le compteur global conformément au Chapitre 8.
@@ -240,21 +244,27 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
-			result := crawlURL(targetURL, client, robotsCache, &cacheMu)
-
-			// Verrouiller le mutex pour mettre à jour les données partagées
-			mu.Lock()
-			if result.Err != nil {
-				errs = append(errs, result.Err)
-			} else {
-				results[result.URL] = result.WordCount
-				totalWords += result.WordCount
-			}
-			mu.Unlock()
+			// Envoyer le résultat dans le canal : la goroutine est productrice
+			resultsCh <- crawlURL(targetURL, client, robotsCache, &cacheMu)
 		}(u)
 	}
 
+	// Fermer resultsCh dès que toutes les goroutines ont envoyé leur résultat
 	wg.Wait()
+	close(resultsCh)
+
+	// Consommateur unique : agrège sous mutex pour garantir la sécurité mémoire
+	for result := range resultsCh {
+		mu.Lock()
+		if result.Err != nil {
+			errs = append(errs, result.Err)
+		} else {
+			results[result.URL] = result.WordCount
+			totalWords += result.WordCount
+		}
+		mu.Unlock()
+	}
+
 	return results, totalWords, errs
 }
 
