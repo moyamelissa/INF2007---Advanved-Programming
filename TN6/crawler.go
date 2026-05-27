@@ -78,6 +78,9 @@ func checkRobotsAllowed(targetURL string, client *http.Client, cache map[string]
 		if !found {
 			r = fetchRobots(parsed.Scheme, host, client)
 			cacheMu.Lock()
+			// Double vérification : une autre goroutine a pu remplir le cache
+			// entre le RUnlock et ce Lock — on utilise sa valeur plutôt que
+			// d'écraser et d'envoyer une requête redondante.
 			if _, alreadyCached := cache[host]; !alreadyCached {
 				cache[host] = r
 			} else {
@@ -97,6 +100,9 @@ func checkRobotsAllowed(targetURL string, client *http.Client, cache map[string]
 }
 
 // fetchPage récupère le contenu HTML d'une URL.
+// http.Client ne retourne pas d'erreur pour les codes 4xx/5xx — le statut
+// doit donc être vérifié explicitement pour détecter les pages inexistantes
+// ou les erreurs serveur.
 func fetchPage(targetURL string, client *http.Client) (string, error) {
 	resp, err := client.Get(targetURL)
 	if err != nil {
@@ -122,7 +128,10 @@ func fetchPage(targetURL string, client *http.Client) (string, error) {
 func countWordsHTML(htmlContent string) int {
 	tokenizer := html.NewTokenizer(strings.NewReader(htmlContent))
 	count := 0
-	// skipTags contient les balises dont le contenu textuel doit être ignoré
+	// skipTags liste les balises dont le contenu textuel doit être ignoré :
+	// <script> et <style> contiennent du code JS ou des règles CSS qui
+	// fausseraient le décompte ; <noscript> affiche du contenu alternatif
+	// non pertinent pour l'analyse sémantique.
 	skipTags := map[string]bool{
 		"script":   true,
 		"style":    true,
@@ -165,7 +174,8 @@ func countWordsHTML(htmlContent string) int {
 // Un délai de politesse configurable (politenessDelay) est appliqué après la
 // vérification robots.txt pour limiter la fréquence d'exploration.
 func crawlURL(targetURL string, client *http.Client, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) CrawlResult {
-	// Vérifier robots.txt avant d'explorer
+	// Respecter robots.txt avant d'explorer : l'ignorer constituerait
+	// une violation de l'étiquette web et potentiellement des CGU du site.
 	if !checkRobotsAllowed(targetURL, client, cache, cacheMu) {
 		return CrawlResult{
 			URL: targetURL,
