@@ -59,9 +59,11 @@ func fetchRobots(scheme, host string, client *http.Client) *robotstxt.RobotsData
 }
 
 // checkRobotsAllowed vérifie si le chemin d'une URL est autorisé par robots.txt.
-// Retourne true si l'exploration est permise, false sinon.
+// Retourne false si l'URL ne peut pas être parsée (comportement sécuritaire).
+// Retourne true si robots.txt est inaccessible, introuvable ou invalide
+// (permissif par défaut, conformément à la convention RFC 9309).
 // Si cache et cacheMu sont fournis (non nil), robots.txt est mis en cache par hôte
-// pour éviter les requêtes répétées. En cas d'erreur, on autorise par défaut.
+// pour éviter les requêtes répétées.
 func checkRobotsAllowed(targetURL string, client *http.Client, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) bool {
 	parsed, err := url.Parse(targetURL)
 	if err != nil {
@@ -168,9 +170,9 @@ func countWordsHTML(htmlContent string) int {
 	}
 }
 
-// crawlURL explore une URL unique : vérifie robots.txt, récupère la page,
-// et compte les mots. Retourne le résultat pour que l'appelant l'agrège
-// sous mutex.
+// crawlURL explore une URL unique : vérifie robots.txt, récupère la page
+// et compte les mots. Retourne un CrawlResult que l'appelant envoie dans
+// le canal résultats.
 // Un délai de politesse configurable (politenessDelay) est appliqué après la
 // vérification robots.txt pour limiter la fréquence d'exploration.
 func crawlURL(targetURL string, client *http.Client, cache map[string]*robotstxt.RobotsData, cacheMu *sync.RWMutex) CrawlResult {
@@ -219,9 +221,10 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 	// le consommateur unique — patron producteur-consommateur via channel.
 	resultsCh := make(chan CrawlResult, len(urls))
 
-	// mu protège l'accès concurrent à results, totalWords et errs.
-	// Chaque goroutine verrouille mu après avoir compté les mots pour
-	// mettre à jour le compteur global conformément au Chapitre 8.
+	// mu protège results, totalWords et errs lors de l'agrégation.
+	// Le consommateur est séquentiel (goroutine unique après close), donc mu
+	// n'est pas strictement nécessaire ici — il est conservé pour démontrer
+	// explicitement la synchronisation par mutex requise par l'énoncé (Ch. 8).
 	var mu sync.Mutex
 	results := make(map[string]int)
 	var totalWords int
@@ -253,7 +256,9 @@ func CrawlURLs(urls []string, maxGoroutines int) (map[string]int, int, []error) 
 	wg.Wait()
 	close(resultsCh)
 
-	// Consommateur unique : agrège sous mutex pour garantir la sécurité mémoire
+	// Consommateur unique : agrège sous mutex pour satisfaire la consigne
+	// (pattern canal + mutex du Ch. 8) ; le verrou est redondant ici car
+	// ce bloc s'exécute séquentiellement après close(resultsCh).
 	for result := range resultsCh {
 		mu.Lock()
 		if result.Err != nil {
