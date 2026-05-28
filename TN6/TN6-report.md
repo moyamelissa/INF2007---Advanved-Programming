@@ -72,27 +72,16 @@ if !found {
 }
 ```
 
-Le parallélisme est borné par un sémaphore implémenté comme un canal bufferisé de
-capacité `maxGoroutines`. Chaque goroutine acquiert un jeton au démarrage et le
-libère via `defer`. Cette borne limite la pression sur les ressources locales et
-sur les serveurs distants.
-
-```go
-semaphore := make(chan struct{}, maxGoroutines)
-semaphore <- struct{}{}
-defer func() { <-semaphore }()
-```
+Le parallélisme est borné par un sémaphore (canal bufferisé de capacité
+`maxGoroutines`). Chaque goroutine acquiert un jeton au démarrage et le libère
+via `defer`.
 
 ### 1.3 Respect de robots.txt
 
-`checkRobotsAllowed()` délègue la récupération à `fetchRobots()`, qui retourne
-`nil` si le fichier est absent ou inaccessible, autorisant l'exploration par défaut
-conformément à la convention standard. Les résultats sont mis en cache par hôte
-pour éviter des requêtes répétées vers `/robots.txt`.
-
-Un délai de politesse de 100 ms (`politenessDelay`) est appliqué avant chaque
-requête principale pour limiter la fréquence des accès aux serveurs explorés. Il
-est désactivé dans les bancs d'essai pour isoler l'effet réel du parallélisme.
+`checkRobotsAllowed()` délègue à `fetchRobots()`, qui retourne `nil` si le fichier
+est absent ou inaccessible. L'exploration est autorisée par défaut (RFC 9309). Les
+résultats sont mis en cache par hôte. Un délai de politesse de 100 ms
+(`politenessDelay`) limite la fréquence des requêtes en production.
 
 ### 1.4 Comptage des mots
 
@@ -108,14 +97,14 @@ HTML sont décodées automatiquement.
 Le fichier `crawler_test.go` contient 28 tests unitaires et 3 bancs d'essai,
 pour une couverture de 100 %. La majorité des tests utilise
 `httptest.NewServer` afin de supprimer la dépendance au réseau réel et d'assurer
-la reproductibilité ; un cas spécifique emploie `net.Listen` pour simuler une
+la reproductibilité. Un cas spécifique emploie `net.Listen` pour simuler une
 connexion interrompue (corps annoncé à 1 000 octets, fermeture après 7) et
 couvrir l'erreur de lecture `io.ReadAll` dans `fetchRobots`.
 
-Les tests couvrent les chemins nominaux et les cas limites critiques : timeout
-client, réponse 404 (`http.Client` ne signalant pas les 4xx comme erreurs), URL
+Les tests couvrent les chemins nominaux et les cas limites critiques, notamment le timeout
+client, la réponse 404 (`http.Client` ne signalant pas les 4xx comme erreurs), l'URL
 injoignable via `127.0.0.1:1` (port fermé, erreur déterministe sans dépendance
-DNS), et octet nul pour forcer l'échec de `url.Parse` dans `checkRobotsAllowed`.
+DNS) et l'octet nul forçant l'échec de `url.Parse` dans `checkRobotsAllowed`.
 
 La testabilité de `main()` repose sur `mainURLs`, variable de paquet
 temporairement remplacée par une URL locale puis restaurée avec `defer`. La
@@ -134,7 +123,7 @@ désactivé (`politenessDelay = 0`) afin d'isoler l'effet du parallélisme. Les
 benchmarks ont été exécutés avec `go test -bench=Benchmark -benchmem -run=^$ -count=6`
 sur un Intel i5-10300H à 2,50 GHz (Windows/amd64).
 
-Deux scénarios isolent des contentions différentes : `BenchmarkCrawlGoroutines`
+Deux scénarios isolent des contentions différentes. `BenchmarkCrawlGoroutines`
 compare 1, 2, 4 et 8 goroutines sur 8 URLs vers un serveur unique (contention
 côté serveur), tandis que `BenchmarkCrawlGoroutinesMultiServer` répète la même
 comparaison avec 8 serveurs distincts pour mesurer le parallélisme effectif.
@@ -170,8 +159,8 @@ s'expliquent surtout par la contention dans le serveur de test
 coordination. C'est principalement un artefact de banc d'essai, mais cohérent
 avec le cas réel où plusieurs URLs partagent un même hôte.
 
-Les données brutes à 4 goroutines confirment cette instabilité : trois exécutions
-autour de 1,78 ms, puis 4,4 ms, 8,6 ms et 9,1 ms, vraisemblablement sous
+Les données brutes à 4 goroutines confirment cette instabilité. Trois exécutions
+autour de 1,78 ms précèdent 4,4 ms, 8,6 ms et 9,1 ms, vraisemblablement sous
 interférence de l'ordonnanceur Windows. La médiane benchstat (3,09 ms) reste
 donc peu représentative pour cette configuration.
 
@@ -181,42 +170,34 @@ Le rendement reste décroissant, comme attendu quand la part séquentielle devie
 dominante.
 
 `BenchmarkCountWordsHTML` (346 µs ± 35 %, 48 Ko, 204 allocations) montre que le
-parsing HTML n'est pas le goulot principal ; la limite de performance du crawler
+parsing HTML n'est pas le goulot principal. La limite de performance du crawler
 demeure la latence réseau, ce que confirme le gain 4,44× en multi-hôtes.
 
 ## 4. Défis et optimisations
 
-Sans cache de `robots.txt`, chaque URL aurait refait une requête vers
-`/robots.txt`. Un cache par hôte protégé par `sync.RWMutex`, avec double
-vérification (lecture partagée puis verrou exclusif en cas de défaut), supprime
-ces accès redondants sans bloquer les lectures concurrentes.
-
-Le délai de politesse de 100 ms, nécessaire en production, fausserait les
-benchmarks ; `politenessDelay` est donc exposé comme variable de paquet pour être
-désactivé en test sans changer le comportement réel.
+Le cache `robots.txt` (§1.2) et la variable `politenessDelay` (§1.3) ont résolu
+deux défis liés. Le cache élimine les requêtes redondantes vers `/robots.txt` et
+`politenessDelay` isole le parallélisme dans les benchmarks sans modifier le
+comportement en production.
 
 Pour atteindre 100 % de couverture, certains cas ont nécessité des simulations
-hors `httptest.NewServer` : connexion TCP interrompue via `net.Listen` pour
-forcer une erreur de lecture, octet nul pour faire échouer `url.Parse`, et
-substitution de `mainURLs` pour tester `main()` sans réseau externe.
+hors `httptest.NewServer`. Ces simulations comprennent une connexion TCP
+interrompue via `net.Listen` pour forcer une erreur de lecture, un octet nul
+pour faire échouer `url.Parse` et la substitution de `mainURLs` pour tester
+`main()` sans réseau externe.
 
 Avec plus de temps, les benchmarks auraient été relancés sur machine dédiée avec
 `-benchtime=5s`. Les variances observées (± 196 % à 4 goroutines, ± 35 % pour
-`BenchmarkCountWordsHTML`) indiquent une interférence du planificateur Windows ;
-des mesures plus stables auraient mieux quantifié le rendement décroissant
+`BenchmarkCountWordsHTML`) indiquent une interférence du planificateur Windows.
+Des mesures plus stables auraient mieux quantifié le rendement décroissant
 au-delà de 4 goroutines.
 
 ## 5. Conclusion
 
-Ce projet démontre comment la robustesse, la concurrence structurée et la mesure
-rigoureuse se combinent pour produire un crawler fiable et performant. Un
-`sync.Mutex` protège l'agrégation du compteur global `totalWords` contre les
-accès concurrents, le sémaphore bufferisé contrôle le degré de parallélisme et les
-28 tests unitaires atteignent une couverture de 100 %. Les benchmarks confirment
-une accélération de 4,44× en scénario multi-hôtes et un parsing HTML de 346 µs
-pour 48 Ko alloués. La conformité à `robots.txt` avec cache par hôte et délai de
-politesse configurable complète une implémentation correcte, performante et
-éthiquement responsable.
+Ce projet démontre comment robustesse, concurrence structurée et mesure rigoureuse
+se combinent en un crawler fiable. Il atteint 4,44× d'accélération en multi-hôtes, 100 %
+de couverture sur 28 tests et le respect de `robots.txt` avec cache par hôte et
+délai de politesse configurable.
 
 ### Bibliographie
 
