@@ -113,9 +113,9 @@ connexion interrompue (corps annoncé à 1 000 octets, fermeture après 7) et
 couvrir l'erreur de lecture `io.ReadAll` dans `fetchRobots`.
 
 Les tests couvrent les chemins nominaux et les cas limites critiques : timeout
-client, réponse 404 (`http.Client` ne signalant pas les 4xx comme erreurs), et
-URL invalide via octet nul pour forcer l'échec de `url.Parse` dans
-`checkRobotsAllowed`.
+client, réponse 404 (`http.Client` ne signalant pas les 4xx comme erreurs), URL
+injoignable via `127.0.0.1:1` (port fermé, erreur déterministe sans dépendance
+DNS), et octet nul pour forcer l'échec de `url.Parse` dans `checkRobotsAllowed`.
 
 La testabilité de `main()` repose sur `mainURLs`, variable de paquet
 temporairement remplacée par une URL locale puis restaurée avec `defer`. La
@@ -126,10 +126,10 @@ résultats mixtes), ce qui couvre ses deux branches d'affichage.
 
 ### 3.1 Protocole et résultats
 
-Les données de test sont générées hors de la boucle `b.N` et `b.ReportAllocs()`
+Les données de test sont générées hors de la boucle `b.N`, `b.ReportAllocs()`
 confirme l'absence d'allocations parasites pendant la mesure, et `b.ResetTimer()`
-est utilisé dans `BenchmarkCrawlGoroutinesMultiServer` et
-`BenchmarkCountWordsHTML` pour exclure l'initialisation. Le délai de politesse est
+est utilisé dans les trois benchmarks pour exclure le temps d'initialisation
+(création du serveur et des URLs). Le délai de politesse est
 désactivé (`politenessDelay = 0`) afin d'isoler l'effet du parallélisme. Les
 benchmarks ont été exécutés avec `go test -bench=Benchmark -benchmem -run=^$ -count=6`
 sur un Intel i5-10300H à 2,50 GHz (Windows/amd64).

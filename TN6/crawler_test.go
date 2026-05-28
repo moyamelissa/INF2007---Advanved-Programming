@@ -94,12 +94,14 @@ func TestFetchPageSuccess(t *testing.T) {
 	}
 }
 
-// TestFetchPageInvalidURL vérifie la gestion d'erreur pour une URL invalide.
+// TestFetchPageInvalidURL vérifie la gestion d'erreur pour une URL injoignable.
+// Utilise 127.0.0.1:1 (port fermé) pour une erreur de connexion déterministe,
+// sans dépendance au DNS externe.
 func TestFetchPageInvalidURL(t *testing.T) {
 	client := &http.Client{Timeout: 2 * time.Second}
-	_, err := fetchPage("http://url-invalide-qui-nexiste-pas.xyz", client)
+	_, err := fetchPage("http://127.0.0.1:1/page", client)
 	if err == nil {
-		t.Fatal("une erreur était attendue pour une URL invalide, mais aucune erreur retournée")
+		t.Fatal("une erreur était attendue pour une URL injoignable, mais aucune erreur retournée")
 	}
 }
 
@@ -278,27 +280,26 @@ func TestCheckRobotsValidBody(t *testing.T) {
 	}
 }
 
-// TestFetchPageReadError vérifie la gestion d'erreur quand le corps de la réponse
-// ne peut pas être lu complètement (connexion interrompue).
+// TestFetchPageReadError vérifie que fetchPage retourne une erreur quand
+// le corps de la réponse ne peut pas être lu complètement (connexion TCP
+// interrompue après les en-têtes HTTP).
 func TestFetchPageReadError(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Length", "10000")
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "partial")
-		// Le serveur ferme la connexion avant d'envoyer Content-Length octets
-		if f, ok := w.(http.Flusher); ok {
-			f.Flush()
-		}
-	}))
-	defer server.Close()
-
-	client := &http.Client{Timeout: 5 * time.Second}
-	_, err := fetchPage(server.URL, client)
-	// fetchPage peut lire partiellement ou retourner une erreur selon l'implémentation HTTP.
-	// On vérifie que la fonction ne panique pas et retourne soit un contenu partiel soit une erreur.
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	go func() {
+		conn, _ := ln.Accept()
+		defer conn.Close()
+		// HTTP 200 avec Content-Length 1000 mais seulement 7 octets envoyés
+		_, _ = conn.Write([]byte("HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\npartial"))
+		_ = ln.Close()
+	}()
+	serverURL := "http://" + ln.Addr().String()
+	client := &http.Client{Timeout: 2 * time.Second}
+	_, err = fetchPage(serverURL, client)
 	if err == nil {
-		// comportement acceptable — lecture partielle sans erreur
-		return
+		t.Fatal("une erreur était attendue pour une lecture de corps interrompue")
 	}
 }
 
@@ -500,6 +501,7 @@ func BenchmarkCrawlGoroutines(b *testing.B) {
 	for _, g := range []int{1, 2, 4, 8} {
 		b.Run(fmt.Sprintf("%d_goroutines", g), func(b *testing.B) {
 			b.ReportAllocs()
+			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				CrawlURLs(urls, g)
 			}
