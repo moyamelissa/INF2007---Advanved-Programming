@@ -29,7 +29,7 @@ synchronisation par mutex, conformément à la consigne du cours. Les goroutines
 publient leur `CrawlResult` dans un canal bufferisé (`resultsCh`). Après
 `wg.Wait()` et `close(resultsCh)`, un consommateur unique lit chaque résultat et
 verrouille un `sync.Mutex` pour mettre à jour `totalWords`, `results` et `errs`,
-respectant ainsi la synchronisation par mutex requise au Chapitre 8.
+respectant ainsi la synchronisation par mutex.
 
 ```go
 resultsCh := make(chan CrawlResult, len(urls))
