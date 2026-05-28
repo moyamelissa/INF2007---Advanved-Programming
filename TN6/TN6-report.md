@@ -99,7 +99,7 @@ pour une couverture de 100 %. La majorité des tests utilise
 `httptest.NewServer` afin de supprimer la dépendance au réseau réel et d'assurer
 la reproductibilité. Un cas spécifique emploie `net.Listen` pour simuler une
 connexion interrompue (corps annoncé à 1 000 octets, fermeture après 7) et
-couvrir l'erreur de lecture `io.ReadAll` dans `fetchRobots`.
+couvrir l'erreur de lecture `io.ReadAll` dans `fetchRobots` et `fetchPage`.
 
 Les tests couvrent les chemins nominaux et les cas limites critiques, notamment le timeout
 client, la réponse 404 (`http.Client` ne signalant pas les 4xx comme erreurs), l'URL
