@@ -84,8 +84,3 @@ E = 4.44 / 8 = 0.555 -> 55.5%
 Interprétation : bon gain global, mais avec rendement décroissant (normal en parallèle).
 
 ---
-
-## 5) Recommandation de traçabilité
-
-Dans le rapport, chaque fois qu'une valeur dérivée est citée (accélération, médiane, pourcentage),
-indiquer la formule en note courte et renvoyer vers ce fichier de calculs.
