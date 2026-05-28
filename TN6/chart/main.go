@@ -21,7 +21,6 @@ var labels = []string{"1", "2", "4", "8"}
 var singleMS = []float64{1.91, 1.18, 3.09, 10.80}
 var multiMS = []float64{3.14, 1.72, 0.95, 0.71}
 
-// Palette mauve cohérente avec TN4
 var (
 	colorSingle = color.RGBA{R: 106, G: 62, B: 160, A: 255}  // violet foncé — serveur unique
 	colorMulti  = color.RGBA{R: 160, G: 132, B: 210, A: 255} // lavande — multi-serveurs
